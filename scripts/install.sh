@@ -55,8 +55,16 @@ if [ "$UNINSTALL" = "1" ]; then
 
   if [ -d "$INSTALL_DIR" ]; then
     log "Removing clone at $INSTALL_DIR..."
-    rm -rf "$INSTALL_DIR"
-    ok "Removed clone: $INSTALL_DIR"
+    # Try standard rm first, fall back to chmod + rm
+    if ! rm -rf "$INSTALL_DIR" 2>/dev/null; then
+      chmod -R u+w "$INSTALL_DIR" 2>/dev/null
+      rm -rf "$INSTALL_DIR" 2>/dev/null || true
+    fi
+    if [ ! -d "$INSTALL_DIR" ]; then
+      ok "Removed clone: $INSTALL_DIR"
+    else
+      warn "Could not fully remove $INSTALL_DIR — try: chmod -R u+w $INSTALL_DIR && rm -rf $INSTALL_DIR"
+    fi
   fi
   ok "Uninstall complete. Restart Zcode to pick up changes."
   exit 0
