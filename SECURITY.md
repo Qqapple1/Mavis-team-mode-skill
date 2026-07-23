@@ -71,7 +71,7 @@ The skill is a "best effort" recreation. Limitations:
 
 2. **Pin to a specific version**:
    ```bash
-   MAVIS_TEAM_REF=v1.3.1 bash install.sh
+   MAVIS_TEAM_REF=v1.3.6 bash install.sh
    ```
 
 3. **Run with no network** when possible:

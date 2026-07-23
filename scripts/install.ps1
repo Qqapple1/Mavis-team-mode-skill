@@ -17,7 +17,7 @@ param(
     [string]$RepoUrl = "https://github.com/Qqapple1/Mavis-team-mode-skill.git"
 )
 
-$VERSION = "1.3.5"
+$VERSION = "1.3.6"
 $SKILL_NAME = "mavis-team-mode"
 $ZCODE_SKILLS_DIR = "$env:USERPROFILE\.zcode\skills"
 $ZCODE_LINK = "$ZCODE_SKILLS_DIR\$SKILL_NAME"
