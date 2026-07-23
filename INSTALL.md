@@ -6,10 +6,10 @@
 
 ```bash
 # macOS / Linux
-curl -fsSL https://raw.githubusercontent.com/YOUR_USERNAME/mavis-team-mode-skill/main/scripts/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/Qqapple1/Mavis-team-mode-skill/main/scripts/install.sh | bash
 
 # 或先下载再跑（更安全，能看到脚本干了什么）
-curl -fsSL https://raw.githubusercontent.com/YOUR_USERNAME/mavis-team-mode-skill/main/scripts/install.sh -o install.sh
+curl -fsSL https://raw.githubusercontent.com/Qqapple1/Mavis-team-mode-skill/main/scripts/install.sh -o install.sh
 bash install.sh
 ```
 
@@ -21,14 +21,14 @@ bash install.sh
 
 **如果没 `curl` 用 `wget`**：
 ```bash
-wget -qO- https://raw.githubusercontent.com/YOUR_USERNAME/mavis-team-mode-skill/main/scripts/install.sh | bash
+wget -qO- https://raw.githubusercontent.com/Qqapple1/Mavis-team-mode-skill/main/scripts/install.sh | bash
 ```
 
 ## 方式 2：手动 git clone + 软链
 
 ```bash
 # 1. Clone 仓库到本地
-git clone https://github.com/YOUR_USERNAME/mavis-team-mode-skill.git ~/mavis-team-mode-skill
+git clone https://github.com/Qqapple1/Mavis-team-mode-skill.git ~/mavis-team-mode-skill
 
 # 2. 软链到 Zcode skills 目录
 mkdir -p ~/.zcode/skills
@@ -45,8 +45,8 @@ ls -la ~/.zcode/skills/mavis-team-mode/
 
 ```bash
 # 1. Clone 或下载 zip
-git clone https://github.com/YOUR_USERNAME/mavis-team-mode-skill.git /tmp/mavis-team-mode-skill
-# 或：wget https://github.com/YOUR_USERNAME/mavis-team-mode-skill/archive/main.zip && unzip main.zip
+git clone https://github.com/Qqapple1/Mavis-team-mode-skill.git /tmp/mavis-team-mode-skill
+# 或：wget https://github.com/Qqapple1/Mavis-team-mode-skill/archive/main.zip && unzip main.zip
 
 # 2. 复制到 Zcode skills 目录
 mkdir -p ~/.zcode/skills
@@ -61,11 +61,11 @@ cp -r /tmp/mavis-team-mode-skill ~/.zcode/skills/mavis-team-mode
 
 ```bash
 # 方式 A：在 Claude Code 里安装这个 skill
-/plugin marketplace add YOUR_USERNAME/mavis-team-mode-skill
-/plugin install mavis-team-mode@YOUR_USERNAME
+/plugin marketplace add Qqapple1/Mavis-team-mode-skill
+/plugin install mavis-team-mode@Qqapple1
 
 # 方式 B：手动放到 Claude Code 目录
-git clone https://github.com/YOUR_USERNAME/mavis-team-mode-skill.git ~/.claude/skills/mavis-team-mode
+git clone https://github.com/Qqapple1/Mavis-team-mode-skill.git ~/.claude/skills/mavis-team-mode
 
 # Zcode 自动扫描 ~/.claude/skills/（按 SKILL.md 兼容性导入）
 ls -la ~/.zcode/skills/
@@ -76,7 +76,7 @@ ls -la ~/.zcode/skills/
 
 ```bash
 # 通用 skills 安装器（Claude Code / Codex / Cursor 共用）
-npx skills add https://github.com/YOUR_USERNAME/mavis-team-mode-skill --skill mavis-team-mode
+npx skills add https://github.com/Qqapple1/Mavis-team-mode-skill --skill mavis-team-mode
 ```
 
 **注意**：Zcode 本身**没有**类似 `gh skill install` 的内置命令，方式 5 实际上还是会写入 `~/.claude/skills/` 或 `~/.codex/skills/`，Zcode 再自动导入。

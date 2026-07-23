@@ -23,7 +23,7 @@ set -euo pipefail
 INSTALLER_VERSION="1.2.0"
 
 # ---- Config ----
-REPO_URL="${MAVIS_TEAM_REPO:-https://github.com/YOUR_USERNAME/mavis-team-mode-skill.git}"
+REPO_URL="${MAVIS_TEAM_REPO:-https://github.com/Qqapple1/Mavis-team-mode-skill.git}"
 SKILL_NAME="mavis-team-mode"
 INSTALL_DIR="${MAVIS_TEAM_DIR:-${HOME}/mavis-team-mode-skill}"
 ZCODE_SKILLS_DIR="${HOME}/.zcode/skills"

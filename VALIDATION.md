@@ -97,7 +97,7 @@ ls ~/.zcode/skills/mavis-team-mode 2>/dev/null && echo "✗ still there" || echo
 ## 8. CI 验证（推送 GitHub 后）
 
 ```bash
-git remote add origin https://github.com/YOUR_USERNAME/mavis-team-mode-skill.git
+git remote add origin https://github.com/Qqapple1/Mavis-team-mode-skill.git
 git push -u origin main
 ```
 

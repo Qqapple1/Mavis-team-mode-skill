@@ -14,7 +14,7 @@
 
 Email: security@example.com (replace with real address before publishing)
 Or use GitHub Security Advisories (private disclosure):
-https://github.com/YOUR_USERNAME/mavis-team-mode-skill/security/advisories/new
+https://github.com/Qqapple1/Mavis-team-mode-skill/security/advisories/new
 
 Include:
 - Description of the vulnerability
@@ -63,7 +63,7 @@ The skill is a "best effort" recreation. Limitations:
 
 1. **Review the skill before installing**:
    ```bash
-   git clone https://github.com/YOUR_USERNAME/mavis-team-mode-skill
+   git clone https://github.com/Qqapple1/Mavis-team-mode-skill
    less mavis-team-mode-skill/SKILL.md
    less mavis-team-mode-skill/agents/leader.md
    ```
@@ -88,4 +88,4 @@ The skill is a "best effort" recreation. Limitations:
 ## Reporting issues with the skill itself
 
 For non-security bugs, use the standard GitHub issue tracker:
-https://github.com/YOUR_USERNAME/mavis-team-mode-skill/issues
+https://github.com/Qqapple1/Mavis-team-mode-skill/issues
