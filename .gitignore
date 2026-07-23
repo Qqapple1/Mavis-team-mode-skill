@@ -26,3 +26,8 @@ htmlcov/
 
 # Local install tracking
 .installed
+
+# Build artifacts
+dist/
+.package-stage/
+token-benchmark.json

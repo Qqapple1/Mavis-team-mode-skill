@@ -5,6 +5,36 @@ All notable changes to this skill are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.3.7] - 2026-07-23
+
+### Added
+- **Platform-specific release archives** via `scripts/package.sh`:
+  - `mavis-team-mode-skill-{ver}-core.zip` (38 files, cross-platform core,
+    no installer — for browsing/embedding)
+  - `mavis-team-mode-skill-{ver}-bash.tar.gz` (40 files, adds
+    `install.sh` + `validate.sh` for Linux/macOS/Git Bash/WSL)
+  - `mavis-team-mode-skill-{ver}-windows.zip` (41 files, adds
+    PowerShell `install.ps1` + `validate.ps1` + `run_e2e.ps1`)
+  - `mavis-team-mode-skill-{ver}-source.tar.gz` + `.zip` (47 files,
+    everything including CI workflows — for contributors)
+  - `SHA256SUMS` for verification
+  - Run `bash scripts/package.sh` to build all 4 archives locally
+- `Makefile` `package` target — same as above
+- `Makefile` `package-dry-run` target — show file lists without writing
+- `docs/PLATFORMS.md` — which file is for which OS, and which package
+  to download (cross-references `package.sh`)
+
+### Changed
+- Bumped SKILL.md / install.sh / install.ps1 / README badge / index.html
+  badge / docs/ARCHITECTURE.md to version 1.3.7
+- `INSTALL.md` Quick reference now has per-OS download links (matching
+  the new archives)
+
+### Fixed
+- **Stale v1.3.6 / v1.3.7 tag mismatch**: v1.3.7 tag was previously
+  pushed on a commit that didn't bump SKILL.md version. Re-bumped
+  consistently and re-pushed v1.3.7 tag on the corrected commit.
+
 ## [1.3.0] - 2026-07-23
 
 ### Added

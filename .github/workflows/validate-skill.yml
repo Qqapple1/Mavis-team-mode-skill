@@ -367,3 +367,77 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Total**: $total files" >> $GITHUB_STEP_SUMMARY
           cat $GITHUB_STEP_SUMMARY
+
+  # ============ Build platform-specific release archives ============
+  package:
+    name: Build release archives
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install zip
+        run: sudo apt-get update -qq && sudo apt-get install -y zip
+
+      - name: Build archives
+        run: bash scripts/package.sh
+
+      - name: Verify archive contents
+        run: |
+          echo "### Archive contents" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          for f in dist/*.zip dist/*.tar.gz; do
+            if [ -f "$f" ]; then
+              size=$(du -h "$f" | awk '{print $1}')
+              count=$(tar -tzf "$f" 2>/dev/null | wc -l || unzip -l "$f" 2>/dev/null | tail -1 | awk '{print $2}')
+              echo "- \`$(basename $f)\`: $count entries, $size" >> $GITHUB_STEP_SUMMARY
+            fi
+          done
+          cat $GITHUB_STEP_SUMMARY
+
+      - name: Test bash archive
+        run: |
+          tar -xzf dist/mavis-team-mode-skill-*-bash.tar.gz -C /tmp
+          ls /tmp/mavis-team-mode-skill-*/
+          /tmp/mavis-team-mode-skill-*/scripts/install.sh --version
+
+      - name: Test core archive
+        run: |
+          mkdir -p /tmp/core-test
+          unzip -q dist/mavis-team-mode-skill-*-core.zip -d /tmp/core-test
+          # Verify no install scripts leaked into core
+          if [ -f /tmp/core-test/mavis-team-mode-skill-*/scripts/install.sh ]; then
+            echo "ERROR: install.sh should not be in core archive"
+            exit 1
+          fi
+          if [ -f /tmp/core-test/mavis-team-mode-skill-*/scripts/install.ps1 ]; then
+            echo "ERROR: install.ps1 should not be in core archive"
+            exit 1
+          fi
+          # Verify SKILL.md + agents are there
+          test -f /tmp/core-test/mavis-team-mode-skill-*/SKILL.md || { echo "SKILL.md missing"; exit 1; }
+          test -d /tmp/core-test/mavis-team-mode-skill-*/agents || { echo "agents/ missing"; exit 1; }
+          echo "core archive: clean (no installers) ✓"
+
+      - name: Verify SHA256SUMS
+        run: |
+          cd dist
+          for f in *.zip *.tar.gz; do
+            [ -f "$f" ] || continue
+            expected=$(grep "$f" SHA256SUMS | awk '{print $1}')
+            actual=$(sha256sum "$f" | awk '{print $1}')
+            if [ "$expected" != "$actual" ]; then
+              echo "FAIL: $f checksum mismatch"
+              echo "  expected: $expected"
+              echo "  actual:   $actual"
+              exit 1
+            fi
+            echo "  ✓ $f"
+          done
+          echo "All SHA256 checksums match"
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-archives
+          path: dist/
+          retention-days: 14

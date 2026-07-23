@@ -138,15 +138,8 @@ prototype-stop: ## Stop the prototype server
 	@echo "Stopped"
 
 # ---- Clean ----
-.PHONY: clean
-clean: ## Remove __pycache__ and other build artifacts
-	find . -name "__pycache__" -type d -not -path "./.git/*" -exec rm -rf {} + 2>/dev/null || true
-	find . -name "*.pyc" -not -path "./.git/*" -delete 2>/dev/null || true
-	find . -name "*.pyo" -not -path "./.git/*" -delete 2>/dev/null || true
-	@echo "Cleaned"
-
 .PHONY: clean-all
-clean-all: clean prototype-stop uninstall ## Clean everything (incl. install + server)
+clean-all: clean prototype-stop uninstall clean-dist ## Clean everything (incl. install + server + dist)
 
 # ---- Info ----
 .PHONY: info
@@ -164,6 +157,26 @@ stats: ## Show file count by type
 	@echo "Bash:     $$(find . -name '*.sh' -not -path './.git/*' | wc -l | tr -d ' ')"
 	@echo "YAML:     $$(find . -name '*.yml' -not -path './.git/*' | wc -l | tr -d ' ')"
 	@echo "HTML:     $$(find . -name '*.html' -not -path './.git/*' | wc -l | tr -d ' ')"
+
+# ---- Packaging ----
+.PHONY: package
+package: ## Build platform-specific archives to dist/
+	bash scripts/package.sh
+
+.PHONY: package-dry-run
+package-dry-run: ## Show which files would go into each package (no write)
+	bash scripts/package.sh --dry-run
+
+.PHONY: clean-dist
+clean-dist: ## Remove dist/ directory
+	rm -rf dist/
+
+.PHONY: clean
+clean: ## Remove __pycache__ and other build artifacts
+	find . -name "__pycache__" -type d -not -path "./.git/*" -exec rm -rf {} + 2>/dev/null || true
+	find . -name "*.pyc" -not -path "./.git/*" -delete 2>/dev/null || true
+	find . -name "*.pyo" -not -path "./.git/*" -delete 2>/dev/null || true
+	@echo "Cleaned"
 
 # ---- Default ----
 .DEFAULT_GOAL := help
