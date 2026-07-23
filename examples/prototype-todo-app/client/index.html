@@ -198,7 +198,7 @@ async function api(method, path, body) {
 
 function renderTags(tags) {
   tagsEl.innerHTML = tags
-    .map(t => `<div class="tag" data-tag="${t}">#${escapeHtml(t)}</div>`)
+    .map(t => `<div class="tag" data-tag="${escapeHtml(t)}">#${escapeHtml(t)}</div>`)
     .join("");
   document.querySelectorAll(".tag").forEach(el => {
     el.addEventListener("click", () => {

@@ -55,31 +55,38 @@ cp -r /tmp/mavis-team-mode-skill ~/.zcode/skills/mavis-team-mode
 # 3. 重启 Zcode
 ```
 
-## 方式 4：通过 Claude Code 间接安装
+## 方式 4：跨工具通用（已知支持 Claude Code）
 
-如果你**已经**在用 Claude Code，并且有 `~/.claude/skills/mavis-team-mode`：
+Zcode 3.0 的官方文档说"如果你已经在 Claude Code、Codex CLI、OpenClaw、Augment、Windsurf 里维护过技能，可以直接导入 ZCode，支持软链或复制两种方式"。但**这个 skill 没在真实的 Claude Code + Zcode 双工具环境里测过跨工具路径**——下面的步骤是按文档描述写的，不保证 work。
 
 ```bash
-# 方式 A：在 Claude Code 里安装这个 skill
-/plugin marketplace add Qqapple1/Mavis-team-mode-skill
-/plugin install mavis-team-mode@Qqapple1
+# 假设你已经在 Claude Code 里用过这个 skill
+# （1）软链路径 A：把 Zcode 的 skill 目录指向 Claude Code 的位置
+ln -s ~/.claude/skills/mavis-team-mode ~/.zcode/skills/mavis-team-mode
 
-# 方式 B：手动放到 Claude Code 目录
-git clone https://github.com/Qqapple1/Mavis-team-mode-skill.git ~/.claude/skills/mavis-team-mode
+# （2）软链路径 B：把 Claude Code 指向 Zcode 的位置
+ln -s ~/.zcode/skills/mavis-team-mode ~/.claude/skills/mavis-team-mode
 
-# Zcode 自动扫描 ~/.claude/skills/（按 SKILL.md 兼容性导入）
-ls -la ~/.zcode/skills/
-# 应该看到 mavis-team-mode -> ~/.claude/skills/mavis-team-mode
+# 任选一种，验证
+ls -la ~/.zcode/skills/mavis-team-mode/SKILL.md
+ls -la ~/.claude/skills/mavis-team-mode/SKILL.md
 ```
 
-## 方式 5：npx skills CLI（如果装了）
+如果两边都已经有同名的目录，**先备份再删**——Zcode 的 symlink 是覆盖式：
 
 ```bash
-# 通用 skills 安装器（Claude Code / Codex / Cursor 共用）
+# 备份再覆盖
+mv ~/.claude/skills/mavis-team-mode ~/.claude/skills/mavis-team-mode.bak
+ln -s ~/.zcode/skills/mavis-team-mode ~/.claude/skills/mavis-team-mode
+```
+
+## 方式 5：npx skills CLI（**未验证**）
+
+```bash
 npx skills add https://github.com/Qqapple1/Mavis-team-mode-skill --skill mavis-team-mode
 ```
 
-**注意**：Zcode 本身**没有**类似 `gh skill install` 的内置命令，方式 5 实际上还是会写入 `~/.claude/skills/` 或 `~/.codex/skills/`，Zcode 再自动导入。
+**这个 CLI 的存在和确切行为**没有在我的环境里验证过。如果失败，请改用方式 2（手动 git clone + 软链），那是最稳的。
 
 ## 验证安装
 

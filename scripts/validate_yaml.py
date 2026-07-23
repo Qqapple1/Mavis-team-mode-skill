@@ -169,6 +169,19 @@ def validate_file(path):
         if not SEMVER_RE.match(ver):
             issues.append(("WARN", f"version '{ver}' is not semver (expected X.Y.Z)"))
 
+    # allowed-tools (or tools) — both spellings seen in the wild
+    for key in ("allowed-tools", "tools"):
+        if key in data:
+            val = data[key]
+            if not isinstance(val, list):
+                issues.append(("WARN", f"{key} must be a list, got {type(val).__name__}"))
+            elif not val:
+                issues.append(("WARN", f"{key} is empty (no tools allowed?)"))
+            else:
+                for tool in val:
+                    if not isinstance(tool, str) or not tool.strip():
+                        issues.append(("WARN", f"{key} contains non-string: {tool!r}"))
+
     return issues
 
 

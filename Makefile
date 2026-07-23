@@ -11,7 +11,7 @@ SKILL_DIR := $(shell pwd)
 ZCODE_SKILLS_DIR := $(HOME)/.zcode/skills
 ZCODE_LINK := $(ZCODE_SKILLS_DIR)/mavis-team-mode
 INSTALL_DIR := $(HOME)/mavis-team-mode-skill
-REPO_URL ?= https://github.com/YOUR_USERNAME/mavis-team-mode-skill.git
+REPO_URL ?= https://github.com/Qqapple1/Mavis-team-mode-skill.git
 GIT_REF ?=
 
 # ---- Help target ----

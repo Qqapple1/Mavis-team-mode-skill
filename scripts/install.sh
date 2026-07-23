@@ -256,6 +256,11 @@ install() {
   if [ -n "$GIT_REF" ]; then
     log "Checking out ref: $GIT_REF"
     cd "$INSTALL_DIR"
+    # Unshallow if needed: shallow clones can't fetch arbitrary refs
+    if git rev-parse --is-shallow-repository 2>/dev/null | grep -q true; then
+      log "  unshallowing repository to enable ref fetch..."
+      git fetch --unshallow origin 2>&1 | tail -3 || true
+    fi
     if ! git fetch --depth 1 origin "$GIT_REF" 2>&1 | tail -3; then
       die "Failed to fetch ref $GIT_REF"
     fi

@@ -4,16 +4,17 @@
 
 | Version | Supported           |
 |---------|---------------------|
-| 1.1.x   | ✅ Active           |
-| 1.0.x   | ⚠️ Critical fixes only |
+| 1.3.x   | ✅ Active           |
+| 1.2.x   | ✅ Active           |
+| 1.1.x   | ⚠️ Critical fixes only |
+| 1.0.x   | ❌ No longer supported |
 | < 1.0   | ❌ No longer supported |
 
 ## Reporting a vulnerability
 
 **Please do NOT file a public issue for security vulnerabilities.**
 
-Email: security@example.com (replace with real address before publishing)
-Or use GitHub Security Advisories (private disclosure):
+Use GitHub Security Advisories (private disclosure):
 https://github.com/Qqapple1/Mavis-team-mode-skill/security/advisories/new
 
 Include:
@@ -70,7 +71,7 @@ The skill is a "best effort" recreation. Limitations:
 
 2. **Pin to a specific version**:
    ```bash
-   MAVIS_TEAM_REF=v1.1.0 bash install.sh
+   MAVIS_TEAM_REF=v1.3.1 bash install.sh
    ```
 
 3. **Run with no network** when possible:

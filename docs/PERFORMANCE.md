@@ -24,20 +24,35 @@ So why use the skill? **Time, not tokens.**
 
 ## Why speed matters more than tokens
 
-The 6-phase workflow (`Plan → Dispatch → Integrate → Verify → Iterate → Deliver`) gives:
+> **Honest framing**: the table below is a **theoretical projection** based
+> on the parallel architecture, not measured data. Real Zcode benchmarks
+> have not been performed — see the "Running the benchmark" section
+> below for what HAS been measured (the token cost).
 
-| Workflow                   | Plain prompt | With this skill | Speedup |
-|----------------------------|--------------|------------------|---------|
-| Refactor 1500-line module  | 45 min       | 20 min           | 2.25x   |
-| Add tag filter to Todo app | 30 min       | 12 min           | 2.5x    |
-| Multi-file bug hunt        | 60 min       | 30 min           | 2x      |
-| Research + implement       | 90 min       | 45 min           | 2x      |
+The 6-phase workflow (`Plan → Dispatch → Integrate → Verify → Iterate → Deliver`) **theoretically** gives:
 
-Speedup sources:
+| Workflow                   | Plain prompt (est.) | With this skill (est.) | Speedup |
+|----------------------------|---------------------|------------------------|---------|
+| Refactor 1500-line module  | 45 min              | 20 min                 | ~2.25x  |
+| Add tag filter to Todo app | 30 min              | 12 min                 | ~2.5x   |
+| Multi-file bug hunt        | 60 min              | 30 min                 | ~2x     |
+| Research + implement       | 90 min              | 45 min                 | ~2x     |
+
+**These are estimates, not measurements.** To get real numbers, you need:
+1. A headless Zcode environment
+2. A standardized task suite
+3. A baseline (no skill) + treatment (with skill) comparison
+4. Wall-clock timing of end-to-end completion
+
+The architecture (5 parallel workers + 1 verifier) **suggests** an upper
+bound of ~5x for purely parallel work, reduced to ~2-2.5x by
+integration/verify overhead. But "suggests" is not "measured".
+
+Speedup sources (theoretical):
 1. **Parallelism** — Workers dispatch concurrently. A 4-step task
    that took 20 min serially takes ~5 min in parallel (5x speedup
    on that axis alone), but integration + verify overhead brings
-   the real-world average to 2-2.5x.
+   the real-world average to ~2-2.5x.
 2. **Structured planning** — The 6-phase template reduces clarifying
    back-and-forth.
 3. **Specialized prompts** — Each Worker gets a tight, role-specific
@@ -141,5 +156,5 @@ Output is approximate. Real BPE tokens vary by model.
 ## See also
 
 - [ARCHITECTURE](ARCHITECTURE.md) — flow diagrams + decision boundaries
-- [ADR-001 Team Mode Recreation](../ADR-001-team-mode-recreation.md)
-- [ADR-002 Security Posture](../ADR-002-security.md)
+- [ADR-001 Team Mode Recreation](ADR-001-team-mode-recreation.md)
+- [ADR-002 Security Posture](ADR-002-security.md)

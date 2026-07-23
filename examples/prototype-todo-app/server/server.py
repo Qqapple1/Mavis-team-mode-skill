@@ -120,12 +120,12 @@ class TodoHandler(BaseHTTPRequestHandler):
         try:
             raw = self.rfile.read(length)
         except OSError as e:
-            self._send_error(400, f"read error: {e}")
+            self._send_error(400, "read error")
             return None
         try:
             return json.loads(raw)
         except json.JSONDecodeError as e:
-            self._send_error(400, f"invalid JSON: {e}")
+            self._send_error(400, "invalid JSON")
             return None
 
     def do_OPTIONS(self):
@@ -263,6 +263,10 @@ def main():
     except OSError as e:
         print(f"[!] Failed to bind: {e}")
         sys.exit(1)
+    # Defense-in-depth: socket timeout prevents slowloris-style hangs
+    # when reading slow/malicious clients. 30s is generous for local
+    # use; tune down if you need faster failure detection.
+    server.timeout = 30
     try:
         server.serve_forever()
     except KeyboardInterrupt:

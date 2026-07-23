@@ -160,10 +160,12 @@ Prototype server 默认：
 
 详见 [docs/PERFORMANCE.md](docs/PERFORMANCE.md)。
 
-实测加速：
-- 重构 1500 行模块：45 min → 20 min
-- 加 tag filter：30 min → 12 min
-- 多文件 bug 排查：60 min → 30 min
+理论加速（基于"4 个 parallel subagent + 1 个 verifier" 的最坏情况推导）：
+
+- 1 个 Leader 加 4 个并行 Worker = 5x 串行
+- 减去 dispatch / integrate / verify overhead = 实际 ~2-2.5x
+- 这个数字**没有真在 Zcode 上 benchmark 过**，是纸面推算
+- 真要测需要 headless Zcode + 一组标准化任务——见路线图
 
 ## 路线图
 
