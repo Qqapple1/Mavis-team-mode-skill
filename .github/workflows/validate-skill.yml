@@ -24,7 +24,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-latest, macos-latest, windows-latest]
     steps:
       - uses: actions/checkout@v4
 
@@ -78,6 +78,141 @@ jobs:
 
       - name: YAML validation
         run: python scripts/validate_yaml.py
+
+  # ============ Windows compatibility test ============
+  windows-install:
+    name: Windows install (PowerShell)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Test PowerShell install script syntax
+        shell: pwsh
+        run: |
+          $tokens = $null
+          $errors = $null
+          [System.Management.Automation.Language.Parser]::ParseFile(
+            '${{ github.workspace }}/scripts/install.ps1',
+            [ref]$tokens,
+            [ref]$errors
+          ) | Out-Null
+          if ($errors.Count -gt 0) {
+            Write-Host 'PowerShell syntax errors:'
+            $errors | ForEach-Object { Write-Host $_ }
+            exit 1
+          }
+          Write-Host 'install.ps1 syntax OK'
+
+      - name: Test PowerShell validate script syntax
+        shell: pwsh
+        run: |
+          $tokens = $null
+          $errors = $null
+          [System.Management.Automation.Language.Parser]::ParseFile(
+            '${{ github.workspace }}/scripts/validate.ps1',
+            [ref]$tokens,
+            [ref]$errors
+          ) | Out-Null
+          if ($errors.Count -gt 0) {
+            Write-Host 'PowerShell syntax errors:'
+            $errors | ForEach-Object { Write-Host $_ }
+            exit 1
+          }
+          Write-Host 'validate.ps1 syntax OK'
+
+      - name: Test PowerShell run_e2e script syntax
+        shell: pwsh
+        run: |
+          $tokens = $null
+          $errors = $null
+          [System.Management.Automation.Language.Parser]::ParseFile(
+            '${{ github.workspace }}/examples/prototype-todo-app/run_e2e.ps1',
+            [ref]$tokens,
+            [ref]$errors
+          ) | Out-Null
+          if ($errors.Count -gt 0) {
+            Write-Host 'PowerShell syntax errors:'
+            $errors | ForEach-Object { Write-Host $_ }
+            exit 1
+          }
+          Write-Host 'run_e2e.ps1 syntax OK'
+
+      - name: Run install.ps1 (copy mode)
+        shell: pwsh
+        run: |
+          $env:MAVIS_TEAM_REPO = '${{ github.workspace }}'
+          $env:MAVIS_TEAM_DIR = "$env:USERPROFILE\mavis-team-mode-skill-test"
+          & ./scripts/install.ps1 -NoVerify
+
+      - name: Verify install (PowerShell)
+        shell: pwsh
+        run: |
+          & ./scripts/install.ps1 -Doctor
+
+      - name: Run install (--copy explicit)
+        shell: pwsh
+        run: |
+          # Force copy mode
+          $env:MAVIS_TEAM_FORCE_COPY = '1'
+          & ./scripts/install.ps1 -NoVerify
+
+      - name: Test server starts on Windows
+        shell: pwsh
+        run: |
+          $server = Start-Process python -ArgumentList 'examples/prototype-todo-app/server/server.py' -PassThru -NoNewWindow -RedirectStandardOutput 'server.log' -RedirectStandardError 'server.err.log'
+          Write-Host "Server PID: $($server.Id)"
+          Start-Sleep -Seconds 3
+          try {
+            $r = Invoke-WebRequest -Uri 'http://127.0.0.1:8765/api/health' -UseBasicParsing -TimeoutSec 5
+            if ($r.StatusCode -eq 200) {
+              Write-Host 'Server is healthy'
+            } else {
+              Write-Host "Server returned $($r.StatusCode)"
+              exit 1
+            }
+          } catch {
+            Write-Host "Server did not respond: $_"
+            Get-Content server.log -ErrorAction SilentlyContinue
+            Get-Content server.err.log -ErrorAction SilentlyContinue
+            exit 1
+          } finally {
+            Stop-Process -Id $server.Id -Force -ErrorAction SilentlyContinue
+          }
+
+      - name: Run e2e tests on Windows
+        shell: pwsh
+        run: |
+          $server = Start-Process python -ArgumentList 'examples/prototype-todo-app/server/server.py' -PassThru -NoNewWindow -RedirectStandardOutput 'server.log' -RedirectStandardError 'server.err.log'
+          Start-Sleep -Seconds 3
+          try {
+            # Run each test file
+            $totalPass = 0
+            $totalFail = 0
+            foreach ($testFile in @('test_e2e.py', 'test_e2e_extended.py', 'test_e2e_advanced.py')) {
+              Write-Host "Running $testFile..."
+              $output = python "examples/prototype-todo-app/$testFile" 2>&1
+              $output | ForEach-Object { Write-Host $_ }
+              $lastLines = $output | Select-Object -Last 5
+              foreach ($line in $lastLines) {
+                if ($line -match 'Passed:\s*(\d+)') { $totalPass += [int]$matches[1] }
+                if ($line -match 'Failed:\s*(\d+)') { $totalFail += [int]$matches[1] }
+              }
+            }
+            Write-Host "Total: Passed=$totalPass Failed=$totalFail"
+            if ($totalFail -gt 0) { exit 1 }
+          } finally {
+            Stop-Process -Id $server.Id -Force -ErrorAction SilentlyContinue
+          }
+
+      - name: Test uninstall
+        shell: pwsh
+        run: |
+          & ./scripts/install.ps1 -Uninstall
 
   # ============ Full integration test (Linux only — most thorough) ============
   integration:

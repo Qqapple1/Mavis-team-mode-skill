@@ -82,7 +82,58 @@ kill %1
 # （Zcode 靠 description 匹配自动加载；不需要 /mavis-team-mode 命令）
 ```
 
-## 安装
+## 🚀 Quick Start for Windows（如果你是 Windows 用户）
+
+有 3 个选项，从最简单到最原生：
+
+### 选项 A：Git Bash（最简单，推荐）
+
+1. 装 [Git for Windows](https://git-scm.com/download/win)
+2. 装 [Python 3.8+ for Windows](https://www.python.org/downloads/windows/)（**必须**勾 "Add Python to PATH"）
+3. 装 [Zcode Windows 版](https://zcode-ai.com) (3.4.2+)
+4. 打开 **Git Bash**（**不是** PowerShell / CMD），跑：
+
+```bash
+git clone https://github.com/Qqapple1/Mavis-team-mode-skill.git ~/mavis-team-mode-skill
+cd ~/mavis-team-mode-skill
+bash scripts/install.sh
+```
+
+### 选项 B：PowerShell（不用装 Git Bash）
+
+打开 PowerShell，跑：
+
+```powershell
+git clone https://github.com/Qqapple1/Mavis-team-mode-skill.git $env:USERPROFILE\mavis-team-mode-skill
+cd $env:USERPROFILE\mavis-team-mode-skill
+powershell -ExecutionPolicy Bypass -File scripts\install.ps1
+```
+
+### 选项 C：WSL2（功能最全）
+
+```powershell
+# 一次性：管理员 PowerShell
+wsl --install
+# 重启
+```
+
+```bash
+# Ubuntu terminal 里
+git clone https://github.com/Qqapple1/Mavis-team-mode-skill.git ~/mavis-team-mode-skill
+cd ~/mavis-team-mode-skill
+bash scripts/install.sh
+```
+
+**区别**：
+| 方案 | Symlink | PowerShell | 难度 |
+|---|---|---|---|
+| Git Bash | copy（默认）/ symlink（设 MSYS env） | 不需要 | ⭐ 最简单 |
+| PowerShell | copy | 原生 | ⭐⭐ |
+| WSL2 | 真 symlink | 不需要（Linux bash） | ⭐⭐⭐ |
+
+**详细 Windows 指南**：见 [docs/WINDOWS.md](docs/WINDOWS.md)
+
+## 安装 (macOS / Linux)
 
 5 种方式，详见 [INSTALL.md](INSTALL.md)：
 
