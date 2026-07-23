@@ -62,13 +62,6 @@ if [ -n "${MAVIS_TEAM_FORCE_COPY:-}" ] || [ "${1:-}" = "--copy" ]; then
   FORCE_COPY="1"
 fi
 
-# On Windows Git Bash, default to copy unless user explicitly wants symlink
-if [ "$PLATFORM" = "windows-gitbash" ] && [ -z "$FORCE_COPY" ]; then
-  FORCE_COPY="1"
-  warn "Detected Git Bash on Windows: defaulting to copy mode (not symlink)"
-  warn "  To force symlink: set MSYS=winsymlinks:native, or use WSL"
-fi
-
 # ---- Colors (respect NO_COLOR and non-TTY) ----
 if [ -n "${MAVIS_TEAM_NO_COLOR:-}" ] || [ ! -t 1 ]; then
   C_RESET=""
@@ -86,6 +79,15 @@ ok()   { printf "%s[✓]%s %s\n" "$C_GREEN" "$C_RESET" "$*"; }
 warn() { printf "%s[!]%s %s\n" "$C_YELLOW" "$C_RESET" "$*"; }
 err()  { printf "%s[✗]%s %s\n" "$C_RED" "$C_RESET" "$*" >&2; }
 die()  { err "$*"; exit 1; }
+
+# On Windows Git Bash, default to copy unless user explicitly wants symlink
+# (this block is placed after the warn function definition so shellcheck
+# doesn't flag SC2218 'function used before defined')
+if [ "$PLATFORM" = "windows-gitbash" ] && [ -z "$FORCE_COPY" ]; then
+  FORCE_COPY="1"
+  warn "Detected Git Bash on Windows: defaulting to copy mode (not symlink)"
+  warn "  To force symlink: set MSYS=winsymlinks:native, or use WSL"
+fi
 
 # ---- Cross-platform helpers ----
 

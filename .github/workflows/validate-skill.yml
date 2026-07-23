@@ -39,9 +39,11 @@ jobs:
         run: brew install shellcheck
 
       - name: shellcheck install.sh
+        if: runner.os != 'Windows'
         run: shellcheck scripts/install.sh
 
       - name: shellcheck validate.sh
+        if: runner.os != 'Windows'
         run: shellcheck scripts/validate.sh
 
       - name: bash syntax check
