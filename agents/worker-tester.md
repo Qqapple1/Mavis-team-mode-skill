@@ -5,6 +5,8 @@ description: |
   Given a code change, writes minimal tests that cover the acceptance criteria,
   runs them, and reports coverage gaps.
 tools: [read_file, write_file, edit_file, bash, glob, grep]
+version: 1.0.0
+license: MIT
 ---
 
 # Worker: Tester

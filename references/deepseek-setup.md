@@ -1,3 +1,10 @@
+---
+name: reference-deepseek-setup
+description: "How to configure Zcode to use DeepSeek as the LLM provider, with API setup and model selection guidance. Reference document, not a triggerable skill."
+type: reference
+category: setup
+---
+
 # DeepSeek + Zcode Setup
 
 把 Zcode 接到 DeepSeek API。

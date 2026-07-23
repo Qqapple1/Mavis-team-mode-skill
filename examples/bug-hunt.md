@@ -1,3 +1,10 @@
+---
+name: example-bug-hunt
+description: "Worked example: hunt down a production bug (double-charge) and fix it using Mavis Team Mode. Reference document, not a triggerable skill."
+type: example
+category: bug-fix
+---
+
 # Example: Bug Hunt + Fix
 
 **User task**: "用户报告说下单成功后偶尔会扣两次款。找出根因并修。"

@@ -1,3 +1,10 @@
+---
+name: reference-troubleshooting
+description: "Common issues when installing or running Mavis Team Mode skill in Zcode, with diagnostic steps and fixes. Reference document, not a triggerable skill."
+type: reference
+category: troubleshooting
+---
+
 # Troubleshooting
 
 ## Skill 没被 Zcode 识别

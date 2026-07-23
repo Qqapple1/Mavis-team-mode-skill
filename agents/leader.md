@@ -6,6 +6,8 @@ description: |
   outputs, runs verification, and iterates until the deliverable meets all
   acceptance criteria. Use when invoking the `mavis-team-mode` skill.
 tools: [task, read_file, write_file, edit_file, bash, glob, grep, web_search]
+version: 1.0.0
+license: MIT
 ---
 
 # Team Leader Agent

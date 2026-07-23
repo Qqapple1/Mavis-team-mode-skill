@@ -1,28 +1,23 @@
 ---
 name: mavis-team-mode
-description: |
-  Use this skill when the user requests a complex multi-step task that benefits from
-  parallel execution, quality verification, or structured decomposition. This skill
-  triggers the Mavis Team Mode workflow (Leader + Workers + Verifier) inside Zcode,
-  splitting the task into sub-tasks handled by parallel sub-agents and validated
-  by a Verifier before final delivery. Trigger keywords include: "team mode",
-  "mavis team", "multi-agent", "parallel agents", "verify the result",
-  "split this task", "用 team 模式", "团队模式", "多智能体协作",
-  "拆分任务", "并行处理", "验证结果".
-version: 1.0.0
+description: "Recreates the Mavis (MiniMax Agent) Team Mode workflow (Leader + Workers + Verifier) inside Zcode 3.0. Use this skill when the user wants parallel agent execution, structured task decomposition, independent quality verification, or multi-step work that benefits from sub-agents running concurrently. Triggers on: 'team mode', 'mavis team', 'multi-agent', 'split into subtasks', 'verify the result', '用 team 模式', '团队模式', '多智能体协作', '并行处理'. Do NOT use for simple single-step tasks."
+version: 1.1.0
 license: MIT
+allowed-tools: task read_file write_file edit_file bash glob grep web_search
 metadata:
   author: Mavis (MiniMax M3)
   origin: Recreated from MiniMax Mavis TeamEngine (May 2026 announcement)
   compatibility: Zcode 3.x, GLM-5.2 / DeepSeek / any Anthropic-OpenAI compatible
+  category: workflow
+  tested-on: [zcode-3.0.0, zcode-3.1.0, zcode-3.2.2]
 ---
 
 # Mavis Team Mode for Zcode
 
 ## What this skill does
 
-Recreates the Mavis (MiniMax Agent) **Team Mode** workflow inside Zcode 3.0 using
-the Agent Skills standard + Zcode's built-in sub-agent system.
+Recreates the Mavis (MiniMax Agent) **Team Mode** workflow inside Zcode 3.0
+using the Agent Skills standard + Zcode's built-in sub-agent system.
 
 **Architecture:**
 
@@ -77,9 +72,24 @@ the Agent Skills standard + Zcode's built-in sub-agent system.
 - 任务太小不值得拆（拆完比直接干还慢）
 - 你只想要"试试看"（直接干就行）
 
+## Required companion files
+
+This skill needs the `agents/` directory to work. The Leader agent will
+reference these worker roles by name when dispatching sub-tasks.
+
+**Verify these are installed alongside SKILL.md:**
+
+```bash
+ls ~/.zcode/skills/mavis-team-mode/agents/
+# should show: leader.md verifier.md worker-coder.md worker-tester.md
+#              worker-researcher.md worker-doc-writer.md worker-reviewer.md
+```
+
+If missing, see INSTALL.md.
+
 ## Workflow
 
-### Step 1: 你下达任务
+### Step 1: 用户下达任务
 
 直接说，例如：
 > "用 team 模式帮我做一个 X"
@@ -90,34 +100,7 @@ the Agent Skills standard + Zcode's built-in sub-agent system.
 
 ### Step 2: Leader（你正在聊的 Zcode）做任务拆解
 
-Leader 必须输出一个**结构化任务书**，格式如下：
-
-```markdown
-# Team Plan
-
-## 目标
-[一句话说清楚最终交付物]
-
-## 子任务清单
-
-### Subtask 1: [名称]
-- **类型**: general-purpose | explore
-- **输入**: [需要什么文件/上下文]
-- **产出**: [具体交付物 + 验收标准]
-- **依赖**: 无 | 依赖 Subtask X 的产出
-- **预计时间**: X 分钟
-
-### Subtask 2: [名称]
-... (同上)
-
-## 验收标准
-- [ ] 子任务 1 产出符合 X 标准
-- [ ] 子任务 2 产出符合 Y 标准
-- [ ] 整体产出满足 Z 验收点
-
-## 风险
-- [可能失败的地方 + 降级方案]
-```
+Leader 必须输出一个**结构化任务书**，格式见 `agents/leader.md` 的 Phase 1。
 
 ### Step 3: Leader 启动并行子智能体
 
@@ -150,7 +133,7 @@ Leader 收到所有子智能体的摘要后，**自己整合**成初版交付物
 - 输出 PASS / FAIL 清单
 
 **方法 B（轻量）**：主 Leader 自己当 Verifier
-- 用 `verification-checklist` skill（见 references/）自检
+- 用 `references/verification-checklist.md` skill 自检
 - 但有偏见风险（同模型同上下文容易自我放水）
 
 ### Step 6: 迭代修正
@@ -173,8 +156,9 @@ Leader 收到所有子智能体的摘要后，**自己整合**成初版交付物
 
 See `examples/` for full worked examples:
 - `examples/refactor-large-module.md` — 重构大型模块
-- `examples/multi-file-feature.md` — 跨多文件加新功能
-- `examples/research-and-implement.md` — 先调研再实现
+- `examples/bug-hunt.md` — 排查根因
+- `examples/new-feature.md` — 加新功能
+- `examples/research-then-implement.md` — 先调研再实现
 
 ## Sub-agent prompt templates
 
@@ -182,24 +166,17 @@ See `agents/` directory for ready-to-use prompt templates:
 - `agents/worker-coder.md` — 写代码 worker
 - `agents/worker-tester.md` — 写测试 worker
 - `agents/worker-researcher.md` — 调研 worker
+- `agents/worker-doc-writer.md` — 文档 worker
+- `agents/worker-reviewer.md` — code review worker
 - `agents/verifier.md` — 验收 verifier
 
 ## Advanced: DeepSeek + Zcode
 
-This skill is **model-agnostic**. To use with DeepSeek:
+This skill is **model-agnostic**. See `references/deepseek-setup.md`.
 
-1. In Zcode settings → Models → Add custom provider
-2. Set:
-   - Name: `DeepSeek`
-   - Anthropic-compatible URL: `https://api.deepseek.com/anthropic`
-   - OpenAI-compatible URL: `https://api.deepseek.com/v1`
-   - API key: your `sk-...` key
-   - Model: `deepseek-chat` (or `deepseek-reasoner` for hard tasks)
-3. Save, restart Zcode
-4. Use this skill as normal
+## Validation
 
-**Trade-off**: Zcode 3.0 is deeply optimized for GLM-5.2. Using DeepSeek loses some
-of Zcode's "GLM-tuned" advantages, but the Team Mode workflow itself still works.
+To verify this skill is correctly installed, see `VALIDATION.md`.
 
 ## Notes
 

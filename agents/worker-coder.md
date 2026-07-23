@@ -5,6 +5,8 @@ description: |
   specific, well-scoped code changes with clear acceptance criteria. Read the
   task brief carefully, write minimal correct code, report what you did.
 tools: [read_file, write_file, edit_file, bash, glob, grep]
+version: 1.0.0
+license: MIT
 ---
 
 # Worker: Coder

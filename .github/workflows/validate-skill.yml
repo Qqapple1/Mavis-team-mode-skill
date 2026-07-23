@@ -1,0 +1,93 @@
+name: Validate Skill
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  validate:
+    name: Validate skill structure
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install skill to test location
+        run: |
+          mkdir -p ~/.zcode/skills
+          ln -s "$GITHUB_WORKSPACE" ~/.zcode/skills/mavis-team-mode
+          ls -la ~/.zcode/skills/
+
+      - name: Run validation script
+        run: |
+          chmod +x scripts/validate.sh
+          bash scripts/validate.sh
+
+      - name: Validate SKILL.md YAML
+        run: |
+          python3 -c "
+          import yaml, sys
+          files = [
+            'SKILL.md',
+            'agents/leader.md',
+            'agents/verifier.md',
+            'agents/worker-coder.md',
+            'agents/worker-tester.md',
+            'agents/worker-researcher.md',
+            'agents/worker-doc-writer.md',
+            'agents/worker-reviewer.md',
+            'examples/refactor-large-module.md',
+            'examples/bug-hunt.md',
+            'examples/new-feature.md',
+            'examples/research-then-implement.md',
+            'references/verification-checklist.md',
+            'references/deepseek-setup.md',
+            'references/troubleshooting.md',
+          ]
+          failed = []
+          for f in files:
+              with open(f) as fp:
+                  content = fp.read()
+              if not content.startswith('---'):
+                  print(f'  {f}: NO frontmatter (skipping)')
+                  continue
+              end = content.find('---', 3)
+              if end == -1:
+                  failed.append(f'{f}: unclosed frontmatter')
+                  continue
+              try:
+                  fm = yaml.safe_load(content[3:end])
+                  print(f'  {f}: OK (name={fm.get(\"name\")!r})')
+                  if 'name' not in fm:
+                      failed.append(f'{f}: missing name')
+                  if 'description' not in fm:
+                      failed.append(f'{f}: missing description')
+              except yaml.YAMLError as e:
+                  failed.append(f'{f}: YAML error: {e}')
+          if failed:
+              print('FAIL:')
+              for f in failed:
+                  print(f'  - {f}')
+              sys.exit(1)
+          print(f'All {len(files)} files have valid frontmatter')
+          "
+
+      - name: Test prototype (e2e)
+        run: |
+          cd examples/prototype-todo-app
+          nohup python3 server/server.py > /tmp/server.log 2>&1 &
+          SERVER_PID=$!
+          sleep 2
+          python3 test_e2e.py
+          TEST_EXIT=$?
+          kill $SERVER_PID 2>/dev/null || true
+          exit $TEST_EXIT
+        continue-on-error: false

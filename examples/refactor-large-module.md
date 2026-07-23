@@ -1,3 +1,10 @@
+---
+name: example-refactor-large-module
+description: "Worked example: refactor a 1500-line legacy module into 3 separate modules using Mavis Team Mode. Reference document, not a triggerable skill."
+type: example
+category: refactor
+---
+
 # Example: Refactor a Large Module
 
 **User task**: "重构 src/legacy_auth.py（1500 行），按职责拆成 3 个模块，不改对外行为。"

@@ -1,3 +1,10 @@
+---
+name: example-research-then-implement
+description: "Worked example: research WebSocket libraries then build a demo with mock server using Mavis Team Mode. Reference document, not a triggerable skill."
+type: example
+category: research
+---
+
 # Example: Research → Implement Pattern
 
 **User task**: "我们公司想用 WebSocket 替代轮询。给我一个 demo，连接公司 mock server，接收实时消息。"

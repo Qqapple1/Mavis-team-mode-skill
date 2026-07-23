@@ -6,6 +6,8 @@ description: |
   modify any files. Use when the team plan needs information-gathering before
   implementation can start.
 tools: [read_file, glob, grep, web_search, web_fetch]
+version: 1.0.0
+license: MIT
 ---
 
 # Worker: Researcher

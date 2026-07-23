@@ -1,3 +1,10 @@
+---
+name: reference-verification-checklist
+description: "Self-verification checklist for the Leader agent when no separate Verifier is available. Reference document, not a triggerable skill."
+type: reference
+category: verification
+---
+
 # Verification Checklist
 
 Use this when self-verifying (when you don't have a separate Verifier agent).

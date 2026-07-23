@@ -1,0 +1,127 @@
+# Validation Guide
+
+怎么验证这个 skill 装好、跑得对。
+
+## 1. 文件结构验证（30 秒）
+
+```bash
+# 必需文件全部存在
+for f in SKILL.md agents/leader.md agents/verifier.md agents/worker-coder.md; do
+  test -f ~/.zcode/skills/mavis-team-mode/$f && echo "✓ $f" || echo "✗ MISSING $f"
+done
+```
+
+## 2. 格式验证（10 秒）
+
+```bash
+bash scripts/validate.sh
+```
+
+期望输出：22/22 通过。
+
+## 3. YAML frontmatter 验证（10 秒）
+
+```bash
+# 解析所有 .md 的 frontmatter
+python3 -c "
+import yaml, glob
+for f in glob.glob('**/*.md', recursive=True):
+    with open(f) as fp: c = fp.read()
+    if not c.startswith('---'): continue
+    end = c.find('---', 3)
+    if end == -1: print(f'  ✗ {f}: unclosed'); continue
+    try:
+        yaml.safe_load(c[3:end])
+        print(f'  ✓ {f}')
+    except Exception as e:
+        print(f'  ✗ {f}: {e}')
+"
+```
+
+## 4. 真实可运行验证（2 分钟）
+
+跑 prototype + e2e 测试：
+
+```bash
+cd examples/prototype-todo-app
+python3 server/server.py &
+sleep 2
+python3 test_e2e.py
+# 期望: ALL TESTS PASSED
+kill %1
+```
+
+## 5. Zcode 加载验证（需要 Zcode）
+
+启动 Zcode，输入框输入：
+
+```
+/mavis-team-mode
+```
+
+**期望反应**：
+- Zcode 应该识别 skill 并加载
+- 自动触发 Team Plan 输出模板
+- 问你"什么任务"
+
+**如果没反应**：
+- 检查 Zcode 设置 → Agents → Sub-Agents 是否启用
+- 完全退出 Zcode 再重开（不是最小化）
+- 看 Zcode 日志（设置 → Logs）
+- 重跑 `bash scripts/validate.sh`
+
+## 6. 端到端工作流验证（5 分钟）
+
+在 Zcode 输入：
+
+```
+/mavis-team-mode 帮我给这个项目加一个 README（如果还没有）
+```
+
+**期望反应**：
+- Leader 输出 Team Plan（带 2-3 个 Sub-task）
+- 派 sub-agent 执行
+- 返回整合后的结果
+- 问你要不要开第二个 Zcode 会话当 Verifier
+
+**如果 Verifier 步骤失败**：
+- 看 `references/troubleshooting.md` 的 "Verifier 没找到问题" 部分
+
+## 7. 卸载验证（30 秒）
+
+```bash
+bash scripts/install.sh --uninstall
+ls ~/.zcode/skills/mavis-team-mode 2>/dev/null && echo "✗ still there" || echo "✓ removed"
+```
+
+## 8. CI 验证（推送 GitHub 后）
+
+```bash
+git remote add origin https://github.com/YOUR_USERNAME/mavis-team-mode-skill.git
+git push -u origin main
+```
+
+GitHub Actions 应该跑通：
+- ✓ validate-skill / validate (22 checks)
+- ✓ validate-skill / validate-skill-yaml
+- ✓ validate-skill / test-prototype-e2e
+
+## 全部 8 步通过 = skill 装好且能跑
+
+| Step | 工具 | 时间 | 跳过风险 |
+|------|------|------|----------|
+| 1. 文件结构 | bash | 30s | 低（CI 会查）|
+| 2. 格式验证 | validate.sh | 10s | 低 |
+| 3. YAML 验证 | python | 10s | 低 |
+| 4. prototype | python | 2min | 中（需要 server 端口空闲）|
+| 5. Zcode 加载 | Zcode | 1min | 高（依赖 Zcode 版本）|
+| 6. 端到端 | Zcode | 5min | 中（依赖模型）|
+| 7. 卸载 | bash | 30s | 极低 |
+| 8. CI | GitHub | 1min | 极低（无外部依赖）|
+
+## 失败排查
+
+- **Step 1-3 失败** → 看 `references/troubleshooting.md`
+- **Step 4 失败** → 端口 8765 被占用？改 `PORT=xxxx python3 server/server.py` 和 `test_e2e.py` 里的 `PORT`
+- **Step 5-6 失败** → 检查 Zcode 版本（要 3.0+），Agent Skills 标准支持
+- **Step 8 失败** → 看 GitHub Actions 日志

@@ -5,6 +5,8 @@ description: |
   Leader's integrated output against the original acceptance criteria. Does
   NOT trust the Leader's self-assessment — runs its own checks.
 tools: [read_file, write_file, edit_file, bash, glob, grep, web_search]
+version: 1.0.0
+license: MIT
 ---
 
 # Verifier

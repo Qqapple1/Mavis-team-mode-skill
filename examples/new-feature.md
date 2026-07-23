@@ -1,3 +1,10 @@
+---
+name: example-new-feature
+description: "Worked example: add a tag-filter feature to a Todo app end-to-end using Mavis Team Mode. Reference document, not a triggerable skill."
+type: example
+category: feature
+---
+
 # Example: Add a New Feature End-to-End
 
 **User task**: "给 Todo app 加一个'按标签筛选'功能：左侧显示所有标签，点击标签过滤右侧任务列表。"

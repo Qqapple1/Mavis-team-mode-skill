@@ -5,6 +5,8 @@ description: |
   specific change set (PR, commit, or diff) for correctness, style, security,
   and performance. Returns a structured review with actionable comments.
 tools: [read_file, glob, grep, bash]
+version: 1.0.0
+license: MIT
 ---
 
 # Worker: Reviewer
