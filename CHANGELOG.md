@@ -5,6 +5,34 @@ All notable changes to this skill are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.3.0] - 2026-07-23
+
+### Added
+- `examples/prototype-todo-app/test_e2e_extended.py` — 21 additional e2e
+  tests (HTTP method coverage, unicode, path normalization, idempotency,
+  concurrent reads during writes)
+- `examples/prototype-todo-app/client/index.html` — full web UI rewrite
+  with input validation, error toasts, and tag filtering
+- `scripts/benchmark_tokens.py` — measures skill load cost vs baseline
+- `Makefile` — `make help/install/test/lint/info` shortcuts
+- `docs/ARCHITECTURE.md` — flow diagram + Mermaid rendering + decision
+  boundaries
+- `index.html` — GitHub Pages-friendly landing page for repo root
+- CI matrix: Ubuntu + macOS for shellcheck; Python 3.8-3.12 for syntax
+- CI: 3x idempotency install loop, token benchmark step, stats report
+
+### Changed
+- `SKILL.md` Step 3: clarified that Leader can use Zcode's BUILT-IN
+  `Explore`/`general-purpose` OR custom agents from `agents/`
+- `docs/PERFORMANCE.md`: HONEST token numbers (skill costs ~74% MORE than
+  inline baseline, but gives 2-2.5x wall-clock speedup from parallelism)
+- `.shellcheckrc`: `shell=bash` directive, `external-sources`, `check-sourced`
+
+### Fixed
+- Documented that HEAD requests return 501 (Python stdlib limitation)
+- Removed dead `_send_json` references in test_e2e_extended.py
+- Server: POST with form data (not JSON) now returns 400, not 500
+
 ## [1.2.0] - 2026-07-23
 
 ### Added
@@ -75,6 +103,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - 3 reference documents
 - `README.md`, `LICENSE`, `.gitignore`
 
+[1.3.0]: https://github.com/YOUR_USERNAME/mavis-team-mode-skill/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/YOUR_USERNAME/mavis-team-mode-skill/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/YOUR_USERNAME/mavis-team-mode-skill/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/YOUR_USERNAME/mavis-team-mode-skill/releases/tag/v1.0.0

@@ -1,6 +1,9 @@
 # ShellCheck configuration
 # https://github.com/koalaman/shellcheck/blob/master/shellcheckrc
 
+# Set the shell to bash for accurate checking
+shell=bash
+
 # Allow optional words like "local" in non-bash scripts
 disable=SC3043
 
@@ -12,3 +15,9 @@ disable=SC2164
 
 # Don't warn about not using $(...) - we have plenty of $() calls
 disable=SC2005
+
+# Use POSIX sh dialect by default
+external-sources=true
+
+# Check sourced files
+check-sourced=true
