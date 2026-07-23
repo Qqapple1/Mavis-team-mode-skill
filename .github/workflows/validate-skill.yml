@@ -168,38 +168,79 @@ jobs:
       - name: Test server starts on Windows
         shell: pwsh
         run: |
-          $server = Start-Process python -ArgumentList 'examples/prototype-todo-app/server/server.py' -PassThru -NoNewWindow -RedirectStandardOutput 'server.log' -RedirectStandardError 'server.err.log'
-          Write-Host "Server PID: $($server.Id)"
-          Start-Sleep -Seconds 3
-          try {
-            $r = Invoke-WebRequest -Uri 'http://127.0.0.1:8765/api/health' -UseBasicParsing -TimeoutSec 5
-            if ($r.StatusCode -eq 200) {
-              Write-Host 'Server is healthy'
-            } else {
-              Write-Host "Server returned $($r.StatusCode)"
-              exit 1
-            }
-          } catch {
-            Write-Host "Server did not respond: $_"
-            Get-Content server.log -ErrorAction SilentlyContinue
-            Get-Content server.err.log -ErrorAction SilentlyContinue
-            exit 1
-          } finally {
-            Stop-Process -Id $server.Id -Force -ErrorAction SilentlyContinue
+          # Use 'py' (Windows Python launcher) which is more reliable than 'python'
+          # in fresh CI environments. Fall back to 'python' if not found.
+          $pythonCmd = Get-Command py -ErrorAction SilentlyContinue
+          if (-not $pythonCmd) {
+            $pythonCmd = Get-Command python -ErrorAction SilentlyContinue
           }
+          if (-not $pythonCmd) {
+            Write-Host 'ERROR: no python on PATH'
+            exit 1
+          }
+          $server = Start-Process $pythonCmd.Name -ArgumentList 'examples/prototype-todo-app/server/server.py' -PassThru -NoNewWindow -RedirectStandardOutput 'server.log' -RedirectStandardError 'server.err.log'
+          Write-Host "Server PID: $($server.Id)"
+          # Wait up to 15s for server to come up (Windows can be slow)
+          $ready = $false
+          for ($i = 0; $i -lt 15; $i++) {
+            Start-Sleep -Seconds 1
+            try {
+              $r = Invoke-WebRequest -Uri 'http://127.0.0.1:8765/api/health' -UseBasicParsing -TimeoutSec 2
+              if ($r.StatusCode -eq 200) {
+                $ready = $true
+                break
+              }
+            } catch {
+              # still starting
+            }
+          }
+          if (-not $ready) {
+            Write-Host 'Server did not respond within 15s'
+            Write-Host '--- server.log ---'
+            if (Test-Path server.log) { Get-Content server.log }
+            Write-Host '--- server.err.log ---'
+            if (Test-Path server.err.log) { Get-Content server.err.log }
+            Stop-Process -Id $server.Id -Force -ErrorAction SilentlyContinue
+            exit 1
+          }
+          Write-Host 'Server is healthy'
+          Stop-Process -Id $server.Id -Force -ErrorAction SilentlyContinue
 
       - name: Run e2e tests on Windows
         shell: pwsh
         run: |
-          $server = Start-Process python -ArgumentList 'examples/prototype-todo-app/server/server.py' -PassThru -NoNewWindow -RedirectStandardOutput 'server.log' -RedirectStandardError 'server.err.log'
-          Start-Sleep -Seconds 3
+          # Use 'py' Windows launcher if available, else python
+          $pythonCmd = Get-Command py -ErrorAction SilentlyContinue
+          if (-not $pythonCmd) {
+            $pythonCmd = Get-Command python -ErrorAction SilentlyContinue
+          }
+          if (-not $pythonCmd) {
+            Write-Host 'ERROR: no python on PATH'
+            exit 1
+          }
+          $server = Start-Process $pythonCmd.Name -ArgumentList 'examples/prototype-todo-app/server/server.py' -PassThru -NoNewWindow -RedirectStandardOutput 'server.log' -RedirectStandardError 'server.err.log'
+          # Wait for server to be ready
+          $ready = $false
+          for ($i = 0; $i -lt 15; $i++) {
+            Start-Sleep -Seconds 1
+            try {
+              $r = Invoke-WebRequest -Uri 'http://127.0.0.1:8765/api/health' -UseBasicParsing -TimeoutSec 2
+              if ($r.StatusCode -eq 200) { $ready = $true; break }
+            } catch { }
+          }
+          if (-not $ready) {
+            Write-Host 'Server did not respond within 15s'
+            if (Test-Path server.log) { Get-Content server.log }
+            if (Test-Path server.err.log) { Get-Content server.err.log }
+            Stop-Process -Id $server.Id -Force -ErrorAction SilentlyContinue
+            exit 1
+          }
           try {
-            # Run each test file
             $totalPass = 0
             $totalFail = 0
             foreach ($testFile in @('test_e2e.py', 'test_e2e_extended.py', 'test_e2e_advanced.py')) {
               Write-Host "Running $testFile..."
-              $output = python "examples/prototype-todo-app/$testFile" 2>&1
+              $output = & $pythonCmd.Name "examples/prototype-todo-app/$testFile" 2>&1
               $output | ForEach-Object { Write-Host $_ }
               $lastLines = $output | Select-Object -Last 5
               foreach ($line in $lastLines) {
