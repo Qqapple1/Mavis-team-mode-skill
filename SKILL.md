@@ -7,9 +7,9 @@ allowed-tools: [task, read_file, write_file, edit_file, bash, glob, grep, web_se
 metadata:
   author: Community port (Mavis CLI agent)
   origin: Recreated from MiniMax Mavis TeamEngine (May 2026 announcement)
-  compatibility: Zcode 3.x (Zcode's docs advertise GLM-5.2 / DeepSeek / Anthropic / OpenAI / MiniMax M3 model support)
+  compatibility: Zcode 3.4.2+ (per zcode-ai.com download page, as of 2026-07-23) (Zcode's docs advertise GLM-5.2 / DeepSeek / Anthropic / OpenAI / MiniMax M3 model support)
   category: workflow
-  tested-on:
+  tested-on-ranges:
     - "prototype-todo-app e2e (20+21 tests, 41/41 passing) — included in this repo"
     - "skill format + YAML frontmatter validation (22+15 checks) — included"
     - "GitHub Actions CI on Ubuntu 24.04 + macOS, Python 3.8-3.12 — 9/9 jobs passing"

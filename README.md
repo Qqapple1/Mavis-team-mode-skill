@@ -16,14 +16,17 @@
 
 ## Requirements
 
-- **Platform**: macOS 10.12+ 或 Linux (Ubuntu 20.04+, Debian 11+, etc.)
-  - **Windows 不直接支持**（没测过；用 WSL 应该可以）
+- **Platform**: macOS / Linux / Windows（基于 [Zcode 官方下载页](https://zcode-ai.com) 列出的 Windows x64 / ARM64 / macOS / Linux x64 / Linux ARM64）
+  - **install.sh 是 bash 脚本**：Windows 上需要 Git Bash 或 WSL
+  - **PowerShell / CMD 原生跑不了**（需要 bash 环境）
+  - **prototype server 是 Python**：跨平台（只用了 stdlib）
+  - **我没在真 Windows 上跑过整套**——你要是 Windows 用户，欢迎提 issue 反馈
 - **Python**: 3.6+ （`f-strings` 是 server.py / scripts/*.py 的最低要求）
 - **Git**: 2.0+ （install.sh 用 `--depth 1` shallow clone）
-- **Bash**: 4.0+ （macOS 默认 3.2，会失败——见下）
-  - macOS 用户需要 `brew install bash` 然后 `export PATH=/usr/local/bin:$PATH`
+- **Bash**: 3.2+（我用的语法都兼容 bash 3.2，包括 macOS 默认 bash）
 - **Disk**: ~600KB 安装空间
-- **Zcode**: 3.x（skill description 匹配的最低要求）
+- **Zcode**: 3.4.2+（per [zcode-ai.com](https://zcode-ai.com) download page, 2026-07-23）
+- **Windows 用户**: 见 [docs/WINDOWS.md](docs/WINDOWS.md) — 推荐 WSL2
 
 > **真 Zcode runtime 还没测过**——这套 skill 跑通的部分是 e2e tests
 > + CI matrix + 真机 install/validate/uninstall 流程。Skill 实际触发
