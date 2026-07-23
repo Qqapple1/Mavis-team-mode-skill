@@ -205,10 +205,13 @@ def main():
     print()
 
     print("Savings (progressive vs other modes):")
-    s1 = (1 - progressive["total_tokens"] / baseline["total_tokens"]) * 100
-    s2 = (1 - progressive["total_tokens"] / eager["total_tokens"]) * 100
-    print(f"  vs inline baseline:  {s1:+.1f}%  ({progressive['total_tokens']:,} vs {baseline['total_tokens']:,})")
-    print(f"  vs eager load:      {s2:+.1f}%  ({progressive['total_tokens']:,} vs {eager['total_tokens']:,})")
+    s1 = (progressive["total_tokens"] - baseline["total_tokens"]) / baseline["total_tokens"] * 100
+    s2 = (progressive["total_tokens"] - eager["total_tokens"]) / eager["total_tokens"] * 100
+    # positive = more, negative = less
+    label1 = "more" if s1 > 0 else "less"
+    label2 = "more" if s2 > 0 else "less"
+    print(f"  vs inline baseline:  {s1:+.1f}%  ({progressive['total_tokens']:,} vs {baseline['total_tokens']:,}, {label1})")
+    print(f"  vs eager load:      {s2:+.1f}%  ({progressive['total_tokens']:,} vs {eager['total_tokens']:,}, {label2})")
     print()
     print("=" * 60)
     print("  Disclaimer: token estimates are heuristic (~4 chars/token)")
