@@ -7,12 +7,40 @@
 
 [![CI](https://github.com/Qqapple1/Mavis-team-mode-skill/actions/workflows/validate-skill.yml/badge.svg)](https://github.com/Qqapple1/Mavis-team-mode-skill/actions)
 [![Skill tests](https://img.shields.io/badge/validate-22%2F22%20passing-brightgreen)](VALIDATION.md)
-[![Prototype tests](https://img.shields.io/badge/prototype%20e2e-41%2F41%20passing-brightgreen)](examples/prototype-todo-app/)
+[![Prototype tests](https://img.shields.io/badge/prototype%20e2e-48%2F48%20passing-brightgreen)](examples/prototype-todo-app/)
 [![YAML](https://img.shields.io/badge/yaml-15%2F15%20passing-brightgreen)](scripts/validate_yaml.py)
-[![Version](https://img.shields.io/badge/version-1.3.1-blue)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-1.3.2-blue)](CHANGELOG.md)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 [![Zcode 3.x](https://img.shields.io/badge/zcode-3.x-purple)](https://zcode-ai.com)
 [![Security](https://img.shields.io/badge/security-policy-green)](SECURITY.md)
+
+## Requirements
+
+- **Platform**: macOS 10.12+ 或 Linux (Ubuntu 20.04+, Debian 11+, etc.)
+  - **Windows 不直接支持**（没测过；用 WSL 应该可以）
+- **Python**: 3.6+ （`f-strings` 是 server.py / scripts/*.py 的最低要求）
+- **Git**: 2.0+ （install.sh 用 `--depth 1` shallow clone）
+- **Bash**: 4.0+ （macOS 默认 3.2，会失败——见下）
+  - macOS 用户需要 `brew install bash` 然后 `export PATH=/usr/local/bin:$PATH`
+- **Disk**: ~600KB 安装空间
+- **Zcode**: 3.x（skill description 匹配的最低要求）
+
+> **真 Zcode runtime 还没测过**——这套 skill 跑通的部分是 e2e tests
+> + CI matrix + 真机 install/validate/uninstall 流程。Skill 实际触发
+> 取决于你机器上的 Zcode 3.x 行为。
+
+### 网络访问注意
+
+如果你在中国大陆，`raw.githubusercontent.com`（一键安装命令依赖的）
+可能不稳定（GitHub 在大陆没官方 CDN）。两个解决方案：
+
+1. **手动 clone 替代一键脚本**（推荐）：
+   ```bash
+   git clone https://github.com/Qqapple1/Mavis-team-mode-skill.git ~/mavis-team-mode-skill
+   bash ~/mavis-team-mode-skill/scripts/install.sh
+   ```
+2. **用代理**（如有）：`export https_proxy=http://127.0.0.1:7890`
+3. **用 mirror**（如有）：`git clone https://ghfast.top/https://github.com/Qqapple1/Mavis-team-mode-skill`
 
 ## 功能
 
