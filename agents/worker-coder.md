@@ -1,9 +1,6 @@
 ---
 name: team-worker-coder
-description: |
-  Sub-agent for code-writing tasks inside a Mavis Team Mode workflow. Implements
-  specific, well-scoped code changes with clear acceptance criteria. Read the
-  task brief carefully, write minimal correct code, report what you did.
+description: "Sub-agent for code-writing tasks inside a Mavis Team Mode workflow. Implements specific, well-scoped code changes with clear acceptance criteria. Read the task brief carefully, write minimal correct code, report what you did."
 tools: [read_file, write_file, edit_file, bash, glob, grep]
 version: 1.0.0
 license: MIT

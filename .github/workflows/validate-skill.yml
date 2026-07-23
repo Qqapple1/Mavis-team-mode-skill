@@ -8,7 +8,7 @@ on:
 
 jobs:
   validate:
-    name: Validate skill structure
+    name: Full validation
     runs-on: ubuntu-latest
 
     steps:
@@ -20,74 +20,76 @@ jobs:
         with:
           python-version: '3.11'
 
+      - name: Setup Node (for some helpers)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # ============ Shell script checks ============
+
+      - name: Install shellcheck
+        run: sudo apt-get update -qq && sudo apt-get install -y shellcheck
+
+      - name: shellcheck install.sh
+        run: shellcheck scripts/install.sh
+
+      - name: shellcheck validate.sh
+        run: shellcheck scripts/validate.sh
+
+      - name: bash syntax check (every .sh)
+        run: |
+          for f in $(find . -name "*.sh" -not -path "./.git/*"); do
+            echo "Checking $f..."
+            bash -n "$f" || { echo "SYNTAX ERROR in $f"; exit 1; }
+          done
+
+      # ============ Python checks ============
+
+      - name: python syntax check (every .py)
+        run: |
+          for f in $(find . -name "*.py" -not -path "./.git/*"); do
+            echo "Checking $f..."
+            python3 -m py_compile "$f" || { echo "SYNTAX ERROR in $f"; exit 1; }
+          done
+
+      - name: YAML frontmatter validation
+        run: python3 scripts/validate_yaml.py
+
+      # ============ Skill install + verify ============
+
       - name: Install skill to test location
         run: |
-          mkdir -p ~/.zcode/skills
-          ln -s "$GITHUB_WORKSPACE" ~/.zcode/skills/mavis-team-mode
-          ls -la ~/.zcode/skills/
+          MAVIS_TEAM_REPO="file://$GITHUB_WORKSPACE" bash scripts/install.sh --no-verify
 
       - name: Run validation script
-        run: |
-          chmod +x scripts/validate.sh
-          bash scripts/validate.sh
+        run: bash scripts/validate.sh
 
-      - name: Validate SKILL.md YAML
-        run: |
-          python3 -c "
-          import yaml, sys
-          files = [
-            'SKILL.md',
-            'agents/leader.md',
-            'agents/verifier.md',
-            'agents/worker-coder.md',
-            'agents/worker-tester.md',
-            'agents/worker-researcher.md',
-            'agents/worker-doc-writer.md',
-            'agents/worker-reviewer.md',
-            'examples/refactor-large-module.md',
-            'examples/bug-hunt.md',
-            'examples/new-feature.md',
-            'examples/research-then-implement.md',
-            'references/verification-checklist.md',
-            'references/deepseek-setup.md',
-            'references/troubleshooting.md',
-          ]
-          failed = []
-          for f in files:
-              with open(f) as fp:
-                  content = fp.read()
-              if not content.startswith('---'):
-                  print(f'  {f}: NO frontmatter (skipping)')
-                  continue
-              end = content.find('---', 3)
-              if end == -1:
-                  failed.append(f'{f}: unclosed frontmatter')
-                  continue
-              try:
-                  fm = yaml.safe_load(content[3:end])
-                  print(f'  {f}: OK (name={fm.get(\"name\")!r})')
-                  if 'name' not in fm:
-                      failed.append(f'{f}: missing name')
-                  if 'description' not in fm:
-                      failed.append(f'{f}: missing description')
-              except yaml.YAMLError as e:
-                  failed.append(f'{f}: YAML error: {e}')
-          if failed:
-              print('FAIL:')
-              for f in failed:
-                  print(f'  - {f}')
-              sys.exit(1)
-          print(f'All {len(files)} files have valid frontmatter')
-          "
+      # ============ E2E prototype test ============
 
-      - name: Test prototype (e2e)
+      - name: Start prototype server
         run: |
           cd examples/prototype-todo-app
           nohup python3 server/server.py > /tmp/server.log 2>&1 &
-          SERVER_PID=$!
           sleep 2
-          python3 test_e2e.py
-          TEST_EXIT=$?
-          kill $SERVER_PID 2>/dev/null || true
-          exit $TEST_EXIT
-        continue-on-error: false
+
+      - name: Run e2e tests
+        run: python3 examples/prototype-todo-app/test_e2e.py
+
+      - name: Stop prototype server
+        if: always()
+        run: pkill -f "python3 server/server.py" || true
+
+      # ============ Idempotency check ============
+
+      - name: Re-run install (idempotency)
+        run: MAVIS_TEAM_REPO="file://$GITHUB_WORKSPACE" bash scripts/install.sh --no-verify
+
+      - name: Re-run validate after reinstall
+        run: bash scripts/validate.sh
+
+      # ============ Summary ============
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "::notice::Skill validation complete"

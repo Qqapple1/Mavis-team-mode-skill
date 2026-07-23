@@ -1,9 +1,6 @@
 ---
 name: team-worker-reviewer
-description: |
-  Sub-agent for code review inside a Mavis Team Mode workflow. Reviews a
-  specific change set (PR, commit, or diff) for correctness, style, security,
-  and performance. Returns a structured review with actionable comments.
+description: "Sub-agent for code review inside a Mavis Team Mode workflow. Reviews a specific change set (PR, commit, or diff) for correctness, style, security, and performance. Returns a structured review with actionable comments."
 tools: [read_file, glob, grep, bash]
 version: 1.0.0
 license: MIT

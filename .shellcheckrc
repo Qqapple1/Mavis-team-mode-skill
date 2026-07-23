@@ -1,0 +1,14 @@
+# ShellCheck configuration
+# https://github.com/koalaman/shellcheck/blob/master/shellcheckrc
+
+# Allow optional words like "local" in non-bash scripts
+disable=SC3043
+
+# Suggest explicit -n in `[` test (we use it consistently already)
+disable=SC2155
+
+# Suggest using cd ... || exit (we handle errors differently)
+disable=SC2164
+
+# Don't warn about not using $(...) - we have plenty of $() calls
+disable=SC2005

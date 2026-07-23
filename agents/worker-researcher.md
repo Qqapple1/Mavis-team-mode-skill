@@ -1,10 +1,6 @@
 ---
 name: team-worker-researcher
-description: |
-  Sub-agent for read-only research tasks inside a Mavis Team Mode workflow.
-  Investigates codebases, fetches documentation, summarizes findings. Does NOT
-  modify any files. Use when the team plan needs information-gathering before
-  implementation can start.
+description: "Sub-agent for read-only research tasks inside a Mavis Team Mode workflow. Investigates codebases, fetches documentation, summarizes findings. Does NOT modify any files. Use when the team plan needs information-gathering before implementation can start."
 tools: [read_file, glob, grep, web_search, web_fetch]
 version: 1.0.0
 license: MIT

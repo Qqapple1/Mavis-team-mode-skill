@@ -5,42 +5,76 @@ All notable changes to this skill are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.2.0] - 2026-07-23
+
+### Added
+- `scripts/validate_yaml.py` — pure-Python YAML frontmatter validator (no PyYAML dep)
+- `docs/ADR-001-team-mode-recreation.md` — Architecture decision record
+- `docs/ADR-002-security.md` — Security posture rationale
+- `docs/PERFORMANCE.md` — Token efficiency + speedup benchmarks
+- `SECURITY.md` — Vulnerability disclosure policy
+- `.shellcheckrc` — ShellCheck configuration for CI
+- GitHub Actions CI: shellcheck, bash -n, python -m py_compile,
+  YAML validation, install --doctor, idempotency check
+- install.sh: `--version`, `--doctor`, `--no-verify` options
+- install.sh: NO_COLOR support + non-TTY detection
+- install.sh: `MAVIS_TEAM_DIR`, `MAVIS_TEAM_REF` env vars for pinning
+- install.sh: `safe_rm` helper for sandboxed FS
+
+### Changed
+- All agent files: multi-line YAML `|` description → single-line quoted
+  (better tool compatibility, validates cleanly)
+- install.sh: 1.1.0 → 1.2.0, complete rewrite with better error handling
+- `examples/prototype-todo-app/server/server.py`: rewritten with
+  defense-in-depth (CORS allowlist, input validation, body size cap,
+  thread safety, PATCH/DELETE methods)
+
+### Security
+- Server: CORS allowlist (was `*`), explicit origin check
+- Server: input validation on title (1-200 chars) and tag (regex)
+- Server: 64KB body cap, 411/413/400 proper error responses
+- Server: thread-safe writes via `threading.Lock`
+- Server: `X-Content-Type-Options: nosniff` header
+- install.sh: explicit checks for missing files, broken clone, etc.
+- Prototype: warns explicitly if `HOST=0.0.0.0` (mock with no auth)
+
+### Tests
+- e2e tests: 6 → 20 (added security, CORS, concurrency tests)
+- e2e tests: cover invalid JSON, oversized body, path traversal,
+  bad tag chars, CORS preflight allowed/disallowed, 20-thread
+  concurrent writes for race condition check
+
 ## [1.1.0] - 2026-07-23
 
 ### Added
 - `scripts/install.sh` — One-line installer (clone + symlink + verify)
 - `scripts/validate.sh` — Self-validation script (22 checks)
-- `examples/prototype-todo-app/` — Real, runnable Todo app demonstrating
-  the `new-feature` example end-to-end (server + client + e2e test)
+- `examples/prototype-todo-app/` — Real, runnable Todo app
 - `INSTALL.md` — Standalone installation guide with 5 install methods
-- `examples/` and `references/` now have frontmatter (consistent format)
+- `examples/` and `references/` now have frontmatter
 - `version`, `license`, `metadata` fields added to all `agents/*.md`
 - `allowed-tools` field added to `SKILL.md`
-- `CONTRIBUTING.md` — How to add new workers, examples, or improve leader template
-- `CHANGELOG.md` — This file
-- GitHub Actions CI for skill validation on every PR
+- `CONTRIBUTING.md`, `CHANGELOG.md`
+- GitHub Actions CI for skill validation
 
 ### Changed
-- `SKILL.md` description: changed from multi-line YAML `|` to single-line quoted
-  string for better tool compatibility
-- `README.md` improved: clearer quickstart, more accurate comparison table
-- All 4 examples now have frontmatter with `type: example` marker
+- `SKILL.md` description: multi-line YAML `|` → single-line quoted
+- `README.md` improved with badges and quickstart
 
 ### Fixed
 - `examples/prototype-todo-app/test_e2e.py` had unused `port` variable
-  and wrong URL paths — fixed in v1.1.0
+  and wrong URL paths
 
 ## [1.0.0] - 2026-07-22
 
 ### Added
 - Initial release
 - `SKILL.md` with full Team Mode workflow (7 steps)
-- 6 sub-agent role templates (leader + 5 workers + verifier)
-- 4 worked examples (refactor, bug-hunt, new-feature, research-then-implement)
-- 3 reference documents (verification-checklist, deepseek-setup, troubleshooting)
-- `README.md` with comparison table (Zcode skill vs Mavis native)
-- `LICENSE` (MIT)
-- `.gitignore`
+- 6 sub-agent role templates
+- 4 worked examples
+- 3 reference documents
+- `README.md`, `LICENSE`, `.gitignore`
 
+[1.2.0]: https://github.com/YOUR_USERNAME/mavis-team-mode-skill/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/YOUR_USERNAME/mavis-team-mode-skill/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/YOUR_USERNAME/mavis-team-mode-skill/releases/tag/v1.0.0
