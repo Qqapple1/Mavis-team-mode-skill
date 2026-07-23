@@ -88,12 +88,10 @@ esac
 # ---- Prerequisite checks ----
 check_prereqs() {
   local missing=0
-  for cmd in git; do
-    if ! command -v "$cmd" >/dev/null 2>&1; then
-      err "Required command not found: $cmd"
-      missing=1
-    fi
-  done
+  if ! command -v git >/dev/null 2>&1; then
+    err "Required command not found: git"
+    missing=1
+  fi
   if [ "$missing" -ne 0 ]; then
     die "Install missing prerequisites first."
   fi
