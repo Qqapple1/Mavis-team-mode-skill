@@ -5,6 +5,7 @@
 > 基于 Zcode 3.0 的子智能体系统 + Agent Skills 标准实现，
 > 完整复刻 MiniMax 官方 Mavis 2026-05 公告的 TeamEngine 工作流。
 
+[![CI](https://github.com/Qqapple1/Mavis-team-mode-skill/actions/workflows/validate-skill.yml/badge.svg)](https://github.com/Qqapple1/Mavis-team-mode-skill/actions)
 [![Skill tests](https://img.shields.io/badge/validate-22%2F22%20passing-brightgreen)](VALIDATION.md)
 [![Prototype tests](https://img.shields.io/badge/prototype%20e2e-41%2F41%20passing-brightgreen)](examples/prototype-todo-app/)
 [![YAML](https://img.shields.io/badge/yaml-15%2F15%20passing-brightgreen)](scripts/validate_yaml.py)
