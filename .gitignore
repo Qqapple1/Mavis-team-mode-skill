@@ -11,9 +11,12 @@ Thumbs.db
 # Test artifacts
 __pycache__/
 *.pyc
+*.pyo
 .pytest_cache/
 node_modules/
 coverage/
+.coverage
+htmlcov/
 
 # Secrets — never commit these
 .env
