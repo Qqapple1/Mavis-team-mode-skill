@@ -145,16 +145,16 @@ jobs:
         if: always()
         run: pkill -f "python3 server/server.py" || true
 
-      - name: Idempotency: re-install
+      - name: Idempotency re-install
         run: MAVIS_TEAM_REPO="file://$GITHUB_WORKSPACE" bash scripts/install.sh --no-verify
 
-      - name: Idempotency: re-validate
+      - name: Idempotency re-validate
         run: bash scripts/validate.sh
 
-      - name: Idempotency: 3rd install
+      - name: Idempotency 3rd install
         run: MAVIS_TEAM_REPO="file://$GITHUB_WORKSPACE" bash scripts/install.sh --no-verify
 
-      - name: Idempotency: 3rd validate
+      - name: Idempotency 3rd validate
         run: bash scripts/validate.sh
 
       - name: Summary
