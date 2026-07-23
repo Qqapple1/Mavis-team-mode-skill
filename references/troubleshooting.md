@@ -9,7 +9,7 @@ category: troubleshooting
 
 ## Skill 没被 Zcode 识别
 
-**症状**：输入 `/mavis-team-mode` 没反应，或自然语言没触发
+**症状**：输入 "用 mavis team mode" 之类没反应，或自然语言没触发
 
 **排查步骤**：
 

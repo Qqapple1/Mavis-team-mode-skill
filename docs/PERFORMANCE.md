@@ -136,3 +136,10 @@ The script measures:
 - Savings comparisons (eager vs progressive, baseline vs progressive)
 
 Output is approximate. Real BPE tokens vary by model.
+
+
+## See also
+
+- [ARCHITECTURE](ARCHITECTURE.md) — flow diagrams + decision boundaries
+- [ADR-001 Team Mode Recreation](../ADR-001-team-mode-recreation.md)
+- [ADR-002 Security Posture](../ADR-002-security.md)

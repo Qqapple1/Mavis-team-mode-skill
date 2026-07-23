@@ -1,15 +1,19 @@
 ---
 name: mavis-team-mode
 description: "Recreates the Mavis (MiniMax Agent) Team Mode workflow (Leader + Workers + Verifier) inside Zcode 3.0. Use this skill when the user wants parallel agent execution, structured task decomposition, independent quality verification, or multi-step work that benefits from sub-agents running concurrently. Triggers on: 'team mode', 'mavis team', 'multi-agent', 'split into subtasks', 'verify the result', '用 team 模式', '团队模式', '多智能体协作', '并行处理'. Do NOT use for simple single-step tasks."
-version: 1.3.0
+version: 1.3.1
 license: MIT
 allowed-tools: task read_file write_file edit_file bash glob grep web_search
 metadata:
-  author: Mavis (MiniMax M3)
+  author: Community port (Mavis CLI agent)
   origin: Recreated from MiniMax Mavis TeamEngine (May 2026 announcement)
-  compatibility: Zcode 3.x, GLM-5.2 / DeepSeek / any Anthropic-OpenAI compatible
+  compatibility: Zcode 3.x (Zcode's docs advertise GLM-5.2 / DeepSeek / Anthropic / OpenAI / MiniMax M3 model support)
   category: workflow
-  tested-on: [zcode-3.0.0, zcode-3.1.0, zcode-3.2.2]
+  tested-on:
+    - "prototype-todo-app e2e (20+21 tests, 41/41 passing) — included in this repo"
+    - "skill format + YAML frontmatter validation (22+15 checks) — included"
+    - "GitHub Actions CI on Ubuntu 24.04 + macOS, Python 3.8-3.12 — 9/9 jobs passing"
+    - "Real Zcode runtime: NOT YET TESTED by the skill author. See README 'Real-world testing' section."
 ---
 
 # Mavis Team Mode for Zcode

@@ -25,7 +25,7 @@ the work yourself.
 
 ## When invoked
 
-When the user invokes this skill (`/mavis-team-mode` or natural language), do
+When the user invokes this skill (description-matched trigger or natural language like "team mode" / "拆成子任务"), do
 the following in order:
 
 ### Phase 1: Scope + Plan (do this yourself, ~2 min)

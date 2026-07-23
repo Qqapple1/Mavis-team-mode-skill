@@ -349,6 +349,42 @@ def main():
     run("PATCH nonexistent returns 404", test_patch_nonexistent)
     run("Health endpoint is read-only (no state change)", test_get_health_no_state_change)
 
+    # ===== Serial stress test (100 writes) =====
+    print("\n--- Serial stress test ---")
+
+    def test_serial_writes_100():
+        """100 serial POSTs should all succeed."""
+        import json as _json
+        import urllib.request as _u
+        created_ids = []
+        try:
+            for i in range(100):
+                data = _json.dumps({"title": f"serial-{i}", "tag": "stress"}).encode()
+                req = _u.Request(f"{BASE}/api/todos", data=data, method="POST")
+                req.add_header("Content-Type", "application/json")
+                with _u.urlopen(req, timeout=5) as r:
+                    assert r.status == 201, f"iter {i}: status {r.status}"
+                    body = _json.loads(r.read())
+                    created_ids.append(body["id"])
+            assert len(created_ids) == 100
+        finally:
+            for tid in created_ids:
+                try:
+                    req = _u.Request(f"{BASE}/todos/{tid}", method="DELETE")
+                    _u.urlopen(req, timeout=2)
+                except Exception:
+                    pass
+
+    def test_state_clean_after_stress():
+        """After stress, state is consistent."""
+        _, body, _ = request("GET", "/api/todos")
+        assert isinstance(body, list)
+        for t in body:
+            assert "id" in t and "title" in t and "tag" in t, f"bad todo: {t}"
+
+    run("100 serial writes all succeed", test_serial_writes_100)
+    run("State is consistent after stress", test_state_clean_after_stress)
+
     print(f"\n=== Summary ===")
     print(f"Passed: {passed}")
     print(f"Failed: {failed}")

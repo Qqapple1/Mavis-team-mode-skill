@@ -65,6 +65,11 @@ class TodoHandler(BaseHTTPRequestHandler):
         self.send_response(status)
         self.send_header("Content-Type", "application/json; charset=utf-8")
         self.send_header("X-Content-Type-Options", "nosniff")
+        # Stdlib BaseHTTPRequestHandler defaults to HTTP/1.0, which means
+        # connections are closed after each request. Tell the client
+        # explicitly so it doesn't try to reuse the connection and get
+        # connection-reset errors on the second request.
+        self.send_header("Connection", "close")
         cors = self._get_cors_origin()
         if cors:
             self.send_header("Access-Control-Allow-Origin", cors)

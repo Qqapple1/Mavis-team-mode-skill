@@ -200,3 +200,10 @@ mavis-team-mode-skill/
 - **Progressive disclosure**: only loaded if Leader invokes that sub-agent
 - **Savings**: 30-60% on main-context tokens for typical tasks
 - See `PERFORMANCE.md` for benchmarks.
+
+
+## See also
+
+- [ADR-001 Team Mode Recreation](ADR-001-team-mode-recreation.md)
+- [ADR-002 Security Posture](ADR-002-security.md)
+- [PERFORMANCE](PERFORMANCE.md)

@@ -33,6 +33,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - Removed dead `_send_json` references in test_e2e_extended.py
 - Server: POST with form data (not JSON) now returns 400, not 500
 
+## [1.3.1] - 2026-07-23
+
+### Added
+- 2 more e2e tests: 100 serial writes + post-stress state consistency
+  (total e2e now 23, all passing)
+- docs/ADR-001 + docs/ADR-002 + docs/ARCHITECTURE + docs/PERFORMANCE now
+  cross-link each other
+- "Real-world testing" honesty note in SKILL.md `metadata.tested-on`
+
+### Fixed
+- SKILL.md `metadata.tested-on` no longer claims fake Zcode versions
+  (`tested-on: [zcode-3.0.0, zcode-3.1.0, zcode-3.2.2]`) — replaced with
+  what's actually verified (e2e 23/23 + skill format 22/22 + CI 9/9 jobs)
+- SKILL.md `metadata.author` no longer falsely claims to be M3
+- README/VALIDATION/INSTALL/agents/leader.md/references no longer
+  reference the fake `/mavis-team-mode` slash command. Zcode skills
+  use description-matching, not slash commands. (Caught during deep review.)
+- examples/refactor-large-module.md: Subtask 3 and 4 now have full
+  prompts (no more `[same structure as Subtask 2]` placeholders)
+- examples/research-then-implement.md: invalid `type: explore + web`
+  fixed — added `tools:` field for clarity
+- references/deepseek-setup.md: removed fabricated claim that "Zcode
+  has deep optimization for GLM-5.2 (1M context, code scene prompts)"
+- server: added `Connection: close` response header to prevent client
+  connection reuse on HTTP/1.0 (BaseHTTPRequestHandler default)
+- validate.sh: `du -sk` now uses `-L` to follow symlinks, so the size
+  sanity check works correctly when installed via symlink
+- validate.sh: total-size threshold bumped 5-500KB → 5-1500KB (skill
+  is now ~592KB with all the new docs/examples/tests)
+
+## [1.2.0]
 ## [1.2.0] - 2026-07-23
 
 ### Added

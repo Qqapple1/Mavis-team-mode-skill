@@ -20,7 +20,7 @@
 set -euo pipefail
 
 # ---- Version ----
-INSTALLER_VERSION="1.2.0"
+INSTALLER_VERSION="1.3.1"
 
 # ---- Config ----
 REPO_URL="${MAVIS_TEAM_REPO:-https://github.com/Qqapple1/Mavis-team-mode-skill.git}"
@@ -310,8 +310,8 @@ install() {
 Next steps:
   1. Restart Zcode (fully quit, not minimize)
   2. Open a new conversation in Zcode
-  3. Type: /mavis-team-mode
-     Or naturally: "用 team 模式帮我..."
+  3. Just talk naturally: "用 mavis team mode 帮我..."
+     or "team mode", "拆成子任务", etc. (Zcode matches the skill description automatically)"
   4. See examples/ for worked examples
 
 To uninstall later:

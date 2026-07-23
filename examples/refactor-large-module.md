@@ -48,10 +48,32 @@ category: refactor
 - **estimated_minutes**: 15
 
 ### Subtask 3: 提取 session 管理模块
-[same structure as Subtask 2, but for session management]
+- **type**: general-purpose
+- **prompt**: 基于 Subtask 1 的分析结果，提取所有 session 管理函数到 src/auth/session.py。
+  - 不改函数签名
+  - 不改函数逻辑
+  - 完整保留所有 import
+  - 写一个空 __init__.py
+- **acceptance**:
+  - [ ] legacy_auth.py 中所有 session 相关函数都已提取
+  - [ ] 新文件能 import
+  - [ ] 原 legacy_auth.py 中相应位置已删干净（不留死代码）
+- **dependency**: depends-on-subtask-1
+- **estimated_minutes**: 15
 
 ### Subtask 4: 提取 OAuth 模块
-[same structure, for OAuth]
+- **type**: general-purpose
+- **prompt**: 基于 Subtask 1 的分析结果，提取所有 OAuth 相关代码到 src/auth/oauth.py。
+  - 不改函数签名
+  - 不改函数逻辑
+  - 完整保留所有 import
+  - 写一个空 __init__.py
+- **acceptance**:
+  - [ ] legacy_auth.py 中所有 OAuth 相关代码都已提取
+  - [ ] 新文件能 import
+  - [ ] 原 legacy_auth.py 中相应位置已删干净（不留死代码）
+- **dependency**: depends-on-subtask-1
+- **estimated_minutes**: 15
 
 ### Subtask 5: 更新所有 import
 - **type**: general-purpose

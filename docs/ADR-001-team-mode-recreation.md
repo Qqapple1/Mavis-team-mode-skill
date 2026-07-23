@@ -50,7 +50,7 @@ Skill (SKILL.md)
 
 ### Workflow (7 steps)
 
-1. User issues task with `/mavis-team-mode` trigger
+1. User issues task; Zcode matches the skill description and loads it
 2. Leader outputs structured `Team Plan` with subtasks + acceptance
 3. Leader dispatches sub-agents in parallel (where possible)
 4. Sub-agents work independently (Zcode sub-agent context isolation)
@@ -111,3 +111,10 @@ can be incrementally improved.
 - MiniMax Mavis Team Mode announcement: May 2026
 - Agent Skills specification: https://support.claude.com/en/articles/12512176
 - Zcode 3.0 sub-agent system documentation
+
+
+## See also
+
+- [ADR-002 Security Posture](ADR-002-security.md) — security decisions for the included prototype server
+- [ARCHITECTURE](ARCHITECTURE.md) — flow diagrams and decision boundaries
+- [PERFORMANCE](PERFORMANCE.md) — token cost & wall-clock speedup analysis

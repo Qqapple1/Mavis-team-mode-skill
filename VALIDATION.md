@@ -56,17 +56,27 @@ kill %1
 启动 Zcode，输入框输入：
 
 ```
-/mavis-team-mode
+用 mavis team mode 帮我 …
 ```
 
+或自然语言：
+
+```
+拆开来做
+用 team 模式跑一下
+用多智能体协作处理
+```
+
+**Zcode 技能触发机制**：Agent Skills 标准下，技能是 **description 匹配触发**，不是 `/skill-name` 命令。Zcode 在用户输入时扫描所有可用 skill 的 `description` 字段，匹配后才加载完整 `SKILL.md`。
+
 **期望反应**：
-- Zcode 应该识别 skill 并加载
-- 自动触发 Team Plan 输出模板
-- 问你"什么任务"
+- Zcode 加载 SKILL.md，Leader 身份接管
+- Leader 输出 Team Plan 模板，问你“具体什么任务”
 
 **如果没反应**：
-- 检查 Zcode 设置 → Agents → Sub-Agents 是否启用
-- 完全退出 Zcode 再重开（不是最小化）
+- 检查 Zcode 是否有这个 skill：`bash scripts/install.sh --doctor`
+- 试试更明确的触发词：“team mode”、“用 team 模式”、“拆成子任务”
+- 完全退出 Zcode 重开
 - 看 Zcode 日志（设置 → Logs）
 - 重跑 `bash scripts/validate.sh`
 
@@ -75,7 +85,7 @@ kill %1
 在 Zcode 输入：
 
 ```
-/mavis-team-mode 帮我给这个项目加一个 README（如果还没有）
+用 mavis team mode 帮我给这个项目加一个 README（如果还没有）
 ```
 
 **期望反应**：

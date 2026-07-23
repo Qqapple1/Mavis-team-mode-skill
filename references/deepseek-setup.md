@@ -45,8 +45,10 @@ category: setup
 
 ## 4. 跑 Mavis Team Mode
 
+跟 Zcode 说（描述匹配触发）：
+
 ```
-/mavis-team-mode 用 deepseek 模型，帮我 [你的复杂任务]
+用 mavis team mode 加 deepseek 模型，帮我 [你的复杂任务]
 ```
 
 ## 5. 模型选择建议
@@ -61,7 +63,7 @@ category: setup
 ## 6. 已知限制
 
 **DeepSeek 在 Zcode 上的 trade-off**：
-- ❌ 失去 Zcode 对 GLM-5.2 的深度优化（如 1M 上下文、代码场景 prompt）
+- ❌ 失去 Zcode 对原生 GLM 模型路径的默认调优（具体未在官方文档明确公开，按经验观察）
 - ❌ DeepSeek 工具调用格式跟 Anthropic 有差异，部分 Zcode 功能可能降级
 - ✅ 价格便宜（输入 ¥1/M tokens，输出 ¥2/M tokens）
 - ✅ 100 万 token 上下文（跟 GLM-5.2 / M3 同级别）

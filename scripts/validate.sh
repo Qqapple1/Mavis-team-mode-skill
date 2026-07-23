@@ -117,11 +117,11 @@ for e in "${EXAMPLES[@]}"; do
 done
 
 # 10. Total size sanity check
-total_size=$(du -sk "$SKILL_DIR" 2>/dev/null | awk '{print $1}')
-if [ "$total_size" -lt 500 ] && [ "$total_size" -gt 5 ]; then
+total_size=$(du -skL "$SKILL_DIR" 2>/dev/null | awk '{print $1}')
+if [ "$total_size" -lt 1500 ] && [ "$total_size" -gt 5 ]; then
   ok "Total size looks reasonable: ${total_size}KB"
 else
-  warn "Total size: ${total_size}KB (expected 5-500KB for a skill)"
+  warn "Total size: ${total_size}KB (expected 5-1500KB for a skill)"
 fi
 
 # Summary

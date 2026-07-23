@@ -5,6 +5,8 @@
 
 ## Context
 
+Related: [ADR-001 Team Mode Recreation](ADR-001-team-mode-recreation.md) — the architectural decision that brought this skill into existence; this ADR focuses on the security stance of the included prototype server.
+
 The skill ships a runnable Python HTTP server (`examples/prototype-todo-app/server/server.py`)
 to demonstrate the workflow end-to-end. The server is a teaching example,
 not a production application, but it must still be safe to run on a

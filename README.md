@@ -9,7 +9,7 @@
 [![Skill tests](https://img.shields.io/badge/validate-22%2F22%20passing-brightgreen)](VALIDATION.md)
 [![Prototype tests](https://img.shields.io/badge/prototype%20e2e-41%2F41%20passing-brightgreen)](examples/prototype-todo-app/)
 [![YAML](https://img.shields.io/badge/yaml-15%2F15%20passing-brightgreen)](scripts/validate_yaml.py)
-[![Version](https://img.shields.io/badge/version-1.3.0-blue)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-1.3.1-blue)](CHANGELOG.md)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 [![Zcode 3.x](https://img.shields.io/badge/zcode-3.x-purple)](https://zcode-ai.com)
 [![Security](https://img.shields.io/badge/security-policy-green)](SECURITY.md)
@@ -45,9 +45,10 @@ sleep 2
 python3 test_e2e.py
 kill %1
 
-# 4. 打开 Zcode
-#    /mavis-team-mode
-#    "用 team 模式帮我..."
+# 4. 打开 Zcode，跟它说：
+#    "用 mavis team mode 帮我 ..."
+#    或“拆开来做”、“用 team 模式跑一下”
+# （Zcode 靠 description 匹配自动加载；不需要 /mavis-team-mode 命令）
 ```
 
 ## 安装

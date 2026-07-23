@@ -20,7 +20,8 @@ category: research
 ## 子任务清单
 
 ### Subtask 1: 调研 WebSocket 库选型
-- **type**: explore + web
+- **type**: explore
+- **tools**: [read_file, grep, glob, web_search, web_fetch]
 - **prompt**: 调研：
   1. Node.js 主流 WebSocket 库对比（ws / socket.io / uWebSockets.js）
   2. 浏览器原生 WebSocket API 现状
