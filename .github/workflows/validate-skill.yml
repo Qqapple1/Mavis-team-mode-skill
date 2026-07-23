@@ -47,6 +47,7 @@ jobs:
         run: shellcheck scripts/validate.sh
 
       - name: bash syntax check
+        shell: bash
         run: |
           set -e
           for f in $(find . -name "*.sh" -not -path "./.git/*"); do
@@ -71,6 +72,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: python syntax check
+        shell: bash
         run: |
           set -e
           for f in $(find . -name "*.py" -not -path "./.git/*"); do
@@ -249,6 +251,7 @@ jobs:
           done
 
       - name: python syntax
+        shell: bash
         run: |
           for f in $(find . -name "*.py" -not -path "./.git/*"); do
             python3 -m py_compile "$f"
