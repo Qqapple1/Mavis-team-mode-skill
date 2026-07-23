@@ -44,11 +44,11 @@ doctor: ## Diagnose current install state (no changes)
 
 # ---- Validation ----
 .PHONY: validate
-validate: ## Run all skill format checks (22 checks)
+validate: ## Run all skill format checks (23 checks)
 	bash scripts/validate.sh
 
 .PHONY: validate-yaml
-validate-yaml: ## Run YAML frontmatter validation (15 checks)
+validate-yaml: ## Run YAML frontmatter validation (12 files)
 	$(PYTHON) scripts/validate_yaml.py
 
 .PHONY: validate-all
@@ -79,7 +79,7 @@ syntax: ## Check bash + python syntax only
 test: test-e2e ## Run end-to-end tests (requires prototype server)
 
 .PHONY: test-e2e
-test-e2e: ## Run 20 e2e tests (requires server running)
+test-e2e: ## Run 20 base e2e tests (requires server running)
 	@if ! lsof -i :8765 >/dev/null 2>&1; then \
 	  echo "Starting prototype server..."; \
 	  cd examples/prototype-todo-app && $(PYTHON) server/server.py & echo $$! > /tmp/test-server.pid; \
@@ -92,7 +92,7 @@ test-e2e: ## Run 20 e2e tests (requires server running)
 	fi
 
 .PHONY: test-e2e-extended
-test-e2e-extended: ## Run 21 extended e2e tests
+test-e2e-extended: ## Run 23 extended e2e tests
 	@if ! lsof -i :8765 >/dev/null 2>&1; then \
 	  echo "Starting prototype server..."; \
 	  cd examples/prototype-todo-app && $(PYTHON) server/server.py & echo $$! > /tmp/test-server.pid; \
@@ -104,8 +104,21 @@ test-e2e-extended: ## Run 21 extended e2e tests
 	  rm /tmp/test-server.pid; \
 	fi
 
+.PHONY: test-e2e-advanced
+test-e2e-advanced: ## Run 5 advanced e2e tests (slow client, idempotency, tags sort, health ISO ts, max length)
+	@if ! lsof -i :8765 >/dev/null 2>&1; then \
+	  echo "Starting prototype server..."; \
+	  cd examples/prototype-todo-app && $(PYTHON) server/server.py & echo $$! > /tmp/test-server.pid; \
+	  sleep 2; \
+	fi
+	cd examples/prototype-todo-app && $(PYTHON) test_e2e_advanced.py
+	@if [ -f /tmp/test-server.pid ]; then \
+	  kill $$(cat /tmp/test-server.pid) 2>/dev/null || true; \
+	  rm /tmp/test-server.pid; \
+	fi
+
 .PHONY: test-all
-test-all: validate-all syntax test-e2e test-e2e-extended ## Run EVERYTHING
+test-all: validate-all syntax test-e2e test-e2e-extended test-e2e-advanced ## Run EVERYTHING
 
 # ---- Prototype ----
 .PHONY: prototype

@@ -43,21 +43,23 @@ category: troubleshooting
 **症状**：Leader 输出 Team Plan 后，没派 sub-agent
 
 **原因**：
-- Zcode 3.0 子智能体还是 Beta，可能需要手动启用
+- Zcode 3.x 子智能体在某些版本下需要手动启用（**未在每个 Zcode 3.x minor 版本实测**，以下是基于一般 Zcode 行为推断）
 - 某些任务类型不满足触发条件
+- Leader 没在 Team Plan 模板里指定 `type: general-purpose | explore`
 
 **解决**：
 - 检查 Zcode 设置 → Agents → 确认 Sub-Agents 启用
 - 确认任务描述里有"用 team 模式"或"mavis team"触发词
+- 在 Team Plan 里明确每个 Sub-task 的 `type: general-purpose`（写文件）或 `type: explore`（只读）
 
 ## Verifier 没找到问题
 
 **症状**：Verifier 给了 PASS，但用户实际发现 bug
 
-**原因**：Verifier 是"软"独立——第二个 Zcode 会话，模型可能跟 Leader 一样
+**原因**：Verifier 是"软"独立——第二个 Zcode 会话，模型可能跟 Leader 一样（**没有强制要求 Zcode 切换模型**）
 
 **解决**：
-- 用不同模型（Leader 用 GLM-5.2，Verifier 用 DeepSeek）
+- 在 Zcode 里手动给 Verifier 会话换不同模型（**不保证 Zcode 3.x 一定支持热切换**）
 - 加更严格的 acceptance criteria
 - 让 Verifier 独立跑测试，不只是看代码
 

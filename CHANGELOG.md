@@ -33,6 +33,98 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - Removed dead `_send_json` references in test_e2e_extended.py
 - Server: POST with form data (not JSON) now returns 400, not 500
 
+## [1.3.6] - 2026-07-23
+
+### Fixed
+- Version sync: README badge, SKILL.md frontmatter, install.ps1, index.html
+  bumped to 1.3.6 (previous v1.3.6 commit only updated install.sh)
+- `scripts/validate.sh` final line: removed fake `/mavis-team-mode` slash
+  command suggestion, replaced with description-match guidance
+- `docs/ADR-001-team-mode-recreation.md`: "Author: Mavis (MiniMax M3)" →
+  "Community port (Mavis CLI agent)"
+- `docs/PERFORMANCE.md` speedup table: all 4 columns now labeled `(est.)`
+- `docs/WINDOWS.md`: removed contradictory "PowerShell not supported" claim
+  (this repo DOES ship `install.ps1` and `validate.ps1`)
+- `references/deepseek-setup.md`: added "honest framing" intro, removed
+  unverified claims about Zcode GLM optimization, corrected 1M context to
+  64K (V3/R1 actual limit per DeepSeek docs as of 2026-07)
+- `references/troubleshooting.md`: marked sub-agent / verifier claims as
+  not-tested per Zcode minor version
+- `SKILL.md` metadata `tested-on-ranges`: corrected "20+21=41" → "20+23+5=48"
+  and "9/9 jobs" → "11/11 jobs"
+- `index.html`: removed fake Zcode slash commands (`/plugin marketplace
+  add`, `/plugin install mavis-team-mode@Qqapple1`), removed unverified
+  speedup claim from hero, corrected test count (41 → 48)
+- `docs/ARCHITECTURE.md`: corrected file/line counts (SKILL.md 212→201,
+  test_e2e_extended 21→23, added test_e2e_advanced 5, scripts 3→5,
+  docs 4→5), fixed "(21 tests)" in tree
+- `Makefile`: added `test-e2e-advanced` target, fixed "21" → "23"
+- `VALIDATION.md`: corrected CI job names + test counts
+- `SECURITY.md`: corrected `python3 server/server.py` path (was at repo
+  root, actually under `examples/prototype-todo-app/`)
+- `INSTALL.md`: rewrote to 4 actually-tested install methods (1: bash,
+  2: PowerShell, 3: manual git + symlink, 4: manual copy). Removed fake
+  "npx skills CLI" and "from Claude Code import" methods.
+- `README.md`: corrected 5 install methods → 4, removed "npx skills CLI"
+  bullet, corrected 41/41 e2e → 48/48, fixed 9/9 jobs → 11/11 jobs
+
+## [1.3.5] - 2026-07-23
+
+### Added
+- `scripts/install.ps1` (224 lines) — PowerShell installer, never symlink
+- `scripts/validate.ps1` (104 lines) — PowerShell validator
+- `examples/prototype-todo-app/run_e2e.ps1` — Windows e2e runner
+- `docs/WINDOWS.md` (150 lines) — 3-scheme comparison (Git Bash / PowerShell / WSL2)
+- `references/deepseek-setup.md` — DeepSeek + Zcode setup guide
+- `Makefile` — `make help/install/test/lint/info` shortcuts
+- Windows install + Python startup CI job (PowerShell)
+- Cross-platform helpers in install.sh: `abs_path`, `dir_size_kb`, `make_link`
+  with `MAVIS_TEAM_FORCE_COPY` env var
+- `--copy` flag in install.sh for explicit copy mode
+
+### Changed
+- `install.sh` rewrite for cross-platform safety (symlink → copy fallback)
+- Git Bash detection now defaults to copy mode automatically
+- `.shellcheckrc` updated for new test layout
+
+### Fixed
+- macOS `shellcheck` SC2218 (warn before def) — moved platform-default
+  block after function defs
+- Windows runner `bash syntax check` step — added `shell: bash` directive
+- Windows server startup — use `py` launcher (Windows Python launcher)
+  with 15s retry loop
+
+## [1.3.4] - 2026-07-23
+
+### Fixed
+- Zcode version reference: 3.0.0 → 3.4.2 (per zcode-ai.com download
+  page, 2026-07-23)
+- `docs/WINDOWS.md` typos and "1M context" claim removed from DeepSeek
+  model table (V3/R1 actual: 64K)
+
+## [1.3.3] - 2026-07-23
+
+### Added
+- README "Requirements" section listing platform, Python, Git, Bash, Disk
+- README "网络访问注意" section (China GFW workaround for
+  raw.githubusercontent.com)
+
+## [1.3.2] - 2026-07-23
+
+### Security
+- Server: socket-level timeout (`socket.settimeout(30)`) to prevent
+  slow-loris DoS
+- Server: stripped sensitive info from 404 responses (no path leak)
+- Client: `data-tag` XSS prevention (HTML-escape tag content before
+  injecting into DOM)
+
+### Fixed
+- Token benchmark: corrected sign of "eager load vs progressive" comparison
+  (progressive is -88.7% LESS, not "more")
+- `examples/prototype-todo-app/test_e2e_advanced.py`: added 5 stress /
+  edge-case tests (slow client, idempotency, tags sort, health ISO
+  timestamp, max length = 200 chars boundary)
+
 ## [1.3.1] - 2026-07-23
 
 ### Added
@@ -134,6 +226,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - 3 reference documents
 - `README.md`, `LICENSE`, `.gitignore`
 
+[1.3.6]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.5...v1.3.6
+[1.3.5]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.4...v1.3.5
+[1.3.4]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.3...v1.3.4
+[1.3.3]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.2...v1.3.3
+[1.3.2]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.1...v1.3.2
+[1.3.1]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.0.0...v1.1.0

@@ -7,6 +7,14 @@ category: setup
 
 # DeepSeek + Zcode Setup
 
+> **Honest framing**: This doc tells you how to connect Zcode to DeepSeek
+> at the provider level. It does **not** test that DeepSeek + this skill
+> actually produces good Team Mode output. Model behavior in multi-agent
+> workflows depends on each model's tool-use reliability, which DeepSeek
+> has not officially documented for Zcode 3.x as of 2026-07-23. The
+> "model selection" table below is general DeepSeek knowledge, not
+> measured in this repo.
+
 把 Zcode 接到 DeepSeek API。
 
 ## 1. 拿到 DeepSeek API Key
@@ -32,8 +40,8 @@ category: setup
 | Model | `deepseek-chat` 或 `deepseek-reasoner` |
 
 **说明：**
-- `deepseek-chat` — DeepSeek V3 系列，对标 GPT-4o
-- `deepseek-reasoner` — DeepSeek R1 系列，强推理但慢
+- `deepseek-chat` — DeepSeek V3 系列，对标 GPT-4o（按 DeepSeek 官方文档，2026-07 检索）
+- `deepseek-reasoner` — DeepSeek R1 系列，强推理但慢（同上）
 
 ## 3. 验证连通
 
@@ -62,12 +70,12 @@ category: setup
 
 ## 6. 已知限制
 
-**DeepSeek 在 Zcode 上的 trade-off**：
-- ❌ 失去 Zcode 对原生 GLM 模型路径的默认调优（具体未在官方文档明确公开，按经验观察）
-- ❌ DeepSeek 工具调用格式跟 Anthropic 有差异，部分 Zcode 功能可能降级
-- ✅ 价格便宜（输入 ¥1/M tokens，输出 ¥2/M tokens）
-- ✅ 100 万 token 上下文（跟 GLM-5.2 / M3 同级别）
-- ✅ 推理能力强（R1 系列）
+**DeepSeek 在 Zcode 上的 trade-off**（**这些只是常识 + 一般经验，不是我测出来的 Zcode 实际行为**）：
+- ❌ 失去 Zcode 对原生 GLM 模型路径的默认调优 — **未验证**
+- ❌ DeepSeek 工具调用格式跟 Anthropic 有差异 — **未在 Zcode 实测**
+- ✅ 价格便宜（按 DeepSeek 官网公开定价，2026-07）
+- ✅ 上下文长度（V3: 64K / R1: 64K 推理 + 8K 输出 — **不是 1M**，以 DeepSeek 官方为准）
+- ✅ 推理能力强（R1 系列 — 公开基准）
 - ✅ 开源（如果你想本地部署，可以跳过 API）
 
 ## 7. 国内访问

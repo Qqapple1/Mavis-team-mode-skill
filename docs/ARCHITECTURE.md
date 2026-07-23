@@ -125,21 +125,24 @@ flowchart TB
 
 ## File-level architecture
 
+> Line counts and test counts as of 2026-07-23 (v1.3.6). Run `make info`
+> or `wc -l` for current numbers — these can drift.
+
 ```
 mavis-team-mode-skill/
 │
-├── SKILL.md                       (212 lines) — Zcode loads this
-│   ├── YAML frontmatter            triggers on description
+├── SKILL.md                       (201 lines) — Zcode loads this on trigger
+│   ├── YAML frontmatter            triggers on description match
 │   └── Markdown body               instructions for Leader
 │
 ├── agents/                        (7 files) — sub-agent prompt templates
-│   ├── leader.md                   — Team Plan format, 6 phases
-│   ├── verifier.md                 — independent review checklist
-│   ├── worker-coder.md
-│   ├── worker-tester.md
-│   ├── worker-researcher.md
-│   ├── worker-doc-writer.md
-│   └── worker-reviewer.md
+│   ├── leader.md                   (127 lines) — Team Plan format, 6 phases
+│   ├── verifier.md                 (64 lines) — independent review checklist
+│   ├── worker-coder.md             (87 lines)
+│   ├── worker-tester.md            (54 lines)
+│   ├── worker-researcher.md        (58 lines)
+│   ├── worker-doc-writer.md        (54 lines)
+│   └── worker-reviewer.md          (64 lines)
 │
 ├── examples/                      (4 files) — concrete use cases
 │   ├── refactor-large-module.md
@@ -152,26 +155,34 @@ mavis-team-mode-skill/
 │   ├── deepseek-setup.md
 │   └── troubleshooting.md
 │
-├── scripts/                       (3 files) — install/validate
-│   ├── install.sh
-│   ├── validate.sh
-│   └── validate_yaml.py
+├── scripts/                       (5 files) — install/validate/benchmark
+│   ├── install.sh                  (483 lines) — bash, all platforms
+│   ├── install.ps1                 (224 lines) — PowerShell, Windows native
+│   ├── validate.sh                 (142 lines) — bash
+│   ├── validate.ps1                (104 lines) — PowerShell
+│   ├── validate_yaml.py            (224 lines) — pure-Python YAML
+│   └── benchmark_tokens.py         (224 lines) — token cost estimator
 │
-├── docs/                          (4 files) — architecture & decision logs
+├── docs/                          (5 files) — architecture & decision logs
 │   ├── ADR-001-team-mode-recreation.md
 │   ├── ADR-002-security.md
 │   ├── PERFORMANCE.md
-│   └── ARCHITECTURE.md  ← this file
+│   ├── ARCHITECTURE.md             ← this file
+│   └── WINDOWS.md                  (150 lines) — Windows-specific guide
 │
 ├── examples/prototype-todo-app/   — real working web app
-│   ├── server/server.py            (defense-in-depth HTTP)
-│   ├── client/index.html           (validation + UI)
-│   ├── test_e2e.py                 (20 tests)
-│   └── test_e2e_extended.py        (21 tests)
+│   ├── server/server.py            (279 lines, defense-in-depth HTTP)
+│   ├── client/index.html           (324 lines, validation + UI)
+│   ├── test_e2e.py                 (20 tests, base HTTP + CRUD)
+│   ├── test_e2e_extended.py        (23 tests, methods + unicode + concurrency)
+│   ├── test_e2e_advanced.py        (5 tests, slow client + idempotency)
+│   ├── run_e2e.ps1                 (Windows runner)
+│   └── README.md
 │
-├── .github/workflows/              — CI (shellcheck, bash, py, e2e)
+├── .github/workflows/              — CI (11 jobs: lint x3, py x5, win, integration, stats)
 ├── .shellcheckrc
-├── Makefile                        — `make` shortcut
+├── Makefile                        — `make help/install/test/lint` shortcuts
+├── index.html                      — GitHub Pages-friendly landing
 ├── README.md
 ├── INSTALL.md
 ├── VALIDATION.md
@@ -195,11 +206,13 @@ mavis-team-mode-skill/
 
 ## Token economics
 
-- **Without skill**: average task plan = 800-1500 tokens in main context (since Leader writes detailed prompts)
-- **With skill**: SKILL.md = 212 lines, agents/ templates = 50-150 lines each
-- **Progressive disclosure**: only loaded if Leader invokes that sub-agent
-- **Savings**: 30-60% on main-context tokens for typical tasks
-- See `PERFORMANCE.md` for benchmarks.
+> **Estimated**, not measured. See `docs/PERFORMANCE.md` for the actual
+> 4-chars-per-token heuristic numbers.
+
+- **Without skill**: average task plan = ~3,000 tokens in main context (Leader writes detailed prompts inline)
+- **With skill (progressive load)**: ~5,229 tokens on activation, additional agents loaded only if invoked
+- **Net change**: skill costs **+74%** vs inline baseline, but enables parallel execution
+- The skill is a **time-saver, not a token-saver** — use it when wall-clock matters more than tokens.
 
 
 ## See also

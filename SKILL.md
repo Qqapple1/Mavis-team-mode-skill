@@ -7,12 +7,12 @@ allowed-tools: [task, read_file, write_file, edit_file, bash, glob, grep, web_se
 metadata:
   author: Community port (Mavis CLI agent)
   origin: Recreated from MiniMax Mavis TeamEngine (May 2026 announcement)
-  compatibility: Zcode 3.4.2+ (per zcode-ai.com download page, as of 2026-07-23) (Zcode's docs advertise GLM-5.2 / DeepSeek / Anthropic / OpenAI / MiniMax M3 model support)
+  compatibility: Zcode 3.4.2+ (per zcode-ai.com download page, as of 2026-07-23). Model-agnostic: works with whatever model your Zcode is configured for (Zcode 3.x supports multiple providers per its docs; not independently tested for each).
   category: workflow
   tested-on-ranges:
-    - "prototype-todo-app e2e (20+21 tests, 41/41 passing) — included in this repo"
+    - "prototype-todo-app e2e (20+23+5 tests, 48/48 passing) — included in this repo"
     - "skill format + YAML frontmatter validation (22+15 checks) — included"
-    - "GitHub Actions CI on Ubuntu 24.04 + macOS, Python 3.8-3.12 — 9/9 jobs passing"
+    - "GitHub Actions CI: Ubuntu 24.04 + macOS + Windows (PowerShell install + Python startup), Python 3.8-3.12 — 11/11 jobs passing"
     - "Real Zcode runtime: NOT YET TESTED by the skill author. See README 'Real-world testing' section."
 ---
 
@@ -57,7 +57,7 @@ using the Agent Skills standard + Zcode's built-in sub-agent system.
 | Verifier 对抗迭代 | ✅ 独立推理空间 | ⚠️ 用第二个 Zcode 会话模拟 |
 | 状态机管理 | ✅ TeamEngine 状态机 | ❌ 无（用 checkpoint 模拟） |
 | 上下文隔离 | ✅ Worker 独立上下文 | ✅ Zcode subagent 原生支持 |
-| 适用模型 | 绑定 M3 | 任意（GLM-5.2 / DeepSeek / Claude / MiniMax M3） |
+| 适用模型 | 绑定 M3 | 任意（取决于你 Zcode 接的 provider） |
 
 ## When to use this skill
 

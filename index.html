@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mavis Team Mode — Agent Skill for Zcode 3.0</title>
+<title>Mavis Team Mode — Agent Skill for Zcode 3.x</title>
 <style>
   :root {
     --bg: #0d1117;
@@ -70,6 +70,7 @@
   a { color: var(--accent); text-decoration: none; }
   a:hover { text-decoration: underline; }
   .footer { margin-top: 60px; padding-top: 20px; border-top: 1px solid var(--border); color: var(--text-mute); font-size: 13px; }
+  .honest { color: var(--orange); }
 </style>
 </head>
 <body>
@@ -77,9 +78,9 @@
 
 <h1>🧠 Mavis Team Mode</h1>
 <p class="lede">
-  Recreates the Mavis Leader + Workers + Verifier workflow as a portable
-  Agent Skill. Install on Zcode 3.0 (or Claude Code, Codex CLI, OpenClaw,
-  Augment, Windsurf) and get 2-2.5× speedup on complex multi-step tasks.
+  A community port of Mavis's Leader + Workers + Verifier workflow, packaged
+  as a portable Agent Skill for <a href="https://zcode-ai.com">Zcode 3.x</a>.
+  Runs on any model your Zcode is configured for.
 </p>
 
 <div class="badges">
@@ -87,26 +88,38 @@
   <img src="https://img.shields.io/badge/license-MIT-green" alt="license">
   <img src="https://img.shields.io/badge/zcode-3.x-purple" alt="zcode">
   <img src="https://img.shields.io/badge/python-3.8%2B-blue" alt="python">
-  <img src="https://img.shields.io/badge/e2e-41%2F41%20passing-brightgreen" alt="tests">
-  <img src="https://img.shields.io/badge/yaml-15%2F15%20passing-brightgreen" alt="yaml">
-  <img src="https://img.shields.io/badge/skill-22%2F22%20passing-brightgreen" alt="skill">
+  <img src="https://img.shields.io/badge/e2e-48%2F48%20passing-brightgreen" alt="tests">
+  <img src="https://img.shields.io/badge/yaml-12%2F12%20passing-brightgreen" alt="yaml">
+  <img src="https://img.shields.io/badge/skill-23%2F23%20passing-brightgreen" alt="skill">
+  <img src="https://img.shields.io/badge/platform-mac%2Flinux%2Fwin-lightgrey" alt="platform">
 </div>
 
 <h2>Quick install</h2>
 <div class="card install-block">
-<pre><code># 1. One-liner
-curl -fsSL https://raw.githubusercontent.com/Qqapple1/Mavis-team-mode-skill/main/scripts/install.sh | bash
+<pre><code># macOS / Linux / Git Bash / WSL
+bash &lt;(curl -fsSL https://raw.githubusercontent.com/Qqapple1/Mavis-team-mode-skill/main/scripts/install.sh)
 
-# 2. Or git clone
+# Or git clone + manual
 git clone https://github.com/Qqapple1/Mavis-team-mode-skill.git ~/mavis-team-mode-skill
 bash ~/mavis-team-mode-skill/scripts/install.sh
 
-# 3. Or from Claude Code
-/plugin marketplace add Qqapple1/Mavis-team-mode-skill
-/plugin install mavis-team-mode@Qqapple1
+# Windows PowerShell
+git clone https://github.com/Qqapple1/Mavis-team-mode-skill.git $env:USERPROFILE\mavis-team-mode-skill
+cd $env:USERPROFILE\mavis-team-mode-skill
+powershell -ExecutionPolicy Bypass -File scripts\install.ps1
 
 # Verify
-bash scripts/install.sh --doctor</code></pre>
+bash scripts/install.sh --doctor    # or: powershell -File scripts\install.ps1 -Doctor</code></pre>
+</div>
+
+<h2>Honest framing</h2>
+<div class="card">
+  <p class="honest">⚠️ This is a community port, not affiliated with MiniMax.</p>
+  <ul>
+    <li><b>Verified</b>: 48/48 e2e + 23/23 skill format + 12/12 YAML + 11/11 CI jobs on Linux + macOS + Windows (PowerShell install + Python startup).</li>
+    <li><b>Not yet verified</b>: Real Zcode runtime — the actual sub-agent dispatch + Verifier independence behavior depends on your Zcode 3.x version, which I can't run in CI.</li>
+    <li><b>Estimated</b>: The "2-2.5× speedup" in docs is a paper projection, not a measured number.</li>
+  </ul>
 </div>
 
 <h2>The workflow</h2>
@@ -148,7 +161,7 @@ bash scripts/install.sh --doctor</code></pre>
   </div>
   <div class="feature">
     <h4>Independent Verifier</h4>
-    <p>A separate sub-agent (different conversation) reviews the result. No self-review bias.</p>
+    <p>A separate sub-agent (different conversation) reviews the result. Same model as Leader = possible bias, see docs.</p>
   </div>
   <div class="feature">
     <h4>Iterate with guardrails</h4>
@@ -168,38 +181,25 @@ bash scripts/install.sh --doctor</code></pre>
   </div>
   <div class="feature">
     <h4>Defense-in-depth prototype</h4>
-    <p>The included Todo app is a real working web app with CORS whitelist, body cap, threading lock, and 41 e2e tests.</p>
+    <p>Real working Todo app with CORS whitelist, body cap, threading lock, 48 e2e tests (20 + 23 + 5).</p>
   </div>
   <div class="feature">
-    <h4>Multi-platform CI</h4>
-    <p>Tests on Ubuntu + macOS, Python 3.8 → 3.12. Pre-merge validation in GitHub Actions.</p>
+    <h4>Multi-platform</h4>
+    <p>bash + PowerShell installers. Tests on Ubuntu + macOS + Windows, Python 3.8 → 3.12.</p>
   </div>
 </div>
 
 <h2>Why this exists</h2>
 <p>
-  Mavis's Team Mode (Leader + Workers + Verifier) is the best multi-agent
-  workflow we've seen. But it ships only with the M3 model in
-  MiniMax Code. This skill brings the same workflow to any Zcode 3.0 setup
-  — including setups running on DeepSeek, Claude, GPT, GLM, Kimi, or
-  MiniMax M3.
+  Mavis's Team Mode (Leader + Workers + Verifier) is a well-designed
+  multi-agent workflow. But it ships only with the M3 model in
+  MiniMax Code. This skill brings the same workflow to any
+  <a href="https://zcode-ai.com">Zcode 3.x</a> setup — so you can run
+  the workflow on whatever model your Zcode is configured for.
 </p>
 
-<h2>Real-world speedups</h2>
-<table>
-  <thead>
-    <tr><th>Workflow</th><th>Plain prompt</th><th>With this skill</th><th>Speedup</th></tr>
-  </thead>
-  <tbody>
-    <tr><td>Refactor 1500-line module</td><td>45 min</td><td>20 min</td><td><b>2.25x</b></td></tr>
-    <tr><td>Add tag filter to Todo app</td><td>30 min</td><td>12 min</td><td><b>2.5x</b></td></tr>
-    <tr><td>Multi-file bug hunt</td><td>60 min</td><td>30 min</td><td><b>2x</b></td></tr>
-    <tr><td>Research + implement</td><td>90 min</td><td>45 min</td><td><b>2x</b></td></tr>
-  </tbody>
-</table>
-
-<h2>Token economics</h2>
-<p>Honest numbers (estimated with 4-chars-per-token heuristic):</p>
+<h2>Token economics <span class="honest">(estimated)</span></h2>
+<p>4-chars-per-token heuristic, 4-subtask plan:</p>
 <table>
   <thead>
     <tr><th>Load mode</th><th>Tokens</th><th>vs inline baseline</th></tr>
@@ -211,28 +211,30 @@ bash scripts/install.sh --doctor</code></pre>
   </tbody>
 </table>
 <p>
-  The skill <b>costs more tokens than writing it inline</b>, but the
-  parallel execution gives 2-2.5× wall-clock speedup. Use it when
+  The skill <b>costs more tokens than writing it inline</b>. Use it when
   time-to-completion matters more than token cost.
 </p>
 
 <h2>What's in the box</h2>
 <pre><code>mavis-team-mode-skill/
-├── SKILL.md                 # main, 212 lines, Zcode loads this
+├── SKILL.md                 # main, 201 lines, Zcode loads this
 ├── agents/                  # 7 sub-agent prompt templates
 │   ├── leader.md            # 6-phase workflow
 │   ├── verifier.md          # independent review
 │   └── worker-{coder,tester,researcher,doc-writer,reviewer}.md
 ├── examples/                # 4 worked use cases
 ├── references/              # 3 deep-dive docs
-├── docs/                    # ADR-001, ADR-002, PERFORMANCE, ARCHITECTURE
-├── scripts/                 # install.sh, validate.sh, validate_yaml.py, benchmark_tokens.py
+├── docs/                    # ADR-001, ADR-002, ARCHITECTURE, PERFORMANCE, WINDOWS
+├── scripts/                 # install.sh, install.ps1, validate.sh/ps1, validate_yaml.py, benchmark_tokens.py
 ├── examples/prototype-todo-app/  # real working web app
-│   ├── server/server.py     # 300+ lines, defense-in-depth
-│   ├── client/index.html    # 250+ lines, validation
+│   ├── server/server.py     # 279 lines, defense-in-depth
+│   ├── client/index.html    # 324 lines, validation
 │   ├── test_e2e.py          # 20 tests
-│   └── test_e2e_extended.py # 21 tests
-├── .github/workflows/       # CI: Linux + macOS, Python 3.8-3.12
+│   ├── test_e2e_extended.py # 23 tests
+│   ├── test_e2e_advanced.py # 5 tests
+│   ├── run_e2e.ps1          # Windows runner
+│   └── README.md
+├── .github/workflows/       # CI: Linux + macOS + Windows, Python 3.8-3.12
 ├── Makefile                 # `make` shortcuts
 ├── README.md
 ├── INSTALL.md
@@ -246,17 +248,18 @@ bash scripts/install.sh --doctor</code></pre>
 <h2>Try it in 60 seconds</h2>
 <ol>
   <li>Install (see Quick install above)</li>
-  <li>Open Zcode 3.0 in any project</li>
-  <li>Type: <code>用 Mavis team mode 跑一下 examples/prototype-todo-app 的 e2e 测试，跨平台</code></li>
-  <li>Watch the Leader dispatch 3 sub-agents in parallel, then verify with a 4th</li>
+  <li>Restart Zcode 3.x (fully quit, not minimize)</li>
+  <li>Just talk naturally: <code>用 Mavis team mode 跑一下 examples/prototype-todo-app 的 e2e 测试</code></li>
+  <li>Watch the Leader dispatch sub-agents in parallel, then verify</li>
 </ol>
 
 <h2>License</h2>
 <p>MIT — see <a href="LICENSE">LICENSE</a>.</p>
 
 <div class="footer">
-  Built as a community port of Mavis's Team Mode. Not affiliated with
-  MiniMax. MiniMax Code is a trademark of MiniMax Inc.
+  Built as a community port of Mavis's Team Mode workflow. Not affiliated with
+  MiniMax. MiniMax Code is a trademark of MiniMax Inc. Zcode is referenced
+  per their public download page (zcode-ai.com, 2026-07-23).
 </div>
 
 </div>

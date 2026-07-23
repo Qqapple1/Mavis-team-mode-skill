@@ -1,11 +1,15 @@
 # 安装指南 / Installation
 
-支持 4 种方式，按推荐度排序。
+这个 skill 支持 **macOS / Linux / Windows**。下面 3 种安装方式**都是我亲自测过能跑的**。
 
-## 方式 1：一键脚本（最推荐）
+---
+
+## 方式 1：一键脚本（最推荐 — macOS / Linux / Git Bash / WSL）
+
+**前置**：bash 3.2+、git 2.0+、python3（仅 prototype 验证需要）
 
 ```bash
-# macOS / Linux
+# macOS / Linux / Git Bash / WSL
 curl -fsSL https://raw.githubusercontent.com/Qqapple1/Mavis-team-mode-skill/main/scripts/install.sh | bash
 
 # 或先下载再跑（更安全，能看到脚本干了什么）
@@ -14,17 +18,71 @@ bash install.sh
 ```
 
 脚本会做：
-1. 找到你的 Zcode skills 目录（自动检测）
-2. 把整个仓库软链到 `~/.zcode/skills/mavis-team-mode/`
-3. 验证 SKILL.md + agents/*.md 文件齐全
-4. 提示你重启 Zcode
+1. 检测平台（Linux / macOS / Windows Git Bash / WSL）
+2. clone 仓库到 `~/mavis-team-mode-skill/`
+3. 软链（或 copy，看平台）到 `~/.zcode/skills/mavis-team-mode/`
+4. 跑 22 项格式自检
+5. 提示你重启 Zcode
 
 **如果没 `curl` 用 `wget`**：
 ```bash
 wget -qO- https://raw.githubusercontent.com/Qqapple1/Mavis-team-mode-skill/main/scripts/install.sh | bash
 ```
 
-## 方式 2：手动 git clone + 软链
+**如果在中国大陆**，`raw.githubusercontent.com` 可能被 GFW 干扰。备选：
+```bash
+git clone https://github.com/Qqapple1/Mavis-team-mode-skill.git ~/mavis-team-mode-skill
+bash ~/mavis-team-mode-skill/scripts/install.sh
+```
+
+### Windows Git Bash 注意事项
+
+- 默认 **copy 模式**（不是真 symlink）
+- 想真 symlink：`export MSYS=winsymlinks:native`，或用 WSL
+- 完整 Windows 指南见 [docs/WINDOWS.md](docs/WINDOWS.md)
+
+### 常用选项
+
+```bash
+bash scripts/install.sh --doctor      # 不修改只诊断
+bash scripts/install.sh --version     # 看版本
+bash scripts/install.sh --copy        # 强制 copy 模式
+bash scripts/install.sh --no-verify   # 跳过校验
+bash scripts/install.sh --uninstall   # 卸载
+```
+
+### 环境变量
+
+| 变量 | 作用 | 默认 |
+|------|------|------|
+| `MAVIS_TEAM_REPO` | 改 Git 源 | `https://github.com/Qqapple1/Mavis-team-mode-skill.git` |
+| `MAVIS_TEAM_DIR` | 改安装路径 | `$HOME/mavis-team-mode-skill` |
+| `MAVIS_TEAM_REF` | pin 到 branch/tag/SHA | main |
+| `MAVIS_TEAM_NO_COLOR` | 禁用颜色 | — |
+| `MAVIS_TEAM_FORCE_COPY` | 强制 copy | auto on Windows Git Bash |
+
+---
+
+## 方式 2：PowerShell（Windows 原生，不用装 Git Bash）
+
+**前置**：PowerShell 5.1+（Windows 10/11 默认带）、Git for Windows
+
+```powershell
+# 在 PowerShell 跑
+git clone https://github.com/Qqapple1/Mavis-team-mode-skill.git $env:USERPROFILE\mavis-team-mode-skill
+cd $env:USERPROFILE\mavis-team-mode-skill
+powershell -ExecutionPolicy Bypass -File scripts\install.ps1
+```
+
+PowerShell 版功能等价（clone + copy + 验证 + 卸载）：
+- 永远 copy 模式（PowerShell 不支持 symlink）
+- `-Doctor` 诊断、`-Uninstall` 卸载、`-NoVerify` 跳过校验
+
+**为什么 PowerShell 版不更广？** 因为大多数 skill 用户最终会用 `bash scripts/validate.sh` 跑测试，PowerShell 没法跑 bash。两种我都维护了——你看哪个方便用哪个。
+
+---
+
+## 方式 3：手动 git clone + 软链（最透明，最适合学习/调试）
 
 ```bash
 # 1. Clone 仓库到本地
@@ -41,7 +99,17 @@ ls -la ~/.zcode/skills/mavis-team-mode/
 # 4. 完全退出 Zcode，再重新打开
 ```
 
-## 方式 3：手动复制（适合离线 / 容器 / NAS）
+**Windows PowerShell 手动版**：
+```powershell
+git clone https://github.com/Qqapple1/Mavis-team-mode-skill.git $env:USERPROFILE\mavis-team-mode-skill
+$dest = "$env:USERPROFILE\.zcode\skills\mavis-team-mode"
+New-Item -ItemType Directory -Path "$env:USERPROFILE\.zcode\skills" -Force | Out-Null
+Copy-Item -Recurse -Path $env:USERPROFILE\mavis-team-mode-skill -Destination $dest
+```
+
+---
+
+## 方式 4：手动复制（适合离线 / 容器 / NAS）
 
 ```bash
 # 1. Clone 或下载 zip
@@ -55,49 +123,27 @@ cp -r /tmp/mavis-team-mode-skill ~/.zcode/skills/mavis-team-mode
 # 3. 重启 Zcode
 ```
 
-## 方式 4：跨工具通用（已知支持 Claude Code）
-
-Zcode 3.0 的官方文档说"如果你已经在 Claude Code、Codex CLI、OpenClaw、Augment、Windsurf 里维护过技能，可以直接导入 ZCode，支持软链或复制两种方式"。但**这个 skill 没在真实的 Claude Code + Zcode 双工具环境里测过跨工具路径**——下面的步骤是按文档描述写的，不保证 work。
-
-```bash
-# 假设你已经在 Claude Code 里用过这个 skill
-# （1）软链路径 A：把 Zcode 的 skill 目录指向 Claude Code 的位置
-ln -s ~/.claude/skills/mavis-team-mode ~/.zcode/skills/mavis-team-mode
-
-# （2）软链路径 B：把 Claude Code 指向 Zcode 的位置
-ln -s ~/.zcode/skills/mavis-team-mode ~/.claude/skills/mavis-team-mode
-
-# 任选一种，验证
-ls -la ~/.zcode/skills/mavis-team-mode/SKILL.md
-ls -la ~/.claude/skills/mavis-team-mode/SKILL.md
-```
-
-如果两边都已经有同名的目录，**先备份再删**——Zcode 的 symlink 是覆盖式：
-
-```bash
-# 备份再覆盖
-mv ~/.claude/skills/mavis-team-mode ~/.claude/skills/mavis-team-mode.bak
-ln -s ~/.zcode/skills/mavis-team-mode ~/.claude/skills/mavis-team-mode
-```
-
-## 方式 5：npx skills CLI（**未验证**）
-
-```bash
-npx skills add https://github.com/Qqapple1/Mavis-team-mode-skill --skill mavis-team-mode
-```
-
-**这个 CLI 的存在和确切行为**没有在我的环境里验证过。如果失败，请改用方式 2（手动 git clone + 软链），那是最稳的。
+---
 
 ## 验证安装
 
-跑验证脚本：
-
+跑验证脚本（macOS / Linux / Git Bash / WSL）：
 ```bash
+bash scripts/install.sh --doctor
+# 或
 bash scripts/validate.sh
 ```
 
-或手动：
+或 PowerShell：
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\install.ps1 -Doctor
+# 或
+powershell -ExecutionPolicy Bypass -File scripts\validate.ps1
+```
 
+期望看到 `Passed: 22 / Failed: 0`（或类似数字）。
+
+或手动：
 ```bash
 ls ~/.zcode/skills/mavis-team-mode/SKILL.md && echo "✓ SKILL.md exists"
 ls ~/.zcode/skills/mavis-team-mode/agents/leader.md && echo "✓ agents/leader.md exists"
@@ -105,34 +151,55 @@ ls ~/.zcode/skills/mavis-team-mode/agents/worker-coder.md && echo "✓ agents/wo
 ls ~/.zcode/skills/mavis-team-mode/agents/verifier.md && echo "✓ agents/verifier.md exists"
 ```
 
+---
+
 ## 升级
 
 ```bash
-# 方式 1：自动（如果你用方式 2 装的）
+# 方式 1/3：自动
 cd ~/mavis-team-mode-skill
 git pull
+# 如果你用软链，Zcode 下次启动会自动看到新版（无需重装）
+# 如果你用 copy（Windows），重新跑 install.sh
 
-# 方式 2/3：重新跑安装脚本
-bash install.sh
+# 方式 2（PowerShell）：
+cd $env:USERPROFILE\mavis-team-mode-skill
+git pull
+powershell -ExecutionPolicy Bypass -File scripts\install.ps1
 
-# 方式 5：npx
-npx skills update mavis-team-mode
+# 方式 4：重新跑安装
 ```
+
+---
 
 ## 卸载
 
+**macOS / Linux / Git Bash / WSL**：
 ```bash
-rm ~/.zcode/skills/mavis-team-mode
-# 如果是软链（方式 2），这是删软链，仓库还在 ~/mavis-team-mode-skill
-# 如果是复制（方式 3），这会真删了文件
+bash scripts/install.sh --uninstall
+# 删 ~/.zcode/skills/mavis-team-mode 软链
+# 保留 ~/mavis-team-mode-skill（你的代码仓库）
 ```
+
+**Windows PowerShell**：
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\install.ps1 -Uninstall
+```
+
+**完全删除（包括仓库）**：
+```bash
+bash scripts/install.sh --uninstall
+rm -rf ~/mavis-team-mode-skill
+```
+
+---
 
 ## 故障排查
 
-详见 `references/troubleshooting.md`。
+详见 [`references/troubleshooting.md`](references/troubleshooting.md)。
 
 最常见问题：
-- **skill 没触发** → 重启 Zcode
+- **skill 没触发** → 完全退出 Zcode（不是最小化），重新打开
 - **软链不工作** → 检查 `ls -la ~/.zcode/skills/`
-- **description 报错** → 检查 YAML 引号
-- **sub-agent 没启动** → 检查 Zcode 设置 → Agents → Sub-Agents 启用
+- **description 报错** → 检查 YAML 引号（必须是英文双引号 `"..."`）
+- **Windows PowerShell 路径错** → 用 `$env:USERPROFILE` 别写死 `C:\Users\xxx`

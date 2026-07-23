@@ -2,7 +2,13 @@
 
 **Status**: Accepted
 **Date**: 2026-07-23
-**Author**: Mavis (MiniMax M3)
+**Author**: Community port (Mavis CLI agent)
+
+> **Note**: This ADR was written before I had access to the MiniMax Mavis
+> source code. The "70-80% fidelity" claim is qualitative, based on
+> documented TeamEngine features (May 2026 announcement). Real fidelity
+> depends on the Zcode 3.x sub-agent API surface, which is partially
+> documented and partially reverse-engineered from observed behavior.
 
 ## Context
 
@@ -16,16 +22,20 @@ This is a powerful workflow pattern, but it's locked inside MiniMax Code:
 - Closed-source, no way to inspect or extend
 - Tied to the MiniMax Code desktop app
 
-Users who want this pattern but use other tools (Zcode, Claude Code,
-Cursor, etc.) have no equivalent. The pattern is also useful in pure
-skill form even for MiniMax Code users who want to understand the
+Users who want this pattern but use other tools (Zcode, etc.) have no
+equivalent that I know of as of 2026-07. The pattern is also useful in
+pure skill form even for MiniMax Code users who want to understand the
 workflow explicitly.
 
 ## Decision
 
 We recreate the Mavis Team Mode workflow as a **portable Agent Skill**
-that can be installed in any tool that supports the Agent Skills standard
-(Claude Code, Zcode, Codex, Cursor, etc.).
+that can be installed in any tool that supports the Agent Skills standard.
+This skill is built and tested against Zcode 3.4.2+ (per
+[zcode-ai.com](https://zcode-ai.com) download page, 2026-07-23).
+Cross-tool compatibility (Claude Code, Codex CLI, Cursor, etc.) is
+plausible based on the shared Agent Skills standard, but **not
+independently tested** in this repo.
 
 The skill provides:
 - A `SKILL.md` defining the workflow and triggers
@@ -63,14 +73,15 @@ Skill (SKILL.md)
 | Dimension | Native Mavis | Skill recreation |
 |-----------|--------------|------------------|
 | Leader planning | Automatic (TeamEngine) | Manual (Leader follows template) |
-| Worker parallelism | Background tasks | Foreground (Zcode 3.0 limit) |
-| Verifier isolation | Independent reasoning space | Second Zcode session |
-| State machine | TeamEngine | Checkpoint files (planned) |
-| Model freedom | Locked to M3 | Any (GLM-5.2, DeepSeek, Claude, M3) |
+| Worker parallelism | Background tasks | Foreground (Zcode 3.x limit) |
+| Verifier isolation | Independent reasoning space | Second Zcode session (same model = possible bias) |
+| State machine | TeamEngine | None (use checkpoints manually) |
+| Model freedom | Locked to M3 | Whatever your Zcode is configured for |
 | Cost | M3 Token Plan | User's existing API key |
 
-We accept ~70-80% of native capability in exchange for portability and
-model freedom.
+We accept **~70-80% of native capability** (qualitative estimate) in
+exchange for portability and model freedom. The biggest gap is
+Verifier independence — without a separate model, bias is real.
 
 ## Consequences
 
@@ -108,9 +119,9 @@ can be incrementally improved.
 
 ## References
 
-- MiniMax Mavis Team Mode announcement: May 2026
-- Agent Skills specification: https://support.claude.com/en/articles/12512176
-- Zcode 3.0 sub-agent system documentation
+- MiniMax Mavis Team Mode announcement: May 2026 (cited per public Mavis docs; original URL not captured)
+- Agent Skills specification: Anthropic's published standard for skills (no specific URL retained; see any Claude Code / Zcode docs for current spec)
+- Zcode 3.x sub-agent system: per [zcode-ai.com](https://zcode-ai.com) public documentation, 2026-07-23
 
 
 ## See also

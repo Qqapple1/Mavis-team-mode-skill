@@ -47,44 +47,46 @@ You'll see:
 - Main area: all todos
 - Click a tag → main area filters to only that tag
 
-### 4. Run the e2e test
+### 4. Run the e2e tests (48 total = 20 + 23 + 5)
 
 ```bash
-python3 test_e2e.py
+python3 test_e2e.py            # 20 base tests (HTTP + CRUD + security)
+python3 test_e2e_extended.py   # 23 extended tests (methods + unicode + concurrency)
+python3 test_e2e_advanced.py   # 5 advanced tests (slow client, idempotency, edges)
+```
+
+Or on Windows PowerShell, all in one terminal:
+```powershell
+powershell -ExecutionPolicy Bypass -File .\run_e2e.ps1
 ```
 
 Should output:
 ```
-=== Test 1: GET /api/health ===
-  ✓ Health check passed
-=== Test 2: GET /api/todos ===
-  ✓ Got N todos
-=== Test 3: GET /api/tags ===
-  ✓ Got N unique tags
-=== Test 4: Filter by tag ===
-  ✓ Filter for 'work' returns N todos
-=== Test 5: Filter by non-existent tag ===
-  ✓ Filter for missing tag returns empty list
-✓ All tests passed!
+ALL TESTS PASSED  (20/20)
+ALL EXTENDED TESTS PASSED  (23/23)
+Passed: 5, Failed: 0  (advanced)
 ```
 
 ## What this proves about the Mavis Team Mode skill
 
 1. **Skill output is runnable** — the team plan produces real code, not vibes
-2. **Acceptance criteria are testable** — e2e tests verify the API
+2. **Acceptance criteria are testable** — 48 e2e tests verify the API
 3. **The workflow scales** — what took one team to do, took ~30 minutes here
 
 ## Files
 
 | File | Purpose |
 |------|---------|
-| `server/server.py` | Python HTTP server with in-memory todo store |
-| `client/index.html` | Single-page tag-filter UI (vanilla JS) |
-| `test_e2e.py` | 5 end-to-end tests (no dependencies) |
+| `server/server.py` | Python HTTP server with in-memory todo store (279 lines, defense-in-depth) |
+| `client/index.html` | Single-page tag-filter UI (vanilla JS, 324 lines, XSS-safe) |
+| `test_e2e.py` | 20 base e2e tests (HTTP + CRUD + security) |
+| `test_e2e_extended.py` | 23 extended tests (HTTP methods, unicode, concurrency) |
+| `test_e2e_advanced.py` | 5 advanced tests (slow client, idempotency, edge cases) |
+| `run_e2e.ps1` | Windows PowerShell e2e runner (one terminal, all 3 suites) |
 | `README.md` | This file |
 
 ## Requirements
 
-- Python 3.8+ (uses only stdlib)
+- Python 3.6+ (uses only stdlib; f-strings are the minimum language feature required)
 - Modern browser for the client
 - No npm, no pip packages, no build step

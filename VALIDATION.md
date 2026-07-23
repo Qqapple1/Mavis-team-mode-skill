@@ -17,7 +17,7 @@ done
 bash scripts/validate.sh
 ```
 
-期望输出：22/22 通过。
+期望输出：`Passed: 23, Failed: 0`（23 项格式自检）。
 
 ## 3. YAML frontmatter 验证（10 秒）
 
@@ -40,15 +40,22 @@ for f in glob.glob('**/*.md', recursive=True):
 
 ## 4. 真实可运行验证（2 分钟）
 
-跑 prototype + e2e 测试：
+跑 prototype + 3 个 e2e 测试（48 个测试 = 20 + 23 + 5）：
 
 ```bash
 cd examples/prototype-todo-app
 python3 server/server.py &
 sleep 2
-python3 test_e2e.py
-# 期望: ALL TESTS PASSED
+python3 test_e2e.py           # 期望: ALL TESTS PASSED (20/20)
+python3 test_e2e_extended.py  # 期望: ALL EXTENDED TESTS PASSED (23/23)
+python3 test_e2e_advanced.py  # 期望: Passed: 5, Failed: 0
 kill %1
+```
+
+或 Windows PowerShell 简化版（一个 terminal 全跑）：
+```powershell
+cd examples\prototype-todo-app
+powershell -ExecutionPolicy Bypass -File .\run_e2e.ps1
 ```
 
 ## 5. Zcode 加载验证（需要 Zcode）
@@ -112,9 +119,13 @@ git push -u origin main
 ```
 
 GitHub Actions 应该跑通：
-- ✓ validate-skill / validate (22 checks)
-- ✓ validate-skill / validate-skill-yaml
-- ✓ validate-skill / test-prototype-e2e
+- ✓ Stats
+- ✓ Windows install (PowerShell) — install + server startup + e2e
+- ✓ Lint (ubuntu) / Lint (macos) / Lint (windows) — bash + python syntax
+- ✓ Python 3.8 / 3.9 / 3.10 / 3.11 / 3.12
+- ✓ Integration test (Linux) — install + validate + 48 e2e + benchmark
+
+实际有 11 个 jobs / job groups，详见 `.github/workflows/validate-skill.yml`。
 
 ## 全部 8 步通过 = skill 装好且能跑
 

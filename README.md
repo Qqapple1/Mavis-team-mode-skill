@@ -48,13 +48,13 @@
 ## 功能
 
 - ✅ Leader 任务拆解（结构化 Team Plan）
-- ✅ Workers 并行执行（general-purpose + explore）
-- ✅ Verifier 独立验收（第二个 Zcode 会话）
+- ✅ Workers 并行执行（Zcode 内置 sub-agent + 自定义 agents/）
+- ✅ Verifier 独立验收（第二个 Zcode 会话 / 同会话自检）
 - ✅ 迭代修正（最多 3 轮）
-- ✅ 模型无关（支持 GLM-5.2、DeepSeek、Claude、MiniMax M3）
+- ✅ 模型无关（Zcode 支持什么模型，这个 skill 就能用什么 — 见 requirements 段）
 - ✅ 渐进式加载（Zcode 默认只读 name/description，节省 token）
 - ✅ 4 个真实可运行 example + 1 个 Todo prototype
-- ✅ 20 项端到端测试 + 22 项 skill 格式自检 + 15 项 YAML 校验
+- ✅ 48 项端到端测试（20 + 23 + 5）+ 23 项 skill 格式自检 + 12 项 YAML 校验
 
 ## 5 分钟快速开始
 
@@ -66,14 +66,16 @@ bash scripts/install.sh --no-verify   # 跳过校验
 bash scripts/install.sh --doctor      # 不修改只诊断
 bash scripts/install.sh --version     # 看版本
 
-# 2. 验证（22 项）
+# 2. 验证（23 项格式自检）
 bash scripts/validate.sh
 
-# 3. 跑 prototype（20 项 e2e）
+# 3. 跑 prototype（48 项 e2e = 20 + 23 + 5）
 cd examples/prototype-todo-app
 python3 server/server.py &
 sleep 2
 python3 test_e2e.py
+python3 test_e2e_extended.py
+python3 test_e2e_advanced.py
 kill %1
 
 # 4. 打开 Zcode，跟它说：
@@ -133,55 +135,61 @@ bash scripts/install.sh
 
 **详细 Windows 指南**：见 [docs/WINDOWS.md](docs/WINDOWS.md)
 
-## 安装 (macOS / Linux)
+## 安装
 
-5 种方式，详见 [INSTALL.md](INSTALL.md)：
+4 种方式（全部经过实际验证），详见 [INSTALL.md](INSTALL.md)：
 
 1. **一键脚本**（推荐）: `bash scripts/install.sh`
-2. **git clone + 软链**
-3. **手动复制**
-4. **从 Claude Code 导入**
-5. **npx skills CLI**
+2. **PowerShell 脚本**（Windows 原生）: `powershell -ExecutionPolicy Bypass -File scripts/install.ps1`
+3. **手动 git clone + 软链**
+4. **手动复制**（适合离线 / 容器 / NAS）
 
 **环境变量**（高级用法）：
 - `MAVIS_TEAM_REPO` — 改 Git 源
 - `MAVIS_TEAM_DIR` — 改安装路径
 - `MAVIS_TEAM_REF` — pin 到特定 branch/tag/SHA
 - `MAVIS_TEAM_NO_COLOR` — 禁用颜色输出
+- `MAVIS_TEAM_FORCE_COPY` — 强制 copy 模式
 
 ## 仓库结构
 
 ```
 mavis-team-mode/
-├── SKILL.md                         # 核心 skill 定义
+├── SKILL.md                         # 核心 skill 定义 (201 lines)
 ├── README.md
-├── INSTALL.md                       # 安装指南
-├── VALIDATION.md                    # 验证清单
+├── INSTALL.md                       # 安装指南（4 种方式）
+├── VALIDATION.md                    # 验证清单（8 步）
 ├── CHANGELOG.md
 ├── CONTRIBUTING.md
 ├── SECURITY.md
 ├── LICENSE (MIT)
 ├── scripts/
-│   ├── install.sh                   # 一键安装（带 --doctor / --version）
-│   ├── validate.sh                  # 22 项格式自检
-│   └── validate_yaml.py             # 15 项 YAML 校验（无 PyYAML 依赖）
-├── agents/                          # Sub-agent 配置
-│   ├── leader.md                    #   Leader（6 阶段流程）
+│   ├── install.sh                   # bash 一键安装（macOS / Linux / Git Bash / WSL）
+│   ├── install.ps1                  # PowerShell 一键安装（Windows 原生）
+│   ├── validate.sh                  # bash 23 项格式自检
+│   ├── validate.ps1                 # PowerShell 验证
+│   ├── validate_yaml.py             # 12 项 YAML 校验（无 PyYAML 依赖）
+│   └── benchmark_tokens.py          # Token 成本估算
+├── agents/                          # Sub-agent 配置（7 个）
+│   ├── leader.md                    #   Leader (6 阶段流程)
+│   ├── verifier.md                  #   Verifier 独立验收
 │   ├── worker-coder.md              #   Worker: 写代码
 │   ├── worker-tester.md             #   Worker: 写测试
 │   ├── worker-researcher.md         #   Worker: 调研
 │   ├── worker-doc-writer.md         #   Worker: 文档
-│   ├── worker-reviewer.md           #   Worker: code review
-│   └── verifier.md                  #   Verifier 独立验收
+│   └── worker-reviewer.md           #   Worker: code review
 ├── examples/                        # 4 个案例 + 1 个真实 prototype
 │   ├── refactor-large-module.md
 │   ├── bug-hunt.md
 │   ├── new-feature.md
 │   ├── research-then-implement.md
 │   └── prototype-todo-app/
-│       ├── server/server.py         #     Python HTTP server (安全加固版)
-│       ├── client/index.html        #     浏览器 UI
+│       ├── server/server.py         #     Python HTTP server (279 lines, 安全加固)
+│       ├── client/index.html        #     浏览器 UI (324 lines)
 │       ├── test_e2e.py              #     20 个端到端测试
+│       ├── test_e2e_extended.py     #     23 个扩展测试
+│       ├── test_e2e_advanced.py     #     5 个高级测试
+│       ├── run_e2e.ps1              #     Windows e2e runner
 │       └── README.md
 ├── references/                      # 引用文档
 │   ├── verification-checklist.md
@@ -190,10 +198,14 @@ mavis-team-mode/
 ├── docs/                            # 设计文档
 │   ├── ADR-001-team-mode-recreation.md
 │   ├── ADR-002-security.md
-│   └── PERFORMANCE.md
+│   ├── ARCHITECTURE.md              # 流程图 + Mermaid + 决策边界
+│   ├── PERFORMANCE.md               # Token 成本 + 加速分析
+│   └── WINDOWS.md                   # Windows 专项指南
 ├── .github/
-│   ├── workflows/validate-skill.yml # CI（22 项格式 + 20 项 e2e + shellcheck）
+│   ├── workflows/validate-skill.yml # CI（11 jobs：lint x3、py x5、win、integration、stats）
 │   └── ISSUE_TEMPLATE/              # Bug / Feature 模板
+├── Makefile                         # make help/install/test/lint 快捷方式
+├── index.html                       # GitHub Pages 风格落地页
 └── .shellcheckrc
 ```
 
@@ -201,32 +213,36 @@ mavis-team-mode/
 
 | 维度 | MiniMax Code 原生 | Zcode + 此 skill |
 |------|---------------------|---------------------|
-| Leader 拆任务 | ✅ TeamEngine 自动 | ✅ 手动/半自动（按 Team Plan 模板） |
-| Worker 并行 | ✅ 后台多任务 | ⚠️ 前台并行（Zcode 3.0 限制） |
-| Verifier 对抗 | ✅ 独立推理空间 | ✅ 第二个 Zcode 会话模拟 |
+| Leader 拆任务 | ✅ TeamEngine 自动 | ⚠️ 手动/半自动（按 Team Plan 模板） |
+| Worker 并行 | ✅ 后台多任务 | ⚠️ 前台并行（Zcode 3.x 限制） |
+| Verifier 对抗 | ✅ 独立推理空间 | ⚠️ 第二个 Zcode 会话模拟（同模型可能引入偏见） |
 | 状态机 | ✅ TeamEngine | ❌ 无（用 checkpoint 模拟） |
-| 模型自由 | ❌ 锁 M3 | ✅ 任意（GLM-5.2、DeepSeek、Claude、MiniMax M3） |
+| 模型自由 | ❌ 锁 M3 | ✅ 任意（取决于你 Zcode 接的是什么模型） |
 | 收费 | 💰 M3 Token Plan | 免费（用你自己的 API key） |
 | 集成难度 | 下载安装 | 下载 + 一行命令 |
 
-**实际体验差距**：约 70-80%。够用，但不是 100% 复刻。
+**实际体验差距**：约 70-80%。够用，但不是 100% 复刻 — Verifier 独立性尤其弱（同模型自检）。
 
 ## 测试
 
 ```bash
-# 22 项格式自检
+# 23 项格式自检
 bash scripts/validate.sh
 
-# 15 项 YAML 校验（无外部依赖）
+# 12 项 YAML 校验（无外部依赖）
 python3 scripts/validate_yaml.py
 
-# 20 项端到端 prototype 测试
+# 48 项端到端 prototype 测试（20 + 23 + 5）
 cd examples/prototype-todo-app
 python3 server/server.py &
+sleep 2
 python3 test_e2e.py
+python3 test_e2e_extended.py
+python3 test_e2e_advanced.py
+kill %1
 ```
 
-GitHub Actions 自动跑全部 3 套测试 + shellcheck（`.github/workflows/validate-skill.yml`）。
+GitHub Actions 自动跑全部 4 套测试 + shellcheck + Windows install + Python 3.8-3.12 矩阵（`.github/workflows/validate-skill.yml`）。
 
 ## 安全
 
@@ -242,21 +258,32 @@ Prototype server 默认：
 
 详见 [docs/PERFORMANCE.md](docs/PERFORMANCE.md)。
 
-理论加速（基于"4 个 parallel subagent + 1 个 verifier" 的最坏情况推导）：
+**理论加速**（基于"4 个 parallel subagent + 1 个 verifier" 的最坏情况推导）：
 
-- 1 个 Leader 加 4 个并行 Worker = 5x 串行
-- 减去 dispatch / integrate / verify overhead = 实际 ~2-2.5x
+- 1 个 Leader 加 4 个并行 Worker ≈ 5x 串行
+- 减去 dispatch / integrate / verify overhead ≈ 实际 ~2-2.5x **(est.)**
 - 这个数字**没有真在 Zcode 上 benchmark 过**，是纸面推算
 - 真要测需要 headless Zcode + 一组标准化任务——见路线图
+
+**Token 成本（实测估算）**：
+
+| 加载模式 | Tokens | vs inline baseline |
+|---|---|---|
+| 内联 Team plan（无 skill） | ~3,000 | — |
+| 一次全加载 | ~39,795 | +1227% |
+| **渐进加载（默认）** | ~5,229 | **+74%** |
+
+Skill 本身**多耗 ~74% tokens**（比内联 baseline），但换来 2-2.5x 并行加速。**用 skill = 换时间，不省钱**。
 
 ## 路线图
 
 - [ ] Worker: 数据库迁移专家
 - [ ] Worker: 性能调优专家
 - [ ] Worker: 安全审计
-- [ ] Verifier: 多模型对抗（Leader/Verifier 用不同模型）
+- [ ] Verifier: 多模型对抗（Leader/Verifier 用不同模型）— 现在只是文档建议
 - [ ] 自动从 Team Plan 生成 skill 的元 skill
-- [ ] Real Zcode integration test (in CI with headless Zcode)
+- [ ] Real Zcode integration test (in CI with headless Zcode) — 需要 Zcode 官方支持 headless 模式
+- [ ] 4 个 e2e 文件之外的更多并发 / 网络异常场景测试
 
 ## 贡献
 

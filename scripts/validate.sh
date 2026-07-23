@@ -137,6 +137,9 @@ if [ "$FAIL" -gt 0 ]; then
 else
   echo "✓ All checks passed. Skill is properly installed."
   echo
-  echo "Try in Zcode: /mavis-team-mode"
+  echo "Restart Zcode, then just talk naturally:"
+  echo "  '用 mavis team mode 帮我...'"
+  echo "  or 'team mode', '拆成子任务', 'multi-agent', etc."
+  echo "(Zcode skills are description-matched — no slash command needed.)"
   exit 0
 fi

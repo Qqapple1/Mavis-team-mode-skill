@@ -74,16 +74,21 @@ documentation and follow OWASP guidelines.
 
 ## Verification
 
-The `test_e2e.py` includes 9 security-specific tests:
+The `test_e2e.py` includes security tests (subset of the 20 base tests):
 - Invalid JSON rejected
 - Title length cap enforced
+- Empty title rejected
 - Tag character class enforced
 - Body size cap enforced
 - Path traversal blocked
 - Unknown endpoints 404
-- CORS preflight enforced
+- CORS preflight enforced (allowed + disallowed)
 - Unsupported HTTP methods rejected
 - Concurrent writes produce unique IDs (race-free)
+
+Plus extended tests in `test_e2e_extended.py` add: PUT/HEAD/PROPFIND
+rejection, malformed UTF-8 handling, double-slash / trailing-slash path
+normalization, content-length and chunked encoding edge cases.
 
 ## References
 

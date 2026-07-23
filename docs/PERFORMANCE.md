@@ -1,9 +1,10 @@
 # Performance & Token Efficiency
 
-> **TL;DR**: This skill trades some **token overhead** for a **2-2.5x
-> speedup** on complex tasks. The 6-phase workflow with parallel Workers
-> + Verifier catches issues earlier and amortizes planning cost over
-> parallel execution.
+> **TL;DR**: This skill trades some **token overhead** (~74% more vs
+> inline baseline) for a **theoretical 2-2.5x wall-clock speedup** on
+> complex tasks. The 6-phase workflow with parallel Workers + Verifier
+> amortizes planning cost over parallel execution. **The speedup number
+> is an estimate, not measured.**
 
 ## What we actually measured
 
@@ -31,14 +32,16 @@ So why use the skill? **Time, not tokens.**
 
 The 6-phase workflow (`Plan → Dispatch → Integrate → Verify → Iterate → Deliver`) **theoretically** gives:
 
-| Workflow                   | Plain prompt (est.) | With this skill (est.) | Speedup |
-|----------------------------|---------------------|------------------------|---------|
-| Refactor 1500-line module  | 45 min              | 20 min                 | ~2.25x  |
-| Add tag filter to Todo app | 30 min              | 12 min                 | ~2.5x   |
-| Multi-file bug hunt        | 60 min              | 30 min                 | ~2x     |
-| Research + implement       | 90 min              | 45 min                 | ~2x     |
+| Workflow                   | Plain prompt (est.) | With this skill (est.) | Speedup (est.) |
+|----------------------------|---------------------|------------------------|----------------|
+| Refactor 1500-line module  | 45 min              | 20 min                 | ~2.25x         |
+| Add tag filter to Todo app | 30 min              | 12 min                 | ~2.5x          |
+| Multi-file bug hunt        | 60 min              | 30 min                 | ~2x            |
+| Research + implement       | 90 min              | 45 min                 | ~2x            |
 
-**These are estimates, not measurements.** To get real numbers, you need:
+**These are paper estimates, not measurements.** All four "(est.)" columns
+are derived from a 4-parallel-worker + 1-verifier model, reduced by
+plausible dispatch/integration overhead. To get real numbers, you need:
 1. A headless Zcode environment
 2. A standardized task suite
 3. A baseline (no skill) + treatment (with skill) comparison

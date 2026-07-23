@@ -71,13 +71,15 @@ The skill is a "best effort" recreation. Limitations:
 
 2. **Pin to a specific version**:
    ```bash
-   MAVIS_TEAM_REF=v1.3.6 bash install.sh
+   MAVIS_TEAM_REF=v1.3.6 bash scripts/install.sh
    ```
 
 3. **Run with no network** when possible:
    ```bash
-   # Disable network for the prototype server
+   # The prototype server defaults to 127.0.0.1 (no network exposure)
+   cd examples/prototype-todo-app
    HOST=127.0.0.1 python3 server/server.py
+   # Check: netstat -an | grep 8765 should show only 127.0.0.1, not 0.0.0.0
    ```
 
 4. **Audit sub-agent outputs**: when a Worker sub-agent reports a result,
