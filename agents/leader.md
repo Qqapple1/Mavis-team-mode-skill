@@ -112,8 +112,15 @@ Leader's self-assessment.
 
 If verification fails:
 - Maximum 3 iterations
-- Each iteration: identify specific failures, dispatch targeted sub-task
-  to fix ONLY those failures (not re-do everything)
+- Each iteration: identify specific failures, dispatch a targeted
+  fix. For targeted bug fixes (single failing test / reported bug
+  / verifier FAIL), use `agents/worker-fixer.md` - it has explicit
+  rules for minimal-change surgical repair. For larger redesigns,
+  re-dispatch `agents/worker-coder.md` with a revised CONTRACT
+  (not a fixer; fixer's 30-line escalation threshold means it
+  should refuse large changes).
+- Do NOT re-do everything. Re-dispatch ONLY the failing sub-task
+  scope.
 - After 3 failed iterations: present the partial result + remaining issues
   to the user, let them decide
 

@@ -58,6 +58,23 @@ OUTPUT FORMAT: <how to report back>
    the string. If you must keep ASCII output, also lowercase the key index
    or document the encoding. When in doubt, write a 5-line self-check:
    `assert '技术' in open(file).read()` after writing, before reporting done.
+6. **If you add ANSI color output to a CLI, also add a `--no-color` flag
+   (or honor `NO_COLOR=1` env var).** This is a courtesy to tests, log
+   scrapers, and CI environments. A 5-line implementation:
+   ```python
+   import os, sys
+   def color(s, code):
+       if "--no-color" in sys.argv or os.environ.get("NO_COLOR"):
+           return s
+       return f"\x1b[{code}m{s}\x1b[0m"
+   ```
+   Without this, every test that touches your CLI output has to
+   strip ANSI escapes (see `worker-tester.md` rule #5). With it,
+   tests can just pass `--no-color` and use plain strings. The
+   `NO_COLOR=1` env var is the cross-tool standard
+   (see https://no-color.org). If the CLI uses a popular library
+   like `rich` / `click` / `colorama`, check whether they already
+   honor `NO_COLOR` (most do).
 
 ## Report format (default)
 

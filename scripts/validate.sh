@@ -77,7 +77,7 @@ fi
 
 # 7. All agents exist
 info "Checking agent files..."
-AGENTS=(leader verifier worker-coder worker-tester worker-researcher worker-doc-writer worker-reviewer)
+AGENTS=(leader verifier worker-coder worker-tester worker-researcher worker-doc-writer worker-reviewer worker-fixer)
 for a in "${AGENTS[@]}"; do
   f="$SKILL_DIR/agents/${a}.md"
   if [ ! -f "$f" ]; then

@@ -18,7 +18,7 @@ param(
     [string]$GitRef = ""
 )
 
-$VERSION = "1.3.17"
+$VERSION = "1.3.18"
 $SKILL_NAME = "mavis-team-mode"
 $ZCODE_SKILLS_DIR = "$env:USERPROFILE\.zcode\skills"
 $ZCODE_LINK = "$ZCODE_SKILLS_DIR\$SKILL_NAME"
@@ -174,7 +174,7 @@ function Invoke-InstallInner {
 
     # 3. Verify required files
     $missing = 0
-    foreach ($f in @("SKILL.md", "agents\leader.md", "agents\verifier.md", "agents\worker-coder.md", "README.md")) {
+    foreach ($f in @("SKILL.md", "agents\leader.md", "agents\verifier.md", "agents\worker-coder.md", "agents\worker-fixer.md", "README.md")) {
         if (-not (Test-Path "$InstallDir\$f")) {
             Err "Missing required file: $f"
             $missing = 1
@@ -266,7 +266,7 @@ function Invoke-Doctor {
     } else {
         Warn "No clone at $InstallDir"
     }
-    foreach ($f in @("SKILL.md", "agents\leader.md", "agents\verifier.md", "agents\worker-coder.md", "README.md")) {
+    foreach ($f in @("SKILL.md", "agents\leader.md", "agents\verifier.md", "agents\worker-coder.md", "agents\worker-fixer.md", "README.md")) {
         if (Test-Path "$InstallDir\$f") {
             Ok "$f present"
         } else {

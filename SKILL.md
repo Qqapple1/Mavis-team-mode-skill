@@ -1,7 +1,7 @@
 ---
 name: mavis-team-mode
 description: "Recreates the Mavis (MiniMax Agent) Team Mode workflow (Leader + Workers + Verifier) inside Zcode 3.4.2+. Use this skill when the user wants parallel agent execution, structured task decomposition, independent quality verification, or multi-step work that benefits from sub-agents running concurrently. Triggers on: 'team mode', 'mavis team', 'multi-agent', 'split into subtasks', 'verify the result', '用 team 模式', '团队模式', '多智能体协作', '并行处理'. Do NOT use for simple single-step tasks."
-version: 1.3.17
+version: 1.3.18
 license: MIT
 metadata:
   author: Community port (Mavis CLI agent)
@@ -12,7 +12,7 @@ metadata:
     - "prototype-todo-app e2e (20+23+5 tests, 48/48 passing) — included in this repo"
     - "skill format + YAML frontmatter validation (23+15 checks) — included"
     - "GitHub Actions CI: Ubuntu 24.04 + macOS + Windows (PowerShell install + Python startup), Python 3.8-3.12 — 12/12 jobs passing"
-    - "Real Zcode runtime: tested 3+ times by community users (builds: frename CLI, mnote CLI, cquote CLI). P0-P3 fixes from real-world feedback shipped in v1.3.14-v1.3.17. See CHANGELOG for details."
+    - "Real Zcode runtime: tested 3+ times by community users (builds: frename CLI, mnote CLI, cquote CLI). P0-P3 fixes from real-world feedback shipped in v1.3.14-v1.3.18. See CHANGELOG for details."
 ---
 
 # Mavis Team Mode for Zcode
@@ -143,7 +143,7 @@ Leader 在主对话里调用 Zcode 的 sub-agent 机制。两种用法：
 - **研究类,需要产出文件(报告/RESEARCH.md/结构化 JSON)** → 用 Zcode 内置的 `general-purpose`(完整工具权限)
 - **实现类**(写代码、改文件) → 用 Zcode 内置的 `general-purpose`(完整工具权限)
 
-> **常见坑**(v1.3.17 反馈): Leader 因为"这是研究任务"就选 Explore,然后又让 Worker 写文件,Explore 不会写,产物丢。**判断标准**: 如果 Leader 的 prompt 里出现"写入 X.md"/"产出报告"/"存为文件"等词,必须用 general-purpose,不能用 Explore。详见 `agents/worker-researcher.md` 里的 Mode selection 表。
+> **常见坑**(v1.3.18 反馈): Leader 因为"这是研究任务"就选 Explore,然后又让 Worker 写文件,Explore 不会写,产物丢。**判断标准**: 如果 Leader 的 prompt 里出现"写入 X.md"/"产出报告"/"存为文件"等词,必须用 general-purpose,不能用 Explore。详见 `agents/worker-researcher.md` 里的 Mode selection 表。
 - **两者并行** → 一次性 fork 多个
 
 **B. 派发自定义 sub-agent**（高级用法）：

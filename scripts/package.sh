@@ -18,7 +18,7 @@
 #
 # Usage:
 #   bash scripts/package.sh                  # uses version from SKILL.md
-#   bash scripts/package.sh --version=1.3.17  # override version
+#   bash scripts/package.sh --version=1.3.18  # override version
 #   bash scripts/package.sh --dry-run        # show what would be packaged, no write
 
 set -euo pipefail
@@ -120,6 +120,7 @@ CORE_FILES=(
   agents/worker-researcher.md
   agents/worker-doc-writer.md
   agents/worker-reviewer.md
+  agents/worker-fixer.md
   examples/bug-hunt.md
   examples/new-feature.md
   examples/refactor-large-module.md

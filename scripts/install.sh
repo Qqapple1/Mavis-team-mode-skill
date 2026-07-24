@@ -27,7 +27,7 @@
 set -euo pipefail
 
 # ---- Version ----
-INSTALLER_VERSION="1.3.17"
+INSTALLER_VERSION="1.3.18"
 
 # ---- Platform detection ----
 detect_platform() {
@@ -417,7 +417,8 @@ install() {
       agents/worker-tester.md \
       agents/worker-researcher.md \
       agents/worker-doc-writer.md \
-      agents/worker-reviewer.md; do
+      agents/worker-reviewer.md \
+      agents/worker-fixer.md; do
       if [ ! -f "$f" ]; then
         warn "Missing $f locally — restoring from HEAD"
         if ! git checkout HEAD -- "$f" 2>&1 | tail -2; then

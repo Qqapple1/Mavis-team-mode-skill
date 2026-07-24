@@ -5,6 +5,75 @@ All notable changes to this skill are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.3.18] - 2026-07-25
+
+Fourth-round real-world feedback: user built `hitokoto` (CLI
+quote manager) with v1.3.17. All v1.3.17 fixes verified working
+including the new worker-fixer role. User flagged 1 follow-up:
+CLI should offer `--no-color` / `NO_COLOR=1` support. While
+verifying, we also found 6 *infrastructure* gaps: v1.3.17 added
+a new `agents/worker-fixer.md` but the install / package /
+validate / doc-counting code paths still treated the agents dir
+as having 7 files. A user installing v1.3.17 from any archive
+would have been missing the fixer role.
+
+### User-reported (1)
+
+- **Coder adds ANSI colors but doesn't offer `--no-color` / `NO_COLOR=1`.**
+  User's hitokoto CLI added yellow highlighting, and the
+  verification checklist (CLI output #2) implies CLIs should
+  have a no-color mode so tests can use plain strings. **Fixed**:
+  - `agents/worker-coder.md` new rule #6 with a 5-line
+    `color()` helper honoring `NO_COLOR=1` env var + `--no-color`
+    CLI flag, plus a link to https://no-color.org
+
+### Self-found (6) - these would have shipped broken
+
+- **`install.sh` partial-recovery list missing `agents/worker-fixer.md`.**
+  v1.3.13 added the recovery list, v1.3.17 added fixer, but the
+  list wasn't updated. A user with a partial-state local clone
+  (e.g. lost worker-fixer.md to a botched git pull) would have
+  the installer refuse to fix it. **Fixed**: added fixer to the
+  recovery list.
+- **`install.ps1` partial-recovery list missing fixer.** Same
+  issue, PowerShell path. **Fixed**: added to two PS recovery
+  lists (install + doctor).
+- **`validate.sh` AGENTS=() array missing `worker-fixer`.**
+  validate.sh iterates this list to check all 8 agents. Without
+  fixer, validate.sh would report "Missing agent: worker-fixer"
+  on a clean install. **Fixed**: array now has 8 entries.
+- **`scripts/package.sh` 5 file lists missing `agents/worker-fixer.md`.**
+  Anyone downloading v1.3.17's `core.zip` / `bash.tar.gz` /
+  `windows.zip` / `source.tar.gz` / `source.zip` would have a
+  skill with only 7 agents. **Fixed**: added to all 5 lists.
+  Verified: all 5 v1.3.18 archives now contain `worker-fixer.md`.
+- **`README.md` said "7 个 sub-agent" but the dir now has 8.**
+  **Fixed**: updated to 8 + added fixer to the tree diagram.
+- **`docs/ARCHITECTURE.md` said "(7 files)" but the dir has 8.**
+  **Fixed**: updated to 8.
+
+### Improvement
+- **`agents/leader.md` Phase 5 (Iterate) now distinguishes
+  worker-fixer from worker-coder.** v1.3.17 added fixer but
+  leader.md Step 5 still said "re-dispatch subagent" without
+  naming which. Now: "for targeted bug fixes use
+  `agents/worker-fixer.md`; for larger redesigns re-dispatch
+  `agents/worker-coder.md` with a revised CONTRACT".
+
+### Verified
+- shellcheck: 0 warnings
+- bash -n: 0 errors
+- python -m py_compile: 0 errors
+- validate.sh: 24/24 (was 23, +1 for fixer check)
+- validate_yaml.py: 16/16
+- e2e (fresh server + CI order): 20+23+5 = 48/48
+- make package: 5/5 archives, all self-test pass, SHA256 verified
+- All 5 archives contain `agents/worker-fixer.md` (verified by
+  `unzip -l` / `tar -tzf`)
+- v1.3.17 fixes (worker-fixer rule, ANSI strip, etc.) all
+  re-verified by the user's hitokoto test (20/20 tests pass,
+  Fixer role used in Iterate phase)
+
 ## [1.3.17] - 2026-07-25
 
 Systematic review pass surfaced 9 issues across 3 severity tiers
@@ -897,6 +966,7 @@ changes that didn't actually land). This release fixes them all.
 [1.3.1]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.1.0...v1.2.0
+[1.3.18]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.17...v1.3.18
 [1.3.17]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.16...v1.3.17
 [1.3.16]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.15...v1.3.16
 [1.3.15]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.14...v1.3.15

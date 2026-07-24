@@ -125,7 +125,7 @@ flowchart TB
 
 ## File-level architecture
 
-> Line counts and test counts as of 2026-07-24 (v1.3.17). Run `make info`
+> Line counts and test counts as of 2026-07-24 (v1.3.18). Run `make info`
 > or `wc -l` for current numbers — these can drift.
 
 ```
@@ -135,7 +135,7 @@ mavis-team-mode-skill/
 │   ├── YAML frontmatter            triggers on description match
 │   └── Markdown body               instructions for Leader
 │
-├── agents/                        (7 files) — sub-agent prompt templates
+├── agents/                        (8 files) — sub-agent prompt templates
 │   ├── leader.md                   (127 lines) — Team Plan format, 6 phases
 │   ├── verifier.md                 (64 lines) — independent review checklist
 │   ├── worker-coder.md             (87 lines)
