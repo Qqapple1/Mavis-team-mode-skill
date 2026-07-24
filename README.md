@@ -2,11 +2,11 @@
 
 把 MiniMax **Mavis Team Mode**（Leader + Workers + Verifier）的能力搬到 Zcode 3.4.2+。
 
-> **Pick your platform → [Download v1.3.11](https://github.com/Qqapple1/Mavis-team-mode-skill/releases/tag/v1.3.11)**:
-> - macOS / Linux / Git Bash / WSL → `mavis-team-mode-skill-1.3.11-bash.tar.gz`
-> - Windows PowerShell → `mavis-team-mode-skill-1.3.11-windows.zip`
-> - Just want to read it → `mavis-team-mode-skill-1.3.11-core.zip`
-> - Contributor / CI → `mavis-team-mode-skill-1.3.11-source.tar.gz`
+> **Pick your platform → [Download v1.3.12](https://github.com/Qqapple1/Mavis-team-mode-skill/releases/tag/v1.3.12)**:
+> - macOS / Linux / Git Bash / WSL → `mavis-team-mode-skill-1.3.12-bash.tar.gz`
+> - Windows PowerShell → `mavis-team-mode-skill-1.3.12-windows.zip`
+> - Just want to read it → `mavis-team-mode-skill-1.3.12-core.zip`
+> - Contributor / CI → `mavis-team-mode-skill-1.3.12-source.tar.gz`
 > - [Which archive should I download? →](docs/PLATFORMS.md)
 
 > 基于 Zcode 3.4.2+ 的子智能体系统 + Agent Skills 标准实现，
@@ -16,7 +16,7 @@
 [![Skill tests](https://img.shields.io/badge/validate-23%2F23%20passing-brightgreen)](VALIDATION.md)
 [![Prototype tests](https://img.shields.io/badge/prototype%20e2e-48%2F48%20passing-brightgreen)](examples/prototype-todo-app/)
 [![YAML](https://img.shields.io/badge/yaml-15%2F15%20passing-brightgreen)](scripts/validate_yaml.py)
-[![Version](https://img.shields.io/badge/version-1.3.11-blue)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-1.3.12-blue)](CHANGELOG.md)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 [![Zcode 3.x](https://img.shields.io/badge/zcode-3.x-purple)](https://zcode-ai.com)
 [![Security](https://img.shields.io/badge/security-policy-green)](SECURITY.md)
@@ -28,7 +28,7 @@
   - **PowerShell / CMD 原生跑不了**（需要 bash 环境）
   - **prototype server 是 Python**：跨平台（只用了 stdlib）
   - **我没在真 Windows 上跑过整套**——你要是 Windows 用户，欢迎提 issue 反馈
-- **Python**: 3.6+ （`f-strings` 是 server.py / scripts/*.py 的最低要求）
+- **Python**: 3.8+ （`f-strings` 是 server.py / scripts/*.py 的最低要求；3.6/3.7 已 EOL，跟 CI matrix 一致）
 - **Git**: 2.0+ （install.sh 用 `--depth 1` shallow clone）
 - **Bash**: 3.2+（我用的语法都兼容 bash 3.2，包括 macOS 默认 bash）
 - **Disk**: ~600KB 安装空间
@@ -61,7 +61,7 @@
 - ✅ 模型无关（Zcode 支持什么模型，这个 skill 就能用什么 — 见 requirements 段）
 - ✅ 渐进式加载（Zcode 默认只读 name/description，节省 token）
 - ✅ 4 个真实可运行 example + 1 个 Todo prototype
-- ✅ 48 项端到端测试（20 + 23 + 5）+ 23 项 skill 格式自检 + 12 项 YAML 校验
+- ✅ 48 项端到端测试（20 + 23 + 5）+ 23 项 skill 格式自检 + 15 项 YAML 校验
 
 ## 5 分钟快速开始
 
@@ -238,7 +238,7 @@ mavis-team-mode/
 # 23 项格式自检
 bash scripts/validate.sh
 
-# 12 项 YAML 校验（无外部依赖）
+# 15 项 YAML 校验（无外部依赖）
 python3 scripts/validate_yaml.py
 
 # 48 项端到端 prototype 测试（20 + 23 + 5）
@@ -276,13 +276,13 @@ Prototype server 默认：
 
 **Token 成本（实测估算）**：
 
-> 下面数字是 `python3 scripts/benchmark_tokens.py` 在 v1.3.11 实跑出来的（1 token ≈ 4 字符，启发式估算，非 BPE 精确数）。重新跑会随文件大小变化。
+> 下面数字是 `python3 scripts/benchmark_tokens.py` 在 v1.3.12 实跑出来的（1 token ≈ 4 字符，启发式估算，非 BPE 精确数）。重新跑会随文件大小变化。
 
 | 加载模式 | Tokens | vs inline baseline |
 |---|---|---|
 | 内联 Team plan（无 skill） | ~3,000 | — |
-| 一次全加载 | ~58,946 | +1865% |
-| **渐进加载（默认）** | ~5,586 | **+86%** |
+| 一次全加载 | ~60,909 | +1930% |
+| **渐进加载（默认）** | ~5,588 | **+86%** |
 
 Skill 本身**多耗 ~86% tokens**（比内联 baseline），但换来 2-2.5x 并行加速。**用 skill = 换时间，不省钱**。
 

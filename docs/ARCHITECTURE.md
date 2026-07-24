@@ -125,7 +125,7 @@ flowchart TB
 
 ## File-level architecture
 
-> Line counts and test counts as of 2026-07-24 (v1.3.11). Run `make info`
+> Line counts and test counts as of 2026-07-24 (v1.3.12). Run `make info`
 > or `wc -l` for current numbers — these can drift.
 
 ```
@@ -156,20 +156,21 @@ mavis-team-mode-skill/
 │   └── troubleshooting.md
 │
 ├── scripts/                       (7 files) — install/validate/benchmark/package
-│   ├── install.sh                  (498 lines) — bash, all platforms
-│   ├── install.ps1                 (241 lines) — PowerShell, Windows native
+│   ├── install.sh                  (510 lines) — bash, all platforms
+│   ├── install.ps1                 (273 lines) — PowerShell, Windows native
 │   ├── validate.sh                 (145 lines) — bash
 │   ├── validate.ps1                (104 lines) — PowerShell
-│   ├── package.sh                  (348 lines) — build platform-specific archives
+│   ├── package.sh                  (350 lines) — build platform-specific archives
 │   ├── validate_yaml.py            (224 lines) — pure-Python YAML
 │   └── benchmark_tokens.py         (224 lines) — token cost estimator
 │
 ├── docs/                          (6 files) — architecture & decision logs
 │   ├── ADR-001-team-mode-recreation.md
 │   ├── ADR-002-security.md
-│   ├── PERFORMANCE.md
 │   ├── ARCHITECTURE.md             ← this file
-│   └── WINDOWS.md                  (150 lines) — Windows-specific guide
+│   ├── PERFORMANCE.md
+│   ├── PLATFORMS.md                — platform matrix + archive selection
+│   └── WINDOWS.md                  (194 lines) — Windows-specific guide
 │
 ├── examples/prototype-todo-app/   — real working web app
 │   ├── server/server.py            (279 lines, defense-in-depth HTTP)
@@ -211,7 +212,7 @@ mavis-team-mode-skill/
 > 4-chars-per-token heuristic numbers.
 
 - **Without skill**: average task plan = ~3,000 tokens in main context (Leader writes detailed prompts inline)
-- **With skill (progressive load)**: ~5,586 tokens on activation, additional agents loaded only if invoked
+- **With skill (progressive load)**: ~5,588 tokens on activation, additional agents loaded only if invoked
 - **Net change**: skill costs **+86%** vs inline baseline, but enables parallel execution
 - The skill is a **time-saver, not a token-saver** — use it when wall-clock matters more than tokens.
 

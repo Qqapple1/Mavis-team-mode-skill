@@ -1,6 +1,6 @@
 # 安装指南 / Installation
 
-这个 skill 支持 **macOS / Linux / Windows**。下面 3 种安装方式**都是我亲自测过能跑的**。
+这个 skill 支持 **macOS / Linux / Windows**。下面 4 种安装方式**都是我亲自测过能跑的**。
 
 ---
 

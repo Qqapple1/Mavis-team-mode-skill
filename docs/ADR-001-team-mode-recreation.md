@@ -113,9 +113,15 @@ Verifier independence — without a separate model, bias is real.
 - Pro: perfect fidelity
 - Con: indefinite wait; current product is closed
 
-We chose the portable Skill approach (D) because it provides 70-80% of the
-benefit today, is portable across the growing Agent Skills ecosystem, and
-can be incrementally improved.
+### D. Recreate as a portable Agent Skill (chosen)
+- Pro: portable across the Agent Skills ecosystem; model-agnostic;
+  self-contained, open source, can be incrementally improved
+- Con: ~70-80% fidelity vs the closed-source Mavis TeamEngine
+  (qualitative estimate; the biggest gap is Verifier independence)
+
+We chose approach **D** because it provides 70-80% of the benefit today,
+is portable across the growing Agent Skills ecosystem, and can be
+incrementally improved.
 
 ## References
 

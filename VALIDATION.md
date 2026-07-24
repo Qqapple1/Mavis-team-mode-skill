@@ -144,5 +144,5 @@ GitHub Actions 应该跑通：
 
 - **Step 1-3 失败** → 看 `references/troubleshooting.md`
 - **Step 4 失败** → 端口 8765 被占用？改 `PORT=xxxx python3 server/server.py` 和 `test_e2e.py` 里的 `PORT`
-- **Step 5-6 失败** → 检查 Zcode 版本（要 3.0+），Agent Skills 标准支持
+- **Step 5-6 失败** → 检查 Zcode 版本（要 3.4.2+），Agent Skills 标准支持
 - **Step 8 失败** → 看 GitHub Actions 日志

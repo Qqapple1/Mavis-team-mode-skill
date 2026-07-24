@@ -92,9 +92,11 @@ ls -la ~/.zcode/skills/
 # 检查软链目标是否存在
 ls -la /path/to/repo/
 
-# 软链不能跨设备（symbolic link 不能链到外接硬盘/NAS）
+# 软链可以跨文件系统（包括外接硬盘/NAS）；
+# 硬链接（hard link）才不能跨设备。软链问题通常是目标路径错了。
 ```
 
 **解决**：
-- 软链目标必须是同一文件系统
-- 跨设备用 `cp -r` 复制
+- 检查软链目标路径是否对（绝对路径，不是相对路径）
+- 如果是 broken symlink，删除再重建：`rm ~/.zcode/skills/mavis-team-mode && ln -s <正确路径> ~/.zcode/skills/`
+- 软链权限问题：跑 `chmod +x <目标目录>/SKILL.md`（某些 Zcode 版本需要）

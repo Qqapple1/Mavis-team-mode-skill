@@ -5,6 +5,112 @@ All notable changes to this skill are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.3.12] - 2026-07-24
+
+A 5th review pass surfaced 20 issues; 15+ were real, including
+3 honest mistakes in the previous v1.3.11 commit (commit claimed
+changes that didn't actually land). This release fixes them all.
+
+### Fixed
+
+#### Hard bugs (3)
+- **package.sh: PLATFORMS.md was in ZERO archives.** All 5 file
+  lists (CORE/BASH/WINDOWS/SOURCE) omitted it, so users who
+  downloaded any release archive got a broken "Which archive should
+  I download?" link in README pointing to a non-existent file.
+  Fixed: added to CORE_FILES (now in all 4 install-able archives).
+- **package.sh: WINDOWS.md was missing from windows.zip.** Windows
+  users got a PowerShell installer but no Windows-specific docs.
+  Fixed: added to WINDOWS_FILES.
+- **v1.3.11 commit lied about Python 3.8+ update.** Commit message
+  and CHANGELOG claimed "Python 3.6+ → 3.8+ (3 places)" but
+  README.md:31 was never actually changed. Fixed: README.md:31
+  now says 3.8+ (this is what v1.3.11 *should* have done).
+
+#### Code bugs (5)
+- **client/index.html: `||` short-circuit hid tag errors.**
+  v1.3.11 changed `!a | !b` to `!a || !b` (correct) but didn't notice
+  this short-circuits — so if title was invalid, the tag validator
+  never ran, hiding tag error hints. v1.3.11 CHANGELOG lied that
+  "behaviour for booleans was identical". Fixed: explicit
+  `validateTitle()` + `validateTag()` calls so BOTH error hints
+  show when both fields are invalid.
+- **server.py: OPTIONS 204 violated RFC 7230 §3.3.2.** 204
+  responses MUST NOT include a body, but `_send_json(204, {})`
+  wrote `{}` (2 bytes) as the body. Fixed: dedicated 204 handler
+  with `end_headers()` and no `wfile.write()`. Also added
+  `Access-Control-Max-Age: 86400` to cache preflight for 24h.
+- **server.py: per-connection socket timeout was missing.**
+  `server.timeout = 30` only controls `select.poll` interval, not
+  read timeouts — so slowloris (slow client dribbling bytes) was
+  NOT actually defended against. Fixed: `TodoHandler.timeout = 30`
+  + `request.settimeout()` in `setup()` for per-connection
+  read timeout.
+- **install.ps1: did not support MAVIS_TEAM_REF / -GitRef.**
+  Bash version supported `MAVIS_TEAM_REF` for pinning to a tag/branch;
+  PowerShell version silently ignored it. Fixed: added `-GitRef`
+  param + `MAVIS_TEAM_REF` env var + checkout logic in install flow.
+- **validate.sh: description length threshold mismatch.**
+  Check was `$desc_len -lt 1100` (accepts up to 1099) but the
+  error message said "should be 50-1024". Fixed: error message
+  now says "51-1099" with a comment explaining the rationale.
+
+#### Documentation accuracy (7)
+- **VALIDATION.md:147 "Zcode 3.0+" → "3.4.2+"**. v1.3.10 claim
+  that all "3.0" was updated was incomplete — this Step 5-6
+  troubleshooting line was missed.
+- **README.md: token numbers 58,946 → 60,909 and 5,586 → 5,588**
+  (eager and progressive loads respectively). Also +1865% →
+  +1930% in the percentage column. 3 other docs updated to match.
+- **README.md: "12 项 YAML 校验" → "15 项"** (2 places). Now
+  consistent with the actual `validate_yaml.py` count and the
+  yaml-15/15 badge.
+- **ARCHITECTURE.md: docs/ tree was missing PLATFORMS.md** and
+  the line counts were stale (install.sh 498→510, install.ps1
+  241→273, package.sh 348→350, WINDOWS.md 150→194).
+- **ADR-001: chose "approach D" but only listed A/B/C alternatives.**
+  The chosen approach (portable Skill) was never formally
+  enumerated. Fixed: added explicit "D. Recreate as a portable
+  Agent Skill (chosen)" section with pros/cons.
+- **references/troubleshooting.md: "symlink 不能跨设备" was wrong.**
+  Hard links can't cross devices, but symlinks CAN. The actual
+  reason softlinks fail is usually wrong target path. Fixed.
+- **INSTALL.md: "下面 3 种安装方式" → "4 种"** (now lists
+  one-liner + PowerShell + manual git+symlink + manual copy).
+
+#### Comments / minor (3)
+- **scripts/benchmark_tokens.py: comment said SKILL.md "~600 tokens"**
+  but the script itself measures 1,868 tokens. Updated comment to
+  reflect measured values, with note that 600 was a stale estimate.
+- **Makefile uninstall target: comment said "delete clone"** but
+  install.sh intentionally keeps the clone (user can re-install
+  without re-cloning). Updated comment to be accurate.
+- **CHANGELOG.md v1.3.11 entry: corrected** to no longer claim
+  "behaviour for booleans was identical" (it wasn't — see above).
+
+### Verified false (NOT fixed)
+- **worker-researcher.md uses `web_fetch` but SKILL.md
+  allowed-tools doesn't**: SKILL.md's `allowed-tools` is the
+  skill's own tool set (used when Leader dispatches sub-agents);
+  worker-researcher.md is a sub-agent template with its own
+  `tools:` frontmatter. The two are independent. False alarm.
+
+### Verified
+- shellcheck: 0 warnings
+- bash -n: 0 errors
+- python -m py_compile: 0 errors
+- PowerShell brace balance: 64/64 + 26/26 + 14/14
+- client JS braces: 47/47 balanced
+- validate.sh: 23/23
+- validate_yaml.py: 15/15 OK
+- e2e (3 consecutive runs): 20+23+5 = 48/48 each
+- make package: 5/5 archives, all self-test pass, SHA256 verified
+- core.zip now contains docs/PLATFORMS.md ✓
+- windows.zip now contains docs/PLATFORMS.md + docs/WINDOWS.md ✓
+- bash.tar.gz now contains docs/PLATFORMS.md ✓
+- OPTIONS 204 returns no body (RFC 7230 §3.3.2 compliant)
+- CORS preflight includes Access-Control-Max-Age: 86400
+
 ## [1.3.11] - 2026-07-24
 
 ### Fixed
@@ -507,6 +613,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 [1.3.1]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.1.0...v1.2.0
+[1.3.12]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.11...v1.3.12
 [1.3.11]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.10...v1.3.11
 [1.3.10]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.9...v1.3.10
 [1.3.9]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.8...v1.3.9

@@ -66,10 +66,13 @@ desc=$(awk '
   in_desc { print }
 ' "$SKILL_DIR/SKILL.md" | tr -d '\n' | tr -d ' ')
 desc_len=${#desc}
+# Accepted: 50 < desc_len < 1100 (Zcode frontmatter limit is generous;
+# the lower 50-char minimum ensures triggers can fit; 1100 is the soft
+# upper bound to leave headroom for the YAML-quoted 1024-byte limit)
 if [ "$desc_len" -gt 50 ] && [ "$desc_len" -lt 1100 ]; then
   ok "SKILL.md description length OK ($desc_len chars)"
 else
-  fail "SKILL.md description length weird: $desc_len chars (should be 50-1024)"
+  fail "SKILL.md description length weird: $desc_len chars (should be 51-1099)"
 fi
 
 # 7. All agents exist

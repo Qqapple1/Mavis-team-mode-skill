@@ -18,7 +18,7 @@
 #
 # Usage:
 #   bash scripts/package.sh                  # uses version from SKILL.md
-#   bash scripts/package.sh --version=1.3.11  # override version
+#   bash scripts/package.sh --version=1.3.12  # override version
 #   bash scripts/package.sh --dry-run        # show what would be packaged, no write
 
 set -euo pipefail
@@ -137,6 +137,7 @@ CORE_FILES=(
   docs/ADR-002-security.md
   docs/ARCHITECTURE.md
   docs/PERFORMANCE.md
+  docs/PLATFORMS.md
   scripts/validate_yaml.py
   scripts/benchmark_tokens.py
 )
@@ -149,19 +150,19 @@ BASH_FILES=(
   scripts/package.sh
 )
 
-# WINDOWS: add PowerShell scripts
+# WINDOWS: add PowerShell scripts + Windows-specific docs
 WINDOWS_FILES=(
   "${CORE_FILES[@]}"
   scripts/install.ps1
   scripts/validate.ps1
   examples/prototype-todo-app/run_e2e.ps1
+  docs/WINDOWS.md
 )
 
 # SOURCE: everything (adds CI + Issue templates)
 SOURCE_FILES=(
   "${BASH_FILES[@]}"
-  "${WINDOWS_FILES[@]}"  # includes all PS files
-  docs/WINDOWS.md
+  "${WINDOWS_FILES[@]}"  # includes all PS files + WINDOWS.md
   .github/ISSUE_TEMPLATE/bug_report.md
   .github/ISSUE_TEMPLATE/feature_request.md
   .github/workflows/validate-skill.yml

@@ -14,10 +14,11 @@ param(
     [switch]$NoVerify,
     [switch]$Help,
     [string]$InstallDir = "$env:USERPROFILE\mavis-team-mode-skill",
-    [string]$RepoUrl = "https://github.com/Qqapple1/Mavis-team-mode-skill.git"
+    [string]$RepoUrl = "https://github.com/Qqapple1/Mavis-team-mode-skill.git",
+    [string]$GitRef = ""
 )
 
-$VERSION = "1.3.11"
+$VERSION = "1.3.12"
 $SKILL_NAME = "mavis-team-mode"
 $ZCODE_SKILLS_DIR = "$env:USERPROFILE\.zcode\skills"
 $ZCODE_LINK = "$ZCODE_SKILLS_DIR\$SKILL_NAME"
@@ -26,6 +27,7 @@ $ZCODE_LINK = "$ZCODE_SKILLS_DIR\$SKILL_NAME"
 # Priority: explicit param > env var > default
 if ($env:MAVIS_TEAM_REPO)   { $RepoUrl   = $env:MAVIS_TEAM_REPO }
 if ($env:MAVIS_TEAM_DIR)    { $InstallDir = $env:MAVIS_TEAM_DIR }
+if ($env:MAVIS_TEAM_REF)    { $GitRef    = $env:MAVIS_TEAM_REF }
 if ($env:MAVIS_TEAM_NO_COLOR) {
     # Disable colors when env var set
     function Log($msg)  { Write-Host "[i] $msg" }
@@ -53,11 +55,13 @@ Usage:
 Parameters:
   -InstallDir <path>   Where to clone (default: `$env:USERPROFILE\mavis-team-mode-skill)
   -RepoUrl <url>       Git URL (default: GitHub Qqapple1 repo)
+  -GitRef <ref>        Branch/tag/SHA to checkout (default: latest)
   -NoVerify            Skip post-install validation
 
 Environment variables (override defaults, mirror bash install.sh):
   MAVIS_TEAM_REPO      Git URL (same as -RepoUrl)
   MAVIS_TEAM_DIR       Where to clone (same as -InstallDir)
+  MAVIS_TEAM_REF       Git ref to checkout (branch/tag/SHA, same as -GitRef)
   MAVIS_TEAM_NO_COLOR  Disable color output (any non-empty value)
 
   Note: MAVIS_TEAM_FORCE_COPY is bash-only (PowerShell installer is always
@@ -136,6 +140,18 @@ function Invoke-InstallInner {
         } catch {
             Warn "git pull had issues; continuing with current state"
         }
+        # If a specific ref was requested, check it out
+        if ($GitRef) {
+            Log "Checking out ref: $GitRef"
+            try {
+                git fetch --depth 1 origin $GitRef 2>&1 | Select-Object -Last 3
+                if ($LASTEXITCODE -ne 0) { throw "fetch failed" }
+                git checkout $GitRef 2>&1 | Select-Object -Last 3
+                if ($LASTEXITCODE -ne 0) { throw "checkout failed" }
+            } catch {
+                Warn "Failed to checkout $GitRef (continuing on current ref)"
+            }
+        }
         Pop-Location
         Ok "Updated"
     } else {
@@ -144,7 +160,11 @@ function Invoke-InstallInner {
             throw "Repository state error"
         }
         Log "Cloning $RepoUrl..."
-        git clone --depth 1 $RepoUrl $InstallDir 2>&1 | Select-Object -Last 5
+        if ($GitRef) {
+            git clone --depth 1 --branch $GitRef $RepoUrl $InstallDir 2>&1 | Select-Object -Last 5
+        } else {
+            git clone --depth 1 $RepoUrl $InstallDir 2>&1 | Select-Object -Last 5
+        }
         if ($LASTEXITCODE -ne 0) {
             Err "git clone failed. Check URL and network."
             throw "git clone failed"

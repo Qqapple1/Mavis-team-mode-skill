@@ -1,7 +1,7 @@
 ---
 name: mavis-team-mode
 description: "Recreates the Mavis (MiniMax Agent) Team Mode workflow (Leader + Workers + Verifier) inside Zcode 3.4.2+. Use this skill when the user wants parallel agent execution, structured task decomposition, independent quality verification, or multi-step work that benefits from sub-agents running concurrently. Triggers on: 'team mode', 'mavis team', 'multi-agent', 'split into subtasks', 'verify the result', '用 team 模式', '团队模式', '多智能体协作', '并行处理'. Do NOT use for simple single-step tasks."
-version: 1.3.11
+version: 1.3.12
 license: MIT
 allowed-tools: [task, read_file, write_file, edit_file, bash, glob, grep, web_search]
 metadata:

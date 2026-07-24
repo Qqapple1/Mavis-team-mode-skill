@@ -55,6 +55,24 @@ ALLOWED_ORIGINS = {
 class TodoHandler(BaseHTTPRequestHandler):
     server_version = "TodoMavis/1.0"
 
+    # Per-connection socket timeout. BaseHTTPServer's `server.timeout`
+    # is the select-poll interval, NOT a per-socket read timeout, so it
+    # does NOT protect against slowloris (a client that opens a socket
+    # and dribbles bytes). We set timeout on the actual request socket
+    # in setup() so a slow client fails the read in N seconds.
+    # See: https://docs.python.org/3/library/socketserver.html#socketserver.BaseServer.timeout
+    timeout = 30
+
+    def setup(self):
+        super().setup()
+        # Defensive: also set on the raw socket in case `timeout` class
+        # attr isn't honored by the thread dispatch.
+        if hasattr(self, "request") and self.request is not None:
+            try:
+                self.request.settimeout(self.timeout)
+            except OSError:
+                pass
+
     def _get_cors_origin(self):
         origin = self.headers.get("Origin", "")
         if origin in ALLOWED_ORIGINS or not origin:
@@ -129,13 +147,26 @@ class TodoHandler(BaseHTTPRequestHandler):
             return None
 
     def do_OPTIONS(self):
-        # CORS preflight
+        # CORS preflight. RFC 7230 §3.3.2: 204 responses MUST NOT include
+        # a message body. We send the CORS headers via _send_json, which
+        # writes 'Content-Type: application/json' + 'Content-Length: 2'
+        # (for '{}') and then writes '{}'. That violates RFC. Fix: for 204
+        # specifically, skip the body and use send_response + headers only.
         cors = self._get_cors_origin()
         if not cors:
             self.send_response(403)
             self.end_headers()
             return
-        self._send_json(204, {})
+        # 204 No Content — no body, no Content-Type/Content-Length
+        self.send_response(204)
+        self.send_header("Connection", "close")
+        if cors:
+            self.send_header("Access-Control-Allow-Origin", cors)
+            self.send_header("Vary", "Origin")
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, PATCH, DELETE, OPTIONS")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type")
+        self.send_header("Access-Control-Max-Age", "86400")
+        self.end_headers()
 
     def do_GET(self):
         if self.path == "/api/todos":
@@ -263,9 +294,10 @@ def main():
     except OSError as e:
         print(f"[!] Failed to bind: {e}")
         sys.exit(1)
-    # Defense-in-depth: socket timeout prevents slowloris-style hangs
-    # when reading slow/malicious clients. 30s is generous for local
-    # use; tune down if you need faster failure detection.
+    # Defense-in-depth: select-poll timeout (the actual slowloris
+    # protection is the per-connection socket timeout set in TodoHandler).
+    # Kept here as a backstop in case some handler subclass forgets to
+    # call super().setup().
     server.timeout = 30
     try:
         server.serve_forever()

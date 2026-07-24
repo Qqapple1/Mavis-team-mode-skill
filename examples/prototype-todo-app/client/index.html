@@ -283,7 +283,11 @@ newTag.addEventListener("input", validateTag);
 
 addForm.addEventListener("submit", async (e) => {
   e.preventDefault();
-  if (!validateTitle() || !validateTag()) return;
+  // Run both validators unconditionally so users see ALL errors at once
+  // (not just the first failure). Returns early if either fails.
+  const titleOk = validateTitle();
+  const tagOk = validateTag();
+  if (!titleOk || !tagOk) return;
   submitBtn.disabled = true;
   const r = await api("POST", "/todos", { title: newTitle.value.trim(), tag: newTag.value.trim() });
   submitBtn.disabled = false;

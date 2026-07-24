@@ -77,6 +77,14 @@ def measure_baseline() -> dict:
     - 4 sub-agent prompts × 300 tokens: 1200 tokens
     - Integration/verify instructions: ~400 tokens
     - Total: ~3000 tokens in main context
+
+    NOTE: The component-token breakdown is unchanged since the original
+    baseline, but the per-file 'tokens used in a typical progressive
+    load' numbers below are now MEASURED (v1.3.12+), not estimated.
+    Previously these were rough estimates (SKILL.md ~600 tokens, etc.)
+    that drifted from reality. See `measure_progressive_load()` for
+    the actual numbers — they're printed at the end of this script's
+    output.
     """
     return {
         "name": "inline_team_plan (no skill)",
@@ -110,10 +118,10 @@ def measure_progressive_load(skill_dir: Path) -> dict:
     """Realistic: SKILL.md loaded, then only the agents/examples used.
 
     For a typical complex task with 3 subtasks, the Leader reads:
-    - SKILL.md (~600 tokens, loaded on first invoke)
-    - agents/leader.md (already in SKILL.md cross-refs, ~300 tokens if not)
-    - 2-3 example files (loaded for inspiration, ~200 tokens each)
-    - 1-2 agent templates (worker-coder.md, worker-reviewer.md, ~250 each)
+    - SKILL.md (~1,868 tokens, loaded on first invoke — measured, not estimated)
+    - agents/leader.md (already in SKILL.md cross-refs, ~1,088 tokens)
+    - 2-3 example files (loaded for inspiration, ~1,055 tokens each)
+    - 1-2 agent templates (worker-coder.md, worker-reviewer.md, ~633 + 439)
     """
     skill_md = (skill_dir / "SKILL.md").read_text(encoding="utf-8")
     leader_md = (skill_dir / "agents" / "leader.md").read_text(encoding="utf-8")

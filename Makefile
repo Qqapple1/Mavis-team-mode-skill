@@ -32,7 +32,7 @@ install: ## Install skill to Zcode (~/.zcode/skills/mavis-team-mode)
 	REPO_URL=$(REPO_URL) GIT_REF=$(GIT_REF) bash scripts/install.sh
 
 .PHONY: uninstall
-uninstall: ## Remove skill from Zcode and delete clone
+uninstall: ## Remove skill from Zcode (keeps the clone dir by default)
 	bash scripts/install.sh --uninstall
 
 .PHONY: reinstall

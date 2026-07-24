@@ -48,8 +48,8 @@ Bundling them all into one archive works, but:
 1. **Smaller download** — bash users don't pull 3 useless `.ps1` files
 2. **Less confusion** — a Linux user never sees `install.ps1` and
    wonders if they should run it
-3. **Cleaner release notes** — you can see "bash release 1.3.11" and
-   "Windows release 1.3.11" are the same content, different installer
+3. **Cleaner release notes** — you can see "bash release 1.3.12" and
+   "Windows release 1.3.12" are the same content, different installer
 4. **Easier to verify** — the SHA256SUMS file lists each archive
    independently
 
@@ -69,11 +69,11 @@ make package-dry-run
 
 After running, `dist/` contains:
 ```
-mavis-team-mode-skill-1.3.11-core.zip        (38 files, ~120KB)
-mavis-team-mode-skill-1.3.11-bash.tar.gz     (41 files, ~127KB)
-mavis-team-mode-skill-1.3.11-windows.zip     (41 files, ~130KB)
-mavis-team-mode-skill-1.3.11-source.tar.gz   (48 files, ~150KB)
-mavis-team-mode-skill-1.3.11-source.zip      (48 files, ~155KB)
+mavis-team-mode-skill-1.3.12-core.zip        (38 files, ~120KB)
+mavis-team-mode-skill-1.3.12-bash.tar.gz     (41 files, ~127KB)
+mavis-team-mode-skill-1.3.12-windows.zip     (41 files, ~130KB)
+mavis-team-mode-skill-1.3.12-source.tar.gz   (48 files, ~150KB)
+mavis-team-mode-skill-1.3.12-source.zip      (48 files, ~155KB)
 SHA256SUMS                                  (checksums)
 ```
 
