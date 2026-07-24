@@ -18,7 +18,7 @@ param(
     [string]$GitRef = ""
 )
 
-$VERSION = "1.3.18"
+$VERSION = "1.3.19"
 $SKILL_NAME = "mavis-team-mode"
 $ZCODE_SKILLS_DIR = "$env:USERPROFILE\.zcode\skills"
 $ZCODE_LINK = "$ZCODE_SKILLS_DIR\$SKILL_NAME"

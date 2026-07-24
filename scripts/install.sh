@@ -27,7 +27,7 @@
 set -euo pipefail
 
 # ---- Version ----
-INSTALLER_VERSION="1.3.18"
+INSTALLER_VERSION="1.3.19"
 
 # ---- Platform detection ----
 detect_platform() {
@@ -332,7 +332,7 @@ doctor() {
     err "No install found (neither $ZCODE_LINK nor $INSTALL_DIR)"
     issues=$((issues+1))
   else
-    for f in SKILL.md agents/leader.md agents/verifier.md agents/worker-coder.md README.md; do
+    for f in SKILL.md agents/leader.md agents/verifier.md agents/worker-coder.md agents/worker-fixer.md README.md; do
       if [ -f "$check_dir/$f" ]; then
         ok "$f present"
       else
@@ -457,7 +457,7 @@ install() {
   # 4. Verify required files
   cd "$INSTALL_DIR"
   local missing=0
-  for f in SKILL.md agents/leader.md agents/verifier.md agents/worker-coder.md README.md; do
+  for f in SKILL.md agents/leader.md agents/verifier.md agents/worker-coder.md agents/worker-fixer.md README.md; do
     if [ ! -f "$f" ]; then
       err "Missing required file: $f"
       missing=1

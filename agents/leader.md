@@ -1,7 +1,7 @@
 ---
 name: team-leader
 description: "Coordinates a Mavis-style team workflow in Zcode. Receives a complex user task, decomposes it into parallel sub-tasks, dispatches sub-agents, integrates their outputs, runs verification, and iterates until the deliverable meets all acceptance criteria. Use when invoking the `mavis-team-mode` skill."
-tools: [task, read_file, write_file, edit_file, bash, glob, grep, web_search]
+tools: [Agent, Read, Write, Edit, Bash, Glob, Grep, WebSearch, WebFetch]
 version: 1.0.0
 license: MIT
 ---

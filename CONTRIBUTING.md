@@ -9,6 +9,17 @@
 3. 写出角色职责、行为规则、报告格式
 4. 在 `README.md` 的"仓库结构"里加上新文件
 5. 在 `SKILL.md` 的 `agents/` 路径里加上新角色
+6. **重要**：同步更新以下 5 个清单，否则 v1.3.17/1.3.18 教过我的事会重演——
+   漏一个用户装上就 broken：
+   - `scripts/validate.sh` 的 `AGENTS=()` 数组
+   - `scripts/install.sh` 的 partial-recovery 列表 + required-files 列表
+   - `scripts/install.ps1` 的 partial-recovery 列表 (install + doctor 两个)
+   - `scripts/package.sh` 的 5 个文件列表（CORE / BASH / WINDOWS / SOURCE）
+   - `docs/ARCHITECTURE.md` 的 agents/ 树（行数 + 名字）
+   - `docs/PLATFORMS.md` 的 archive 数字（重新跑 `make package` 后）
+   - `README.md` 的目录树 + 顶部下载链接的 archive 数字
+   - `index.html` 的 `8 sub-agent roles` + 树 + 行数
+   - `agents/leader.md` Phase 5 (Iterate) 提到新 worker
 
 ## 怎么加新的 example
 
@@ -36,6 +47,7 @@
 - [ ] 新增/修改的 skill 自己跑过一遍
 - [ ] 改了 SKILL.md 就对应改 README
 - [ ] 改了 agents 就对应改 examples 里引用它的地方
+- [ ] 改了行数 / 文件数声明的话，跑 `make package` 重新生成
 - [ ] 没有改 LICENSE
 
 ## 提 Issue

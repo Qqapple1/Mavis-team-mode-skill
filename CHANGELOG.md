@@ -5,6 +5,99 @@ All notable changes to this skill are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.3.19] - 2026-07-25
+
+A long deep-audit pass (not tied to one user feedback round) surfaced
+23 stale / inconsistent issues that had accumulated across v1.3.13
+through v1.3.18. All independently verified against the actual code
+before fixing. Several were **commit-message lies** the previous
+rounds had quietly shipped.
+
+### Hard bugs (3 - the commit-message lies)
+
+1. **`agents/leader.md` `tools:` frontmatter was still snake_case.**
+   v1.3.17's CHANGELOG said "All 7 agents use the correct
+   PascalCase names" but in fact only 6 of 7 were fixed; leader.md
+   was missed. This is the **third** commit-message lie in this
+   repo's history (after the v1.3.11 "changed 3 places" claim
+   and v1.3.11 "behaviour identical" claim). Fixed: leader.md
+   `tools:` now `[Agent, Read, Write, Edit, Bash, Glob, Grep,
+   WebSearch, WebFetch]`.
+2. **`scripts/install.sh` required-files list (5 files) was
+   missing `agents/worker-fixer.md`.** Same list in
+   `scripts/install.ps1` (both install + doctor variants). A
+   user with a partial state checking with doctor / install
+   would not have been told fixer was missing. v1.3.18 added
+   fixer to the partial-recovery list (different code path) but
+   missed these required-files lists. Fixed: both lists now
+   require worker-fixer.md.
+3. **CHANGELOG.md v1.3.17 entry claimed "all 7 agents" PascalCase**
+   when only 6 were. Updated to "6 of 7" + explicit note that
+   leader.md was missed and fixed in v1.3.19. The user who reads
+   the changelog deserves accurate history.
+
+### Stale numbers across docs (10 fixes)
+
+4. **PLATFORMS.md archive file counts** (38/41/41/48/48) were
+   v1.3.7-era, hadn't been updated since. Now real: 50/44/54/51/63.
+5. **PLATFORMS.md "Total: 48 files in source, 38-41 in any
+   release archive"** - now "~50 files, 44-63 in any archive".
+6. **PLATFORMS.md "Cross-platform core | 38 files"** - now
+   "~50 files" with full file enumeration.
+7. **ARCHITECTURE.md agent file line counts (9 files)** were
+   stale: SKILL.md 201->260, leader.md 127->150, worker-coder.md
+   87->123, worker-tester.md 54->77, worker-researcher.md 58->88.
+8. **ARCHITECTURE.md scripts line counts** were stale: install.sh
+   510->521, install.ps1 273->293, package.sh 350->359, validate.sh
+   145->148, benchmark_tokens.py 224->232.
+9. **ARCHITECTURE.md prototype-todo-app line counts** were stale:
+   server.py 279->328, client/index.html 324->328.
+10. **index.html line counts** were stale: "201 lines" 201->260,
+    "279 lines" 279->328, "324 lines" 324->328.
+11. **README.md / PERFORMANCE.md token numbers** were stale
+    from v1.3.15: eager 60,909->72,826, progressive 5,588->7,430,
+    percentage +1930%->+2327%, +86%->+148%. Recomputed by
+    running `python3 scripts/benchmark_tokens.py` (v1.3.19).
+
+### worker-fixer missing from docs (7 fixes)
+
+12. **SKILL.md** agents list (5 worker-* + verifier) didn't
+    include worker-fixer. Now 6 workers + verifier.
+13. **index.html** said "7 sub-agent roles" but the dir has 8.
+    Now "8 sub-agent roles" + worker-fixer in the tree.
+14. **index.html** tree said "7 sub-agent prompt templates".
+    Now "8".
+15. **index.html** tree had `worker-{coder,tester,researcher,
+    doc-writer,reviewer}.md` - missing fixer. Now
+    `worker-{coder,tester,researcher,doc-writer,reviewer,fixer}.md`.
+16. **ARCHITECTURE.md** agents tree had 7 sub-agents - now 8
+    with worker-fixer.md (97 lines) explicitly listed.
+17. **CONTRIBUTING.md** "怎么加一个新的 Worker 角色" - was a
+    5-step checklist that would have produced the v1.3.17/1.3.18
+    broken-state we kept seeing. Now 6 steps with a concrete
+    "if you add an agent, also update these 8 lists" section
+    so the next person doesn't repeat the lesson.
+18. **CONTRIBUTING.md** PR checklist now includes "改了行数 /
+    文件数声明的话, 跑 `make package` 重新生成".
+
+### Verified
+- shellcheck: 0 warnings
+- bash -n: 0 errors
+- python -m py_compile: 0 errors
+- PowerShell braces: 70/70, 26/26, 14/14 (balanced)
+- install.sh install: PASS (first + 2nd + 3rd idempotent)
+- install.sh doctor: PASS
+- install.sh uninstall: PASS
+- install.sh partial-state recovery: PASS (verified by deleting
+  worker-fixer.md then re-running install)
+- validate.sh: 24/24
+- validate_yaml.py: 16/16
+- e2e (fresh server + CI order): 20+23+5 = 48/48
+- make package: 5/5 archives, all self-test pass, SHA256 verified
+- 5 archive file counts match PLATFORMS.md exactly: 50/44/54/51/63
+- All 5 archives contain agents/worker-fixer.md
+- benchmark_tokens.py actual numbers match README.md / PERFORMANCE.md
+
 ## [1.3.18] - 2026-07-25
 
 Fourth-round real-world feedback: user built `hitokoto` (CLI
@@ -103,14 +196,17 @@ correctness issue, not a naming issue.
 
 ### P2 (consistency)
 
-3. **All 7 agent `tools:` frontmatter used snake_case tool names.**
+3. **6 of 7 agent `tools:` frontmatter used snake_case tool names.**
    Zcode's actual tool names are PascalCase (Agent, Read, Write,
    Edit, Bash, Glob, Grep, WebSearch, WebFetch). The skill
    author removed the global `allowed-tools` field in v1.3.14
-   but missed the per-agent `tools:` lists. Now all 7 agents
-   (leader, verifier, worker-coder, worker-tester,
-   worker-reviewer, worker-doc-writer, worker-researcher) use
-   the correct PascalCase names.
+   but missed the per-agent `tools:` lists. Now 6 agents
+   (verifier, worker-coder, worker-tester, worker-reviewer,
+   worker-doc-writer, worker-researcher) use the correct
+   PascalCase names. **Note**: the v1.3.17 commit claimed
+   "all 7 agents" were fixed but `agents/leader.md` was
+   missed; that was a commit-message lie. The actual
+   leader.md fix shipped in v1.3.19.
 4. **SKILL.md metadata still said "Real Zcode runtime: NOT YET
    TESTED".** v1.3.14-1.3.16 shipped 3 rounds of real-world
    feedback fixes. Replaced with "tested 3+ times by community
@@ -966,6 +1062,7 @@ changes that didn't actually land). This release fixes them all.
 [1.3.1]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.1.0...v1.2.0
+[1.3.19]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.18...v1.3.19
 [1.3.18]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.17...v1.3.18
 [1.3.17]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.16...v1.3.17
 [1.3.16]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.15...v1.3.16

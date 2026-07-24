@@ -2,11 +2,11 @@
 
 把 MiniMax **Mavis Team Mode**（Leader + Workers + Verifier）的能力搬到 Zcode 3.4.2+。
 
-> **Pick your platform → [Download v1.3.18](https://github.com/Qqapple1/Mavis-team-mode-skill/releases/tag/v1.3.18)**:
-> - macOS / Linux / Git Bash / WSL → `mavis-team-mode-skill-1.3.18-bash.tar.gz`
-> - Windows PowerShell → `mavis-team-mode-skill-1.3.18-windows.zip`
-> - Just want to read it → `mavis-team-mode-skill-1.3.18-core.zip`
-> - Contributor / CI → `mavis-team-mode-skill-1.3.18-source.tar.gz`
+> **Pick your platform → [Download v1.3.19](https://github.com/Qqapple1/Mavis-team-mode-skill/releases/tag/v1.3.19)**:
+> - macOS / Linux / Git Bash / WSL → `mavis-team-mode-skill-1.3.19-bash.tar.gz`
+> - Windows PowerShell → `mavis-team-mode-skill-1.3.19-windows.zip`
+> - Just want to read it → `mavis-team-mode-skill-1.3.19-core.zip`
+> - Contributor / CI → `mavis-team-mode-skill-1.3.19-source.tar.gz`
 > - [Which archive should I download? →](docs/PLATFORMS.md)
 
 > 基于 Zcode 3.4.2+ 的子智能体系统 + Agent Skills 标准实现，
@@ -16,7 +16,7 @@
 [![Skill tests](https://img.shields.io/badge/validate-23%2F23%20passing-brightgreen)](VALIDATION.md)
 [![Prototype tests](https://img.shields.io/badge/prototype%20e2e-48%2F48%20passing-brightgreen)](examples/prototype-todo-app/)
 [![YAML](https://img.shields.io/badge/yaml-15%2F15%20passing-brightgreen)](scripts/validate_yaml.py)
-[![Version](https://img.shields.io/badge/version-1.3.18-blue)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-1.3.19-blue)](CHANGELOG.md)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 [![Zcode 3.x](https://img.shields.io/badge/zcode-3.x-purple)](https://zcode-ai.com)
 [![Security](https://img.shields.io/badge/security-policy-green)](SECURITY.md)
@@ -186,7 +186,7 @@ mavis-team-mode/
 │   ├── worker-researcher.md         #   Worker: 调研
 │   ├── worker-doc-writer.md         #   Worker: 文档
 │   ├── worker-reviewer.md           #   Worker: code review
-│   └── worker-fixer.md              #   Worker: 精准修复 (v1.3.18+)
+│   └── worker-fixer.md              #   Worker: 精准修复 (v1.3.19+)
 ├── examples/                        # 4 个案例 + 1 个真实 prototype
 │   ├── refactor-large-module.md
 │   ├── bug-hunt.md
@@ -277,15 +277,15 @@ Prototype server 默认：
 
 **Token 成本（实测估算）**：
 
-> 下面数字是 `python3 scripts/benchmark_tokens.py` 在 v1.3.18 实跑出来的（1 token ≈ 4 字符，启发式估算，非 BPE 精确数）。重新跑会随文件大小变化。
+> 下面数字是 `python3 scripts/benchmark_tokens.py` 在 v1.3.19 实跑出来的（1 token ≈ 4 字符，启发式估算，非 BPE 精确数）。重新跑会随文件大小变化。
 
 | 加载模式 | Tokens | vs inline baseline |
 |---|---|---|
 | 内联 Team plan（无 skill） | ~3,000 | — |
-| 一次全加载 | ~60,909 | +1930% |
-| **渐进加载（默认）** | ~5,588 | **+86%** |
+| 一次全加载 | ~72,826 | +2327% |
+| **渐进加载（默认）** | ~7,430 | **+148%** |
 
-Skill 本身**多耗 ~86% tokens**（比内联 baseline），但换来 2-2.5x 并行加速。**用 skill = 换时间，不省钱**。
+Skill 本身**多耗 ~148% tokens**（比内联 baseline），但换来 2-2.5x 并行加速。**用 skill = 换时间，不省钱**。
 
 ## 路线图
 
