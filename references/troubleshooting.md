@@ -103,6 +103,59 @@ ls -la /path/to/repo/
 
 ---
 
+# 非 ASCII 文本相关
+
+## 1. 中文/emoji 搜索返回 0 结果,但 list / add 都正常
+
+**症状**(v1.3.14 用户反馈):
+```
+$ mnote search "技术"
+No matches
+# 但 mnote list 里有"技术备忘"这条记录
+```
+
+**根因**: 代码用了 `json.dumps(value)` 写盘,Python 默认
+`ensure_ascii=True`,中文被转义为 `\u4e2d\u6587` 存入文件。搜索时用
+原始中文关键词"技术",匹配不到 ASCII 转义字符。
+
+**诊断**:
+```bash
+# 看 001.md 文件实际内容（是中文还是转义）
+cat 001.md
+# 如果看到 "\u4e2d\u6587" 这种转义,中招了
+# 如果看到 "中文",是别的 bug
+```
+
+**修复**:
+```python
+# WRONG
+lines.append(f"{key}: {json.dumps(value)}")
+# RIGHT
+lines.append(f"{key}: {json.dumps(value, ensure_ascii=False)}")
+```
+
+**预防**:
+- Worker-Coder 写文件前,如果有非 ASCII 处理,必须 `ensure_ascii=False`
+- Tester 必须有 1 个非 ASCII 关键词的测试用例
+- Leader 在 CONTRACT.md 里明言"非 ASCII 文本必须保留原字符,不得转义"
+
+## 2. 读文件乱码
+
+**症状**: 读出来是 `b'\\xe4\\xb8\\xad\\xe6\\x96\\x87'` 或 `\u4e2d\u6587`
+
+**根因**: 用了 `open(path).read()` 没指定 `encoding="utf-8"`,系统默认
+编码是 GBK / Latin-1
+
+**修复**:
+```python
+# WRONG
+content = open(path).read()
+# RIGHT
+content = open(path, encoding="utf-8").read()
+```
+
+---
+
 # Windows
 
 ## 1. `python3` 命令找不到

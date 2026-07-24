@@ -39,6 +39,25 @@ OUTPUT FORMAT: <how to report back>
    checking.
 4. **Report in the exact OUTPUT FORMAT requested.** The Leader integrates your
    output; mismatched format = wasted work.
+5. **Non-ASCII text (中文, emoji, etc.) must round-trip correctly.** A common
+   bug: writing strings to files via `json.dumps(value)` (default
+   `ensure_ascii=True`) escapes non-ASCII as `\uXXXX`. If the file is later
+   read back and searched/scanned with the original Unicode keys (e.g. search
+   for "技术"), the lookup silently fails — everything else works, only
+   the matching breaks. **Rule**: any time you serialize strings to a
+   human-readable file (YAML / Markdown / JSON config / frontmatter / log
+   file) that will be read back by humans or by code doing string match,
+   pass `ensure_ascii=False`:
+   ```python
+   # WRONG (Chinese becomes \u4e2d\u6587 on disk)
+   lines.append(f"{key}: {json.dumps(value)}")
+   # RIGHT
+   lines.append(f"{key}: {json.dumps(value, ensure_ascii=False)}")
+   ```
+   If writing raw text (no `json.dumps`), this doesn't apply — just write
+   the string. If you must keep ASCII output, also lowercase the key index
+   or document the encoding. When in doubt, write a 5-line self-check:
+   `assert '技术' in open(file).read()` after writing, before reporting done.
 
 ## Report format (default)
 

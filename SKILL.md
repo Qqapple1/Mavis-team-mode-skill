@@ -1,7 +1,7 @@
 ---
 name: mavis-team-mode
 description: "Recreates the Mavis (MiniMax Agent) Team Mode workflow (Leader + Workers + Verifier) inside Zcode 3.4.2+. Use this skill when the user wants parallel agent execution, structured task decomposition, independent quality verification, or multi-step work that benefits from sub-agents running concurrently. Triggers on: 'team mode', 'mavis team', 'multi-agent', 'split into subtasks', 'verify the result', '用 team 模式', '团队模式', '多智能体协作', '并行处理'. Do NOT use for simple single-step tasks."
-version: 1.3.14
+version: 1.3.15
 license: MIT
 metadata:
   author: Community port (Mavis CLI agent)
@@ -121,6 +121,12 @@ If missing, see INSTALL.md.
 
 > **如果任务太简单**(单文件、< 50 行、单一函数)可以跳过 CONTRACT,但 Leader 必须在 prompt 里**写明完整的接口规范**作为 Worker 的输入。
 
+> **CONTRACT 里的文本处理要求**: 如果任务涉及中文/emoji/任何非 ASCII 文本存储、搜索、序列化,CONTRACT 必须明言:
+> - 写盘: `json.dumps(value, ensure_ascii=False)`(默认会转义为 `\uXXXX`,导致后续搜索/读取失败)
+> - 读盘: 优先用 `encoding="utf-8"`,不要用默认系统编码
+> - 验证: Coder 写完自检 1 轮,Tester 至少 1 个测试用例含非 ASCII
+> 常见反模式: Coder 用了 `json.dumps(value)`,Doc-Writer 文档里写"支持中文搜索",Tester 测试用例全是 ASCII,Verifier 集成测试中文才爆——返工。**在 CONTRACT 里就写明,不要在 Verifier 阶段才发现**。
+
 Leader 必须输出一个**结构化任务书**，格式见 `agents/leader.md` 的 Phase 1。
 
 ### Step 3: Leader 启动并行子智能体
@@ -133,7 +139,7 @@ Leader 在主对话里调用 Zcode 的 sub-agent 机制。两种用法：
 - **研究类,需要产出文件(报告/RESEARCH.md/结构化 JSON)** → 用 Zcode 内置的 `general-purpose`(完整工具权限)
 - **实现类**(写代码、改文件) → 用 Zcode 内置的 `general-purpose`(完整工具权限)
 
-> **常见坑**(v1.3.14 反馈): Leader 因为"这是研究任务"就选 Explore,然后又让 Worker 写文件,Explore 不会写,产物丢。**判断标准**: 如果 Leader 的 prompt 里出现"写入 X.md"/"产出报告"/"存为文件"等词,必须用 general-purpose,不能用 Explore。详见 `agents/worker-researcher.md` 里的 Mode selection 表。
+> **常见坑**(v1.3.15 反馈): Leader 因为"这是研究任务"就选 Explore,然后又让 Worker 写文件,Explore 不会写,产物丢。**判断标准**: 如果 Leader 的 prompt 里出现"写入 X.md"/"产出报告"/"存为文件"等词,必须用 general-purpose,不能用 Explore。详见 `agents/worker-researcher.md` 里的 Mode selection 表。
 - **两者并行** → 一次性 fork 多个
 
 **B. 派发自定义 sub-agent**（高级用法）：

@@ -5,6 +5,47 @@ All notable changes to this skill are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.3.15] - 2026-07-24
+
+Second-round real-world feedback from a user running v1.3.14 in Zcode
+to build `mnote` (markdown note CLI, 4 parallel workers, 14/14 tests).
+v1.3.14's P0-P3 fixes all verified working. One new bug surfaced
+that's NOT in the skill but reveals a gap in Coder worker training.
+
+### Fixed (in skill, not in user's code)
+
+- **Non-ASCII round-trip in Worker-Coder.** User's Coder wrote
+  `mnote.py` using `json.dumps(value)` to serialize Markdown
+  frontmatter. Default `ensure_ascii=True` escaped Chinese as
+  ASCII escape on disk. `mnote search "技术"` then matched zero
+  rows because the on-disk file had ASCII escapes, not the original
+  characters. The bug was NOT in this repo (`mnote.py` is user's
+  code), but it's a class of bug Worker-Coder is prone to.
+  **Fixed in skill (so it doesn't happen again)**:
+  - `agents/worker-coder.md`: new rule #5 with a 5-line
+    self-check, the exact `json.dumps(value, ensure_ascii=False)`
+    fix, and a warning about the symptom
+  - SKILL.md Step 2.5: new bullet in CONTRACT template requiring
+    Leader to spell out non-ASCII handling expectations BEFORE
+    dispatching Coder
+  - `references/troubleshooting.md`: new chapter on non-ASCII
+    text with symptom, diagnosis, fix, and prevention
+
+### Verified (v1.3.14 fixes from previous round)
+- P0 (`allowed-tools` removed) - confirmed absent in SKILL.md
+- P1 (Explore vs general-purpose) - RESEARCH.md now lands on disk
+- P2 (CONTRACT.md interface alignment) - Doc-Writer's README
+  matched Coder's CLI exactly
+- P3 (Windows troubleshooting) - section present in SKILL.md +
+  references/troubleshooting.md
+
+### Verified (this round)
+- shellcheck: 0 warnings
+- bash -n: 0 errors
+- python -m py_compile: 0 errors
+- validate.sh: 23/23
+- validate_yaml.py: 15/15 OK
+
 ## [1.3.14] - 2026-07-24
 
 Real-world feedback from a user running the skill in Zcode to build a
@@ -730,6 +771,7 @@ changes that didn't actually land). This release fixes them all.
 [1.3.1]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.1.0...v1.2.0
+[1.3.15]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.14...v1.3.15
 [1.3.14]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.13...v1.3.14
 [1.3.13]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.12...v1.3.13
 [1.3.12]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.11...v1.3.12

@@ -18,7 +18,7 @@
 #
 # Usage:
 #   bash scripts/package.sh                  # uses version from SKILL.md
-#   bash scripts/package.sh --version=1.3.14  # override version
+#   bash scripts/package.sh --version=1.3.15  # override version
 #   bash scripts/package.sh --dry-run        # show what would be packaged, no write
 
 set -euo pipefail
