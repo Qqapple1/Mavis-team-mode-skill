@@ -5,6 +5,46 @@ All notable changes to this skill are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.3.16] - 2026-07-25
+
+Third-round real-world feedback: user built `cquote` (CLI quote
+manager) with v1.3.15. The v1.3.15 fix (ensure_ascii=False) was
+verified working (Chinese search "勿施于人" matched). But two new
+test-side issues surfaced that reveal a class of bug Tester is
+prone to: ANSI escapes + guessed pattern-match lists.
+
+### Fixed (in skill, not in user's code)
+
+- **Tester doesn't strip ANSI escape codes from subprocess output.**
+  User's Coder added ANSI yellow highlighting to search output
+  (`\x1b[33m勿施于人\x1b[0m`). User's Tester ran the CLI via
+  subprocess and asserted on raw stdout, getting 4 false-negative
+  test failures because the actual match text was wrapped in
+  ANSI escapes. The code was correct; the test was wrong. **Fixed**:
+  - `agents/worker-tester.md`: new rule #5 with a 5-line
+    `re.sub(r'\x1b\[[0-9;]*m', '', ...)` pattern + advice to
+    prefer `--no-color` / `NO_COLOR=1` if the CLI is yours
+  - SKILL.md Step 2.5 (CONTRACT template): new "CLI output
+    format" bullet forcing Leader to declare plain/ANSI/JSON
+    before Coder dispatches, so Tester knows whether to strip
+- **Tester pattern-matches against guessed wording, not real
+  wording.** User's test had `["no","empty","暂无","没有"]` but
+  the code actually emitted "为空" (not in the list). **Fixed**:
+  - `agents/worker-tester.md`: new rule #6 "match output
+    assertions to actual wording, not guesses" with a copy-paste
+    from actual run pattern
+
+### Verified (v1.3.15 fix from previous round)
+- ensure_ascii=False CONTRACT warning worked: Coder applied it
+- Chinese search "勿施于人" matched (v1.3.14 mnote had broken it)
+
+### Verified (this round)
+- shellcheck: 0 warnings
+- bash -n: 0 errors
+- python -m py_compile: 0 errors
+- validate.sh: 23/23
+- validate_yaml.py: 15/15 OK
+
 ## [1.3.15] - 2026-07-24
 
 Second-round real-world feedback from a user running v1.3.14 in Zcode
@@ -771,6 +811,7 @@ changes that didn't actually land). This release fixes them all.
 [1.3.1]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.1.0...v1.2.0
+[1.3.16]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.15...v1.3.16
 [1.3.15]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.14...v1.3.15
 [1.3.14]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.13...v1.3.14
 [1.3.13]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.12...v1.3.13
