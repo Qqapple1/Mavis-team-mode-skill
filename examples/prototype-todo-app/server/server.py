@@ -171,6 +171,22 @@ class TodoHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         if self.path == "/api/todos":
             self._send_json(200, TODOS)
+        elif self.path.startswith("/api/todos/"):
+            # GET /api/todos/{id} — single-todo lookup
+            parts = self.path.strip("/").split("/")
+            if len(parts) != 3 or parts[0] != "api" or parts[1] != "todos":
+                self._send_error(404, "not found")
+                return
+            try:
+                todo_id = int(parts[2])
+            except ValueError:
+                self._send_error(400, "id must be integer")
+                return
+            for t in TODOS:
+                if t["id"] == todo_id:
+                    self._send_json(200, t)
+                    return
+            self._send_error(404, f"todo {todo_id} not found")
         elif self.path == "/api/tags":
             tags = sorted({t["tag"] for t in TODOS})
             self._send_json(200, tags)
@@ -281,6 +297,7 @@ def main():
     print(f"Starting Todo server on http://{host}:{port}")
     print("Endpoints:")
     print(f"  GET    http://{host}:{port}/api/todos")
+    print(f"  GET    http://{host}:{port}/api/todos/{{id}}")
     print(f"  GET    http://{host}:{port}/api/tags")
     print(f"  GET    http://{host}:{port}/api/health")
     print(f"  POST   http://{host}:{port}/api/todos")

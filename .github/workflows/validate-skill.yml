@@ -330,6 +330,9 @@ jobs:
       - name: Run extended e2e tests
         run: python3 examples/prototype-todo-app/test_e2e_extended.py
 
+      - name: Run advanced e2e tests
+        run: python3 examples/prototype-todo-app/test_e2e_advanced.py
+
       - name: Token benchmark
         run: |
           python3 scripts/benchmark_tokens.py

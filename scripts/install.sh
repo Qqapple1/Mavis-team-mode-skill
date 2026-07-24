@@ -407,7 +407,17 @@ install() {
     # (e.g. user rm'd them, or partial git pull), restore from HEAD.
     # This is safe because we only restore files the user is
     # explicitly trying to install (not their own untracked work).
-    for f in SKILL.md agents/leader.md agents/verifier.md agents/worker-coder.md README.md; do
+    # The list mirrors the 7 agents validated by validate.sh + the
+    # 4 entry-point docs (SKILL.md, README.md, INSTALL.md, CHANGELOG.md).
+    for f in \
+      SKILL.md README.md INSTALL.md CHANGELOG.md \
+      agents/leader.md \
+      agents/verifier.md \
+      agents/worker-coder.md \
+      agents/worker-tester.md \
+      agents/worker-researcher.md \
+      agents/worker-doc-writer.md \
+      agents/worker-reviewer.md; do
       if [ ! -f "$f" ]; then
         warn "Missing $f locally — restoring from HEAD"
         if ! git checkout HEAD -- "$f" 2>&1 | tail -2; then

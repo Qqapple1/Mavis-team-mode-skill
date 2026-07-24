@@ -107,9 +107,18 @@ def main():
     def test_get_todos():
         status, body, _ = request("GET", "/api/todos")
         assert_eq(status, 200, "status")
-        assert_true(len(body) >= 5, "at least 5 todos")
+        # Seed data ships exactly 7 todos. Asserting exactly 7 (not >= 5)
+        # catches regressions where a todo is dropped from the seed or
+        # the server starts double-counting.
+        assert_eq(len(body), 7, "exactly 7 seed todos")
         for field in ("id", "title", "tag", "done", "created_at"):
             assert_true(field in body[0], f"field {field!r} present")
+        # Also verify GET /api/todos/{id} works for a known seed id
+        status, body0, _ = request("GET", "/api/todos/1")
+        assert_eq(status, 200, "single GET status")
+        assert_eq(body0["id"], 1, "id matches")
+        status, _, _ = request("GET", "/api/todos/99999")
+        assert_eq(status, 404, "unknown id 404")
 
     def test_get_tags():
         status, body, _ = request("GET", "/api/tags")
@@ -156,14 +165,27 @@ def main():
         status, body, _ = request("POST", "/api/todos", {"title": "to delete", "tag": "test"})
         assert_eq(status, 201, "create")
         new_id = body["id"]
+        # Confirm it exists via single-GET endpoint BEFORE delete
+        status, before, _ = request("GET", f"/api/todos/{new_id}")
+        assert_eq(status, 200, "exists before delete")
+        assert_eq(before["id"], new_id, "id matches before")
+        # Delete
         status, _, _ = request("DELETE", f"/api/todos/{new_id}")
         assert_eq(status, 200, "delete status")
-        # Verify gone
+        # Verify actually gone: single-GET must 404 (was previously
+        # checking 404 on a route that didn't exist, which would have
+        # passed even if delete silently did nothing).
         status, _, _ = request("GET", f"/api/todos/{new_id}")
         assert_eq(status, 404, "404 after delete")
+        # And it should not appear in the list either
+        _, after, _ = request("GET", "/api/todos")
+        assert_true(
+            all(t["id"] != new_id for t in after),
+            "deleted id not in list",
+        )
 
     run("Health check returns ok", test_health)
-    run("GET /api/todos returns 7 todos with all fields", test_get_todos)
+    run("GET /api/todos returns 7 todos with all fields; GET /api/todos/{id} works", test_get_todos)
     run("GET /api/tags returns unique tags", test_get_tags)
     run("Filter logic: 'work' tag non-empty", test_filter_by_tag)
     run("Filter logic: nonexistent tag returns empty", test_filter_empty)

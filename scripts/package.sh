@@ -167,8 +167,15 @@ SOURCE_FILES=(
   .github/ISSUE_TEMPLATE/feature_request.md
   .github/workflows/validate-skill.yml
 )
-# Dedupe source list
-mapfile -t SOURCE_FILES < <(printf '%s\n' "${SOURCE_FILES[@]}" | sort -u)
+# Dedupe source list. macOS still ships bash 3.2 by default, and
+# bash 3.2 has no `mapfile` / `readarray` builtins. Use a portable
+# `while read` loop instead (works on bash 3.2+).
+deduped=()
+while IFS= read -r line; do
+  deduped+=("$line")
+done < <(printf '%s\n' "${SOURCE_FILES[@]}" | sort -u)
+SOURCE_FILES=("${deduped[@]}")
+unset deduped
 
 # ---- Sanity check ----
 missing=0
