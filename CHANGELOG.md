@@ -5,6 +5,67 @@ All notable changes to this skill are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.3.14] - 2026-07-24
+
+Real-world feedback from a user running the skill in Zcode to build a
+`frename` CLI tool. Surfaced 4 hard problems + 2 design improvements.
+
+### Fixed (from real-world Zcode usage)
+
+- **P0 — SKILL.md `allowed-tools` field used snake_case tool names
+  (`read_file`, `write_file`, etc.) that don't match Zcode's actual
+  tool names (`Read`, `Write`, `Edit`, `Bash`, `Agent`, etc.).** Field
+  was unused today (Zcode doesn't strictly validate), but would break
+  loading on any future Zcode version that does. **Removed** the field
+  entirely — sub-agent tool permissions are declared independently in
+  each `agents/worker-*.md` `tools:` frontmatter, where they belong.
+- **P1 — Researcher dispatched as Zcode's `Explore` agent, but
+  task asked for a file write.** Explore is read-only and cannot
+  produce files. Result: "调研了但没写文件" silent failure mode.
+  **Fixed**:
+  - `agents/worker-researcher.md`: added warning "Mode selection:
+    pure read vs. produce-a-file" table + escalation rule
+  - SKILL.md Step 3.A: replaced the single "Explore for research"
+    line with a 3-row mode table + explicit "if you need to write
+    a file, use general-purpose" warning
+- **P2 — Worker-Coder's CLI (`--prefix --suffix --replace --regex
+  --index --dry-run --verbose`) didn't match Worker-Doc-Writer's
+  README (`--number --name --start --digits --recursive --filter
+  --include-dirs`).** Root cause: 4 sub-agents fully isolated, no
+  shared context. **Fixed**: added SKILL.md Step 2.5 "接口契约发布"
+  requiring Leader to write `CONTRACT.md` (or include the contract
+  in every Worker prompt) BEFORE dispatching Workers. Workers
+  implement against the contract, not against each other.
+- **P3 — SKILL.md examples were Unix-only (`ls`, `ln -s`,
+  `~/.zcode/`).** Windows users hit `python3` not found, glob not
+  expanding, `~` not expanding in PowerShell. **Fixed**:
+  - SKILL.md: new "Platform notes - Windows users" section linking
+    to `docs/WINDOWS.md` + the 4 most common Windows gotchas
+  - `references/troubleshooting.md`: new "Windows" chapter with
+    6 numbered problems and fixes (python launcher, glob,
+    path separators, `~`, doc/code mismatch, Researcher file
+    loss)
+- **Verifier "Leader 兼任 Verifier" 同模型偏见.** SKILL.md Step 5
+  had Methods A (recommended) and B (with caveat), but not C. A
+  user actually did it and reported self-bias risk. **Added Method
+  C** explicitly with bias warning + checklist mitigation +
+  20-30% miss-rate estimate.
+
+### Not changed (intentionally)
+- **User suggested "Zcode 3.4.2+ is outdated, make it
+  version-agnostic".** Rejected: 3.4.2 is when Zcode's sub-agent
+  tool system landed; earlier versions don't have the primitives
+  this skill needs. The version constraint is real, not cosmetic.
+
+### Verified
+- shellcheck: 0 warnings
+- bash -n: 0 errors
+- python -m py_compile: 0 errors
+- validate.sh: 23/23
+- validate_yaml.py: 15/15 OK
+- All 4 user-reported problems + 2 design improvements independently
+  verified against the actual code (not the user's report)
+
 ## [1.3.13] - 2026-07-24
 
 A 6th review pass + a friend surfaced 5 issues (4 user-reported +
@@ -669,6 +730,7 @@ changes that didn't actually land). This release fixes them all.
 [1.3.1]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.1.0...v1.2.0
+[1.3.14]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.13...v1.3.14
 [1.3.13]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.12...v1.3.13
 [1.3.12]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.11...v1.3.12
 [1.3.11]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.10...v1.3.11

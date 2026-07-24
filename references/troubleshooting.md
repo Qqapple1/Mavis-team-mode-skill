@@ -100,3 +100,80 @@ ls -la /path/to/repo/
 - 检查软链目标路径是否对（绝对路径，不是相对路径）
 - 如果是 broken symlink，删除再重建：`rm ~/.zcode/skills/mavis-team-mode && ln -s <正确路径> ~/.zcode/skills/`
 - 软链权限问题：跑 `chmod +x <目标目录>/SKILL.md`（某些 Zcode 版本需要）
+
+---
+
+# Windows
+
+## 1. `python3` 命令找不到
+
+**症状**: worker 跑 `python3 script.py` 报 `'python3' is not recognized as an internal or external command`
+
+**排查**:
+```powershell
+# 依次试
+python --version
+py --version
+where python
+where py
+```
+
+**解决**:
+- 优先用 `py`(Windows Python launcher,官方推荐)
+- 如果 Zcode 捆绑了 Python(常见于 `codex-runtime/python/python.exe`),在 install 时加到 PATH
+- 或者让 Leader prompt 里 worker 调 `py` 而非 `python3`
+
+## 2. Shell glob 不展开(`*.txt` 原样传给工具)
+
+**症状**: `frename *.txt` 在 Windows bash 里把字面字符串 `*.txt` 传给 frename,不是展开后的文件列表
+
+**排查**:
+```powershell
+# bash 里试
+echo *.txt
+# 如果输出 `*.txt` 而不是文件列表,说明没展开
+```
+
+**解决**:
+- 在 Worker prompt 里要求显式文件列表(不要依赖 glob)
+- 或者跑 `frename $(ls *.txt)` 强制展开
+- PowerShell 原生不支持 Unix glob;用 `Get-ChildItem *.txt | %{ frename $_.Name }`
+
+## 3. 路径分隔符(`\` vs `/`)
+
+**症状**: worker prompt 里写了 `D:\Z code\frename\xxx.py`,但代码里是 `D:/Z code/frename/xxx.py`,不一致
+
+**解决**:
+- Leader prompt 里统一用**正斜杠** `/`,大多数 Python/PowerShell 都接受
+- 或者 Leader prompt 里明确说"用 Windows 原生反斜杠,但 worker 写文件时统一用正斜杠"
+- 不要混用,会出 substring 匹配不到的隐性 bug
+
+## 4. `~/.zcode/` 不展开
+
+**症状**: PowerShell 里 `~/.zcode/skills/...` 字面不展开,~ 不是 PowerShell 的 home 缩写
+
+**解决**:
+- 用 `$env:USERPROFILE` 代替 `~`
+- 或用 `Resolve-Path ~` 拿到完整路径再传
+
+## 5. Worker 产出的文档与实际代码不一致
+
+**症状**: Doc-Writer 写的 README 参数表(`--number --name --filter...`)跟 Coder 实现的 CLI(`--prefix --suffix --replace...`)对不上
+
+**根因**: 4 个 Worker 完全隔离,没有共享接口契约,各自为政
+
+**解决**:
+- 在 SKILL.md Step 2.5 里 Leader 必须**先**写 `CONTRACT.md`(CLI 参数、函数签名、文件格式)再派发 Worker
+- 简单任务(< 50 行)也至少在 Leader prompt 里写明完整接口
+- 详见 SKILL.md Step 2.5
+
+## 6. Worker 调研了但没写文件到磁盘
+
+**症状**: Researcher 报告说"已经调研完成",但下游 Worker / 你自己看不到 `RESEARCH.md`
+
+**根因**: Researcher 被派了 Zcode 内置的 `Explore` agent(只读),但任务要求写文件。Explore 不会写。
+
+**解决**:
+- 如果要写文件,Leader 必须派 `general-purpose`,不是 `Explore`
+- 详见 `agents/worker-researcher.md` 里的 Mode selection 表
+- 如果已经派错了,让 Researcher 重跑成 `general-purpose`

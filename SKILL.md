@@ -1,9 +1,8 @@
 ---
 name: mavis-team-mode
 description: "Recreates the Mavis (MiniMax Agent) Team Mode workflow (Leader + Workers + Verifier) inside Zcode 3.4.2+. Use this skill when the user wants parallel agent execution, structured task decomposition, independent quality verification, or multi-step work that benefits from sub-agents running concurrently. Triggers on: 'team mode', 'mavis team', 'multi-agent', 'split into subtasks', 'verify the result', '用 team 模式', '团队模式', '多智能体协作', '并行处理'. Do NOT use for simple single-step tasks."
-version: 1.3.13
+version: 1.3.14
 license: MIT
-allowed-tools: [task, read_file, write_file, edit_file, bash, glob, grep, web_search]
 metadata:
   author: Community port (Mavis CLI agent)
   origin: Recreated from MiniMax Mavis TeamEngine (May 2026 announcement)
@@ -104,6 +103,24 @@ If missing, see INSTALL.md.
 
 ### Step 2: Leader（你正在聊的 Zcode）做任务拆解
 
+### Step 2.5: Leader 发布接口契约（在派 Worker 前必做）
+
+> **为什么需要这一步**: Zcode 的 sub-agent 完全隔离、各自独立的 tool context,没有共享内存。如果 Leader 拆解完直接派发 4 个 Worker,Coder / Tester / Doc-Writer 拿到的 prompt 是各自独立的,**没人同步接口规范**,结果就是: Coder 实现 `--prefix/--suffix/--replace/--regex/--index/--dry-run/--verbose`, Doc-Writer 文档里写 `--number/--name/--start/--digits/--recursive/--filter/--include-dirs`,根本不是同一个工具。
+
+**强制流程**:
+1. Leader 在派发 Worker 之前,**先**在团队共享目录写一个 `CONTRACT.md`(或在每个 Worker prompt 里塞同一段接口定义),内容包括:
+   - 所有公开函数/类的签名(参数、返回、异常)
+   - CLI 工具的完整 `--help` 输出(即使 Coder 还没写完代码,先约定)
+   - 任何共享文件格式(JSON schema / Markdown 模板 / etc.)
+   - 哪些文件必须存在(产物清单)
+2. Coder 收到 prompt 后**先**按 CONTRACT 写 stub(`raise NotImplementedError`),**再**实现,确保符合契约
+3. Tester / Doc-Writer 基于 CONTRACT 工作,不直接参考 Coder 后续实现
+4. Leader 在 Step 4 整合时,检查 Worker 产物是否遵守 CONTRACT,违反的返回重做
+
+> **如果只有一个 Worker 也要写 CONTRACT** —— 复杂度低的时候只是个 5 行的 `--help` 输出,但省下了"Doc-Writer 文档说 --number 但代码里是 --index"这种返工。
+
+> **如果任务太简单**(单文件、< 50 行、单一函数)可以跳过 CONTRACT,但 Leader 必须在 prompt 里**写明完整的接口规范**作为 Worker 的输入。
+
 Leader 必须输出一个**结构化任务书**，格式见 `agents/leader.md` 的 Phase 1。
 
 ### Step 3: Leader 启动并行子智能体
@@ -112,8 +129,11 @@ Leader 在主对话里调用 Zcode 的 sub-agent 机制。两种用法：
 
 **A. 使用 Zcode 内置 sub-agent**（推荐用于标准任务）：
 
-- **研究类**（读代码、搜文档）→ 用 Zcode 内置的 `Explore`（只读、不改文件）
-- **实现类**（写代码、改文件）→ 用 Zcode 内置的 `general-purpose`（完整工具权限）
+- **研究类,只读调研,总结在对话里返回** → 用 Zcode 内置的 `Explore`(只读、不改文件,快速廉价)
+- **研究类,需要产出文件(报告/RESEARCH.md/结构化 JSON)** → 用 Zcode 内置的 `general-purpose`(完整工具权限)
+- **实现类**(写代码、改文件) → 用 Zcode 内置的 `general-purpose`(完整工具权限)
+
+> **常见坑**(v1.3.14 反馈): Leader 因为"这是研究任务"就选 Explore,然后又让 Worker 写文件,Explore 不会写,产物丢。**判断标准**: 如果 Leader 的 prompt 里出现"写入 X.md"/"产出报告"/"存为文件"等词,必须用 general-purpose,不能用 Explore。详见 `agents/worker-researcher.md` 里的 Mode selection 表。
 - **两者并行** → 一次性 fork 多个
 
 **B. 派发自定义 sub-agent**（高级用法）：
@@ -147,6 +167,12 @@ Leader 收到所有子智能体的摘要后，**自己整合**成初版交付物
 **方法 B（轻量）**：主 Leader 自己当 Verifier
 - 用 `references/verification-checklist.md` skill 自检
 - 但有偏见风险（同模型同上下文容易自我放水）
+
+**方法 C（不建议，除非时间紧）**：Leader 兼任 Verifier
+- 表面上节省一个会话,实际上**同模型偏见**会让"自我验收"变成"自我放水"
+- 真实代价: 自我放水 → 集成测试失败 → 返工 30+ 分钟
+- 如果必须用,用 `references/verification-checklist.md` 作硬 checklist,**逐项勾选不靠记忆**,不靠"应该没问题"
+- 接受 20-30% 漏检率;复杂任务用方法 A
 
 ### Step 6: 迭代修正
 
@@ -185,6 +211,29 @@ See `agents/` directory for ready-to-use prompt templates:
 ## Advanced: DeepSeek + Zcode
 
 This skill is **model-agnostic**. See `references/deepseek-setup.md`.
+
+## Platform notes
+
+### Windows users
+
+This SKILL.md uses Unix-style commands in examples (e.g. `ls`, `ln -s`,
+`~/.zcode/...`). For Windows-specific install paths, PowerShell quirks,
+and python launcher (`py` vs `python3`) troubleshooting, see
+[`docs/WINDOWS.md`](docs/WINDOWS.md). Common Windows gotchas:
+
+- `~` doesn't expand in PowerShell the way bash users expect — use
+  `$env:USERPROFILE` instead of `~/.zcode/`
+- Shell glob `*.txt` doesn't auto-expand in Windows bash — pass files
+  explicitly: `frename *.txt` becomes `frename a.txt b.txt c.txt`
+- Python may not be on `PATH` as `python3` — try `py` (the Windows
+  launcher) or use the full path to your Zcode-bundled Python
+  (often under `codex-runtime/`)
+- Path separator: use forward slashes `/` in agent prompts (most
+  workers / models handle both, but consistency helps)
+
+For more Windows troubleshooting, see
+[`references/troubleshooting.md`](references/troubleshooting.md#windows).
+
 
 ## Validation
 
