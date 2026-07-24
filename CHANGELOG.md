@@ -5,6 +5,93 @@ All notable changes to this skill are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.3.8] - 2026-07-24
+
+### Fixed
+- **CRITICAL: CI Windows job regression**: Previous version's CI passed
+  because `install.ps1` silently ignored `MAVIS_TEAM_DIR` env var (it
+  was hard-coded to the param default). v1.3.8 added env var support
+  per parity with bash, which exposed a pre-existing bug: the CI
+  `Verify install (PowerShell)` step ran `install.ps1 -Doctor` without
+  setting `MAVIS_TEAM_DIR`, so doctor looked for files at the default
+  location while install had put them at `-test` location. Same issue
+  affected the `Test uninstall` step. CI now sets `MAVIS_TEAM_DIR` in
+  doctor + uninstall steps to match the install step. (Catches what
+  would have been a silent bug for Windows users with custom
+  `MAVIS_TEAM_DIR` overrides.)
+- **CRITICAL: bash archive missing `package.sh`**: The `BASH_FILES`
+  list in `package.sh` was missing `scripts/package.sh` itself, so
+  the bash release archive shipped without it. Now bash archive
+  contains install.sh + validate.sh + package.sh (41 files total,
+  up from 40).
+- **Documentation drift** (caught by full-tree grep review):
+  - `INSTALL.md`: claimed 22 format checks (actual: 23)
+  - `SKILL.md` metadata: "22+15 checks" → "23+15 checks"
+  - `SKILL.md` metadata: "11/11 jobs" → "12/12 jobs"
+  - `README.md` / `index.html`: token numbers (5,229 → 5,586;
+    39,795 → 56,832; 74% → 86%) — actual values from
+    `scripts/benchmark_tokens.py` re-run
+  - `README.md` / `index.html` / `docs/PERFORMANCE.md` / `docs/ARCHITECTURE.md`:
+    YAML check count (12 → 15)
+  - `README.md`: added `package.sh` to the repo tree
+  - `docs/PLATFORMS.md` / `package.sh` header: file counts (40 → 41
+    for bash, 47 → 48 for source)
+  - `docs/ARCHITECTURE.md` / `docs/PLATFORMS.md`: 11 jobs → 12 jobs
+  - `VALIDATION.md`: "11 jobs" → "12 jobs (with package)"
+
+### Added
+- **`scripts/install.sh` INT/TERM trap**: Ctrl+C / SIGTERM during
+  install or uninstall now prints a cleanup message and exits 130
+  instead of leaving a half-cloned repo or partial link.
+- **`scripts/install.ps1` try/catch interruption handler**: Mirrors
+  the bash trap. If install throws a terminating error, prints a
+  cleanup message, removes the partial link, and exits 130. (Ctrl+C
+  itself still terminates immediately — PowerShell doesn't allow
+  try/catch to catch console-cancel — but user-thrown errors are
+  handled cleanly.)
+- **`scripts/install.ps1` env var parity**: Now supports
+  `MAVIS_TEAM_REPO`, `MAVIS_TEAM_DIR`, `MAVIS_TEAM_NO_COLOR` (the
+  same vars bash installer accepts). Previously PowerShell users had
+  no way to override defaults except `-InstallDir` / `-RepoUrl`.
+  `MAVIS_TEAM_FORCE_COPY` is intentionally bash-only (PowerShell
+  installer is always copy mode).
+- **`scripts/package.sh` archive self-test**: Every built archive
+  now has its entry count verified (`tar -tzf` / `unzip -l`) against
+  the staged file count. Catches a broken build before it ships.
+- **`scripts/package.sh` OS noise filter**: Defensive filter for
+  `.DS_Store`, `Thumbs.db`, `desktop.ini`, `.AppleDouble`, `.LSOverride`,
+  `._*` (macOS metadata files). Active only if a file matching these
+  patterns ends up in the file lists (which .gitignore normally
+  prevents, but belt-and-suspenders).
+- **Makefile `lint` target**: Now also shellchecks `package.sh` and
+  excludes `__pycache__` from python check (was missing both).
+- **Makefile `info` / `stats` targets**: Now exclude `dist/` and
+  `__pycache__` from file count (was inflating 49 to 61) and add
+  PowerShell / Other buckets so totals reconcile (49 = 30 md + 6 py
+  + 3 sh + 3 ps1 + 1 yml + 2 html + 4 other).
+
+### Changed
+- Version bumped to 1.3.8 across `SKILL.md`, `install.sh`,
+  `install.ps1`, `package.sh` (and all derived badges, archive
+  names, download links, example commands).
+- **`scripts/install.ps1` refactor**: `Invoke-Install` is now a thin
+  wrapper around `Invoke-InstallInner`. The inner function does the
+  real work; the outer catches errors and runs cleanup. Separating
+  these means the trap-equivalent doesn't apply to `--doctor` or
+  `--uninstall` (which don't need it).
+
+### Verified
+- shellcheck: 0 warnings (3 .sh scripts, all 3 in CI now)
+- bash -n: 0 errors (3 .sh scripts)
+- python -m py_compile: 0 errors (6 .py scripts)
+- `make validate-all`: 23/23 format + 15/15 YAML
+- `make test-all`: 48/48 e2e (20 + 23 + 5)
+- `make package`: 5/5 archives, all self-test pass, SHA256 verified
+- Archive end-to-end: extracted `bash.tar.gz` runs `install.sh --version`
+  → "Mavis Team Mode installer v1.3.8"
+- Local Windows-style flow simulation: install (set MAVIS_TEAM_DIR)
+  → doctor (set MAVIS_TEAM_DIR) → no issues found
+
 ## [1.3.7] - 2026-07-23
 
 ### Added
@@ -266,3 +353,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 [1.2.0]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/Qqapple1/Mavis-team-mode-skill/releases/tag/v1.0.0
+[1.3.8]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.7...v1.3.8

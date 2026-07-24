@@ -180,7 +180,7 @@ mavis-team-mode-skill/
 │   ├── run_e2e.ps1                 (Windows runner)
 │   └── README.md
 │
-├── .github/workflows/              — CI (11 jobs: lint x3, py x5, win, integration, stats)
+├── .github/workflows/              — CI (12 jobs: lint x3, py x5, win, integration, stats, package)
 ├── .shellcheckrc
 ├── Makefile                        — `make help/install/test/lint` shortcuts
 ├── index.html                      — GitHub Pages-friendly landing

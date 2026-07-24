@@ -160,6 +160,8 @@ jobs:
       - name: Verify install (PowerShell)
         shell: pwsh
         run: |
+          # Same env vars as install step so doctor inspects the right location
+          $env:MAVIS_TEAM_DIR = "$env:USERPROFILE\mavis-team-mode-skill-test"
           & ./scripts/install.ps1 -Doctor
 
       - name: Run install (--copy explicit)
@@ -261,6 +263,8 @@ jobs:
       - name: Test uninstall
         shell: pwsh
         run: |
+          # Same env vars as install step so uninstall removes the right clone
+          $env:MAVIS_TEAM_DIR = "$env:USERPROFILE\mavis-team-mode-skill-test"
           & ./scripts/install.ps1 -Uninstall
 
   # ============ Full integration test (Linux only — most thorough) ============

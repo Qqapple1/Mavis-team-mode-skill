@@ -17,7 +17,7 @@ param(
     [string]$RepoUrl = "https://github.com/Qqapple1/Mavis-team-mode-skill.git"
 )
 
-$VERSION = "1.3.7"
+$VERSION = "1.3.8"
 $SKILL_NAME = "mavis-team-mode"
 $ZCODE_SKILLS_DIR = "$env:USERPROFILE\.zcode\skills"
 $ZCODE_LINK = "$ZCODE_SKILLS_DIR\$SKILL_NAME"
@@ -60,6 +60,9 @@ Environment variables (override defaults, mirror bash install.sh):
   MAVIS_TEAM_DIR       Where to clone (same as -InstallDir)
   MAVIS_TEAM_NO_COLOR  Disable color output (any non-empty value)
 
+  Note: MAVIS_TEAM_FORCE_COPY is bash-only (PowerShell installer is always
+  copy mode, no symlink on Windows PS).
+
 Notes:
   - On Windows, this script uses COPY mode (no symlink support here)
   - For real symlinks, use Git Bash or WSL
@@ -89,6 +92,32 @@ function Invoke-Install {
         Warn "  Install from https://www.python.org/downloads/windows/"
     }
 
+    # Install interruption handler: if the inner install throws (e.g. network
+    # failure, missing files, etc.) we print a helpful message and remove any
+    # partially-staged copy. Mirrors the bash install.sh trap.
+    # Note: PowerShell try/catch only handles terminating errors. For Ctrl+C,
+    # PowerShell terminates by default; user can re-run or use -Uninstall to
+    # clean up.
+    try {
+        Invoke-InstallInner
+    } catch {
+        Err "Install interrupted: $($_.Exception.Message)"
+        Err "$InstallDir or $ZCODE_LINK may be in a partial state."
+        Err "Re-run with the same arguments to resume, or 'install.ps1 -Uninstall' to clean up."
+        # Best-effort cleanup of the link (not the clone, in case the user wants to debug)
+        if (Test-Path $ZCODE_LINK) {
+            try {
+                Remove-Item -Recurse -Force $ZCODE_LINK
+                Warn "Removed partial install at $ZCODE_LINK"
+            } catch {
+                Warn "Could not remove partial install: $($_.Exception.Message)"
+            }
+        }
+        exit 130
+    }
+}
+
+function Invoke-InstallInner {
     # 1. Create Zcode skills dir
     if (-not (Test-Path $ZCODE_SKILLS_DIR)) {
         Log "Creating $ZCODE_SKILLS_DIR..."
@@ -111,12 +140,14 @@ function Invoke-Install {
         Ok "Updated"
     } else {
         if (Test-Path $InstallDir) {
-            Die "$InstallDir exists but is not a git repo. Remove it and re-run."
+            Err "$InstallDir exists but is not a git repo. Remove it and re-run."
+            throw "Repository state error"
         }
         Log "Cloning $RepoUrl..."
         git clone --depth 1 $RepoUrl $InstallDir 2>&1 | Select-Object -Last 5
         if ($LASTEXITCODE -ne 0) {
-            Die "git clone failed. Check URL and network."
+            Err "git clone failed. Check URL and network."
+            throw "git clone failed"
         }
         Ok "Cloned to $InstallDir"
     }
@@ -130,7 +161,8 @@ function Invoke-Install {
         }
     }
     if ($missing) {
-        Die "Repository is missing required files."
+        Err "Repository is missing required files."
+        throw "Repository is missing required files"
     }
     Ok "All required files present"
 

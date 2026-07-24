@@ -1,23 +1,24 @@
 #!/usr/bin/env bash
 # Package Mavis Team Mode skill for different platforms.
 #
-# Produces 4 archives under dist/:
+# Produces 5 archives under dist/:
 #   1. {ver}-core.zip          - Cross-platform core (no installer scripts)
 #                                38 files: SKILL.md + agents + examples + ...
 #                                For: browsing source, embedding into other tools
 #   2. {ver}-bash.tar.gz       - bash + cross-platform (Linux/macOS/Git Bash/WSL)
-#                                40 files: core + install.sh + validate.sh
+#                                41 files: core + install.sh + validate.sh + package.sh
 #                                For: most users on Unix-like systems
 #   3. {ver}-windows.zip       - PowerShell + cross-platform
 #                                41 files: core + install.ps1 + validate.ps1 + run_e2e.ps1
 #                                For: Windows users without Git Bash
 #   4. {ver}-source.tar.gz     - Full source (including CI workflow + Issue templates)
-#                                47 files: everything
+#                                48 files: everything
 #                                For: contributors, CI, GitHub release auto-attach
+#   5. {ver}-source.zip        - Same as 4 but zip (for Windows contributors)
 #
 # Usage:
 #   bash scripts/package.sh                  # uses version from SKILL.md
-#   bash scripts/package.sh --version=1.3.7  # override version
+#   bash scripts/package.sh --version=1.3.8  # override version
 #   bash scripts/package.sh --dry-run        # show what would be packaged, no write
 
 set -euo pipefail
@@ -140,11 +141,12 @@ CORE_FILES=(
   scripts/benchmark_tokens.py
 )
 
-# BASH: add bash installer + validator
+# BASH: add bash installer + validator + packager
 BASH_FILES=(
   "${CORE_FILES[@]}"
   scripts/install.sh
   scripts/validate.sh
+  scripts/package.sh
 )
 
 # WINDOWS: add PowerShell scripts

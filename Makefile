@@ -58,8 +58,8 @@ validate-all: validate validate-yaml ## Run all validators
 .PHONY: lint
 lint: ## Run shellcheck + python -m py_compile on all files
 	@command -v shellcheck >/dev/null || { echo "shellcheck not installed. Install: apt install shellcheck / brew install shellcheck"; exit 1; }
-	shellcheck scripts/install.sh scripts/validate.sh
-	@for f in $(shell find . -name "*.py" -not -path "./.git/*"); do \
+	shellcheck scripts/install.sh scripts/validate.sh scripts/package.sh
+	@for f in $(shell find . -name "*.py" -not -path "./.git/*" -not -path "*/__pycache__/*"); do \
 	  $(PYTHON) -m py_compile "$$f" || { echo "SYNTAX: $$f"; exit 1; }; \
 	done
 	@echo "Lint OK"

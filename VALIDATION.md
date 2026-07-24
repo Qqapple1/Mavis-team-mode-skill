@@ -125,7 +125,7 @@ GitHub Actions 应该跑通：
 - ✓ Python 3.8 / 3.9 / 3.10 / 3.11 / 3.12
 - ✓ Integration test (Linux) — install + validate + 48 e2e + benchmark
 
-实际有 11 个 jobs / job groups，详见 `.github/workflows/validate-skill.yml`。
+实际有 12 个 jobs / job groups（lint x3 + py x5 + win + integration + stats + package），详见 `.github/workflows/validate-skill.yml`。
 
 ## 全部 8 步通过 = skill 装好且能跑
 

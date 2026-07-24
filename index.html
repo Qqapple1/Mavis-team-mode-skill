@@ -84,12 +84,12 @@
 </p>
 
 <div class="badges">
-  <img src="https://img.shields.io/badge/version-1.3.7-blue" alt="version">
+  <img src="https://img.shields.io/badge/version-1.3.8-blue" alt="version">
   <img src="https://img.shields.io/badge/license-MIT-green" alt="license">
   <img src="https://img.shields.io/badge/zcode-3.x-purple" alt="zcode">
   <img src="https://img.shields.io/badge/python-3.8%2B-blue" alt="python">
   <img src="https://img.shields.io/badge/e2e-48%2F48%20passing-brightgreen" alt="tests">
-  <img src="https://img.shields.io/badge/yaml-12%2F12%20passing-brightgreen" alt="yaml">
+  <img src="https://img.shields.io/badge/yaml-15%2F15%20passing-brightgreen" alt="yaml">
   <img src="https://img.shields.io/badge/skill-23%2F23%20passing-brightgreen" alt="skill">
   <img src="https://img.shields.io/badge/platform-mac%2Flinux%2Fwin-lightgrey" alt="platform">
 </div>
@@ -116,7 +116,7 @@ bash scripts/install.sh --doctor    # or: powershell -File scripts\install.ps1 -
 <div class="card">
   <p class="honest">⚠️ This is a community port, not affiliated with MiniMax.</p>
   <ul>
-    <li><b>Verified</b>: 48/48 e2e + 23/23 skill format + 12/12 YAML + 11/11 CI jobs on Linux + macOS + Windows (PowerShell install + Python startup).</li>
+    <li><b>Verified</b>: 48/48 e2e + 23/23 skill format + 15/15 YAML + 12/12 CI jobs on Linux + macOS + Windows (PowerShell install + Python startup).</li>
     <li><b>Not yet verified</b>: Real Zcode runtime — the actual sub-agent dispatch + Verifier independence behavior depends on your Zcode 3.x version, which I can't run in CI.</li>
     <li><b>Estimated</b>: The "2-2.5× speedup" in docs is a paper projection, not a measured number.</li>
   </ul>
@@ -206,8 +206,8 @@ bash scripts/install.sh --doctor    # or: powershell -File scripts\install.ps1 -
   </thead>
   <tbody>
     <tr><td>Inline team plan (no skill)</td><td>~3,000</td><td>—</td></tr>
-    <tr><td>Eager load (everything)</td><td>~39,795</td><td>+1227%</td></tr>
-    <tr><td><b>Progressive load (default)</b></td><td>~5,229</td><td>+74%</td></tr>
+    <tr><td>Eager load (everything)</td><td>~56,832</td><td>+1794%</td></tr>
+    <tr><td><b>Progressive load (default)</b></td><td>~5,586</td><td>+86%</td></tr>
   </tbody>
 </table>
 <p>
@@ -225,7 +225,7 @@ bash scripts/install.sh --doctor    # or: powershell -File scripts\install.ps1 -
 ├── examples/                # 4 worked use cases
 ├── references/              # 3 deep-dive docs
 ├── docs/                    # ADR-001, ADR-002, ARCHITECTURE, PERFORMANCE, WINDOWS
-├── scripts/                 # install.sh, install.ps1, validate.sh/ps1, validate_yaml.py, benchmark_tokens.py
+├── scripts/                 # install.sh, install.ps1, validate.sh/ps1, package.sh, validate_yaml.py, benchmark_tokens.py
 ├── examples/prototype-todo-app/  # real working web app
 │   ├── server/server.py     # 279 lines, defense-in-depth
 │   ├── client/index.html    # 324 lines, validation

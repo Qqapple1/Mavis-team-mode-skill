@@ -2,11 +2,11 @@
 
 把 MiniMax **Mavis Team Mode**（Leader + Workers + Verifier）的能力搬到 Zcode 3.0。
 
-> **Pick your platform → [Download v1.3.7](https://github.com/Qqapple1/Mavis-team-mode-skill/releases/tag/v1.3.7)**:
-> - macOS / Linux / Git Bash / WSL → `mavis-team-mode-skill-1.3.7-bash.tar.gz`
-> - Windows PowerShell → `mavis-team-mode-skill-1.3.7-windows.zip`
-> - Just want to read it → `mavis-team-mode-skill-1.3.7-core.zip`
-> - Contributor / CI → `mavis-team-mode-skill-1.3.7-source.tar.gz`
+> **Pick your platform → [Download v1.3.8](https://github.com/Qqapple1/Mavis-team-mode-skill/releases/tag/v1.3.8)**:
+> - macOS / Linux / Git Bash / WSL → `mavis-team-mode-skill-1.3.8-bash.tar.gz`
+> - Windows PowerShell → `mavis-team-mode-skill-1.3.8-windows.zip`
+> - Just want to read it → `mavis-team-mode-skill-1.3.8-core.zip`
+> - Contributor / CI → `mavis-team-mode-skill-1.3.8-source.tar.gz`
 > - [Which archive should I download? →](docs/PLATFORMS.md)
 
 > 基于 Zcode 3.0 的子智能体系统 + Agent Skills 标准实现，
@@ -16,7 +16,7 @@
 [![Skill tests](https://img.shields.io/badge/validate-22%2F22%20passing-brightgreen)](VALIDATION.md)
 [![Prototype tests](https://img.shields.io/badge/prototype%20e2e-48%2F48%20passing-brightgreen)](examples/prototype-todo-app/)
 [![YAML](https://img.shields.io/badge/yaml-15%2F15%20passing-brightgreen)](scripts/validate_yaml.py)
-[![Version](https://img.shields.io/badge/version-1.3.7-blue)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-1.3.8-blue)](CHANGELOG.md)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 [![Zcode 3.x](https://img.shields.io/badge/zcode-3.x-purple)](https://zcode-ai.com)
 [![Security](https://img.shields.io/badge/security-policy-green)](SECURITY.md)

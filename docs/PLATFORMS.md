@@ -16,11 +16,11 @@ archive to download for your OS.
 | Category | Files | Used by |
 |----------|-------|---------|
 | **Cross-platform core** | 38 files: SKILL.md, agents/, examples/, references/, docs/, server.py, client/index.html, test_e2e*.py, validate_yaml.py, benchmark_tokens.py, .md docs, LICENSE, index.html, Makefile | All platforms |
-| **bash installer** | + 2: `scripts/install.sh`, `scripts/validate.sh` | Linux / macOS / Git Bash / WSL |
+| **bash installer** | + 3: `scripts/install.sh`, `scripts/validate.sh`, `scripts/package.sh` | Linux / macOS / Git Bash / WSL |
 | **PowerShell installer** | + 3: `scripts/install.ps1`, `scripts/validate.ps1`, `examples/prototype-todo-app/run_e2e.ps1` | Windows PowerShell 5.1+ |
 | **CI / source only** | + 4: `docs/WINDOWS.md`, `.github/ISSUE_TEMPLATE/*.md`, `.github/workflows/validate-skill.yml` | GitHub Actions / contributors |
 
-**Total: 47 files in source, 38-41 in any release archive.**
+**Total: 48 files in source, 38-41 in any release archive.**
 
 ## Which archive should I download?
 
@@ -48,8 +48,8 @@ Bundling them all into one archive works, but:
 1. **Smaller download** — bash users don't pull 3 useless `.ps1` files
 2. **Less confusion** — a Linux user never sees `install.ps1` and
    wonders if they should run it
-3. **Cleaner release notes** — you can see "bash release 1.3.7" and
-   "Windows release 1.3.7" are the same content, different installer
+3. **Cleaner release notes** — you can see "bash release 1.3.8" and
+   "Windows release 1.3.8" are the same content, different installer
 4. **Easier to verify** — the SHA256SUMS file lists each archive
    independently
 
@@ -69,11 +69,11 @@ make package-dry-run
 
 After running, `dist/` contains:
 ```
-mavis-team-mode-skill-1.3.7-core.zip        (38 files, ~120KB)
-mavis-team-mode-skill-1.3.7-bash.tar.gz     (40 files, ~125KB)
-mavis-team-mode-skill-1.3.7-windows.zip     (41 files, ~130KB)
-mavis-team-mode-skill-1.3.7-source.tar.gz   (47 files, ~145KB)
-mavis-team-mode-skill-1.3.7-source.zip      (47 files, ~150KB)
+mavis-team-mode-skill-1.3.8-core.zip        (38 files, ~120KB)
+mavis-team-mode-skill-1.3.8-bash.tar.gz     (41 files, ~127KB)
+mavis-team-mode-skill-1.3.8-windows.zip     (41 files, ~130KB)
+mavis-team-mode-skill-1.3.8-source.tar.gz   (48 files, ~150KB)
+mavis-team-mode-skill-1.3.8-source.zip      (48 files, ~155KB)
 SHA256SUMS                                  (checksums)
 ```
 
