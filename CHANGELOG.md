@@ -5,6 +5,50 @@ All notable changes to this skill are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.3.10] - 2026-07-24
+
+### Fixed
+- **LICENSE: wrong copyright holder** — was `Mavis (MiniMax M3)`
+  (misleading pre-v1.3.6 attribution); changed to
+  `Community port contributors (Mavis CLI agent)` to match
+  the actual rebrand in v1.3.6 (ADR-001 + SKILL.md metadata).
+- **`Zcode 3.0` → `Zcode 3.4.2+`** — v1.3.4 bumped the version
+  in `compatibility` metadata but missed the prose. Fixed 4
+  occurrences: SKILL.md description + body intro, README.md
+  intro (2 lines), docs/PERFORMANCE.md example description.
+- **docs/PLATFORMS.md: `13 YAML checks` → `15`** — was historical
+  drift; actual count from `validate_yaml.py` is 15 OK.
+- **docs/WINDOWS.md: `Passed: 17` → `Passed: 24` (PowerShell)** —
+  validate.ps1 actually runs 24 checks (1 skill-dir + 1 SKILL.md
+  + 1 frontmatter + 3 fields + 7 agents + 3 refs + 4 examples
+  + 4 required files).
+- **Makefile: `12 files` → `15 files`** for `validate-yaml` target.
+- **docs/ARCHITECTURE.md: stale `(v1.3.7)` line-counts note** —
+  bumped to (v1.3.10).
+
+### Notes
+- An external review pass also surfaced 4 FALSE positives that
+  were NOT fixed (verified by direct inspection):
+  - test_e2e_extended.py DELETE paths all have `/api/` already
+  - references/troubleshooting.md frontmatter is correctly delimited
+  - worker-reviewer.md `bash` tool is consistent with worker-coder/
+    worker-tester/verifier (reviewer needs to run tests)
+  - (Note: external review also suggested LICENSE was "fine" since
+    it was MIT; the actual fix is the copyright line, not the
+    license body.)
+
+### Verified
+- shellcheck: 0 warnings
+- bash -n: 0 errors
+- python -m py_compile: 0 errors
+- PowerShell brace balance: 62/62 + 26/26 + 14/14
+- validate.sh: 23/23
+- validate_yaml.py: 15/15
+- e2e (3 consecutive runs): 20+23+5 = 48/48 each
+- make package: 5/5 archives, all self-test pass, SHA256 verified
+- SKILL.md description: 481 chars, contains "Zcode 3.4.2+", does
+  NOT contain "Zcode 3.0" anywhere in source
+
 ## [1.3.9] - 2026-07-24
 
 ### Fixed
@@ -393,6 +437,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 [1.3.1]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.1.0...v1.2.0
+[1.3.10]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.9...v1.3.10
 [1.3.9]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.8...v1.3.9
 [1.1.0]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/Qqapple1/Mavis-team-mode-skill/releases/tag/v1.0.0
