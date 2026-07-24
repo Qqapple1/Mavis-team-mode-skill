@@ -1,7 +1,7 @@
 ---
 name: team-verifier
 description: "Verifier sub-agent in a Mavis Team Mode workflow. Independently checks the Leader's integrated output against the original acceptance criteria. Does NOT trust the Leader's self-assessment — runs its own checks."
-tools: [read_file, write_file, edit_file, bash, glob, grep, web_search]
+tools: [Read, Bash, Glob, Grep, WebSearch, WebFetch]
 version: 1.0.0
 license: MIT
 ---

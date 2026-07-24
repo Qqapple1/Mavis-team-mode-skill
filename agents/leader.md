@@ -87,10 +87,26 @@ When all sub-agents return:
 
 ### Phase 4: Verify
 
-Either:
-- **Ask the user to verify** (default for high-stakes work)
-- **Self-verify** using the checklist in `references/verification-checklist.md`
-- **Spawn a verifier sub-agent** with the role defined in `agents/verifier.md`
+Pick the verification method that matches the work's stakes. Full
+options and tradeoffs are in `SKILL.md` Step 5. Quick summary:
+
+- **Method A (recommended)**: open a second Zcode session and let it
+  verify independently. Highest fidelity. ~5-10 min extra.
+- **Method B (lightweight)**: self-verify using
+  `references/verification-checklist.md`. Bias risk (same model /
+  same context). 20-30% miss-rate for non-trivial work.
+- **Method C (NOT recommended, only when time is critical)**:
+  Leader self-verifies with the checklist, accepts the bias + 20-30%
+  miss-rate. Use only for trivial changes.
+
+For high-stakes work (anything the user will deploy / share / pay
+for), default to Method A.
+
+When spawning a verifier sub-agent, use the role in
+`agents/verifier.md` and pass it: (1) original task brief, (2) the
+integrated output, (3) acceptance criteria. The verifier runs its
+own checks and returns a PASS/FAIL list - it does not trust the
+Leader's self-assessment.
 
 ### Phase 5: Iterate
 

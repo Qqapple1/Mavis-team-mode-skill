@@ -5,6 +5,92 @@ All notable changes to this skill are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.3.17] - 2026-07-25
+
+Systematic review pass surfaced 9 issues across 3 severity tiers
+(2 P1 / 4 P2 / 3 P3). All independently verified against the
+actual code before fixing. One fake-issue (out of 9) was caught
+and rejected: user's claim that "verifier tools are stale
+snake_case" was true, BUT the proposed fix wasn't to add PascalCase
+per se - it was to also STRIP write permissions, which is a
+correctness issue, not a naming issue.
+
+### P1 (functional)
+
+1. **verifier.md had write_file + edit_file + Bash.** Verifier
+   must be read-only to preserve independence. Removing
+   `write_file` and `edit_file` means Verifier cannot tamper
+   with the code it's checking. Bash retained (legitimate
+   verification - run tests, inspect state). WebFetch added
+   so Verifier can independently fetch and verify external
+   documentation claims.
+2. **leader.md Phase 4 and SKILL.md Step 5 contradicted each other.**
+   leader.md listed 3 options (ask user / self-verify /
+   spawn verifier) without ranking. SKILL.md listed 3 methods
+   (A second Zcode session / B self-verify / C leader-as-verifier
+   with bias warning). Now leader.md Phase 4 explicitly
+   references SKILL.md Step 5 + includes the A/B/C ranking +
+   "default to Method A for high-stakes work" guidance.
+
+### P2 (consistency)
+
+3. **All 7 agent `tools:` frontmatter used snake_case tool names.**
+   Zcode's actual tool names are PascalCase (Agent, Read, Write,
+   Edit, Bash, Glob, Grep, WebSearch, WebFetch). The skill
+   author removed the global `allowed-tools` field in v1.3.14
+   but missed the per-agent `tools:` lists. Now all 7 agents
+   (leader, verifier, worker-coder, worker-tester,
+   worker-reviewer, worker-doc-writer, worker-researcher) use
+   the correct PascalCase names.
+4. **SKILL.md metadata still said "Real Zcode runtime: NOT YET
+   TESTED".** v1.3.14-1.3.16 shipped 3 rounds of real-world
+   feedback fixes. Replaced with "tested 3+ times by community
+   users (frename, mnote, cquote)".
+5. **worker-doc-writer rule #2 said "code examples must be
+   runnable" but its tools list had no Bash.** Added Bash so
+   Doc-Writer can actually verify the examples it writes
+   (e.g. run `python -c "print('hello')"` and confirm output).
+6. **verification-checklist.md had no non-ASCII or ANSI check
+   items** even after the mnote (Chinese) and cquote (ANSI)
+   bugs. Added two new sections: "Non-ASCII text" (4 checks
+   covering ensure_ascii / utf-8 read / non-ASCII test case /
+   round-trip check) and "CLI output & test compatibility"
+   (3 checks covering ANSI strip, --no-color, actual-wording
+   match).
+
+### P3 (small)
+
+7. **leader.md hardcoded "Speak Chinese by default".** Bad for
+   English users. Replaced with "Match the user's language
+   (detect from conversation; don't hardcode)".
+8. **SKILL.md architecture diagram still showed Worker-C as
+   `Explore` (read-only).** Since v1.3.14's Step 3.A fix
+   (Explore vs general-purpose depends on DELIVERABLE), the
+   diagram is misleading. Updated Worker-C to `general-purpose`
+   with annotation about when to use Explore.
+9. **No worker-fixer.md template for Step 6 (Iterate) re-dispatches.**
+   Workers dir had coder / tester / reviewer / doc-writer /
+   researcher but no fixer. Created `worker-fixer.md` with:
+   - Role distinction (coder writes new code; fixer surgically
+     repairs existing code)
+   - "Minimal change" rule with ~30-line escalation threshold
+   - 8-row "common fixer scenarios" table (KeyError / Unicode /
+     ANSI / etc.) so the model has a starting diagnosis
+   - Report format with root cause + diff + verification
+
+### Not changed (verified false / not worth)
+- None rejected this round - all 9 claims were independently
+  verified true.
+
+### Verified
+- shellcheck: 0 warnings
+- bash -n: 0 errors
+- python -m py_compile: 0 errors
+- validate.sh: 23/23 (skill structure + 8 agents including new fixer)
+- validate_yaml.py: 15/15 -> 16/16 (new worker-fixer.md validated)
+- All 9 user-reported issues independently verified against
+  the actual code (not the user's report)
+
 ## [1.3.16] - 2026-07-25
 
 Third-round real-world feedback: user built `cquote` (CLI quote
@@ -811,6 +897,7 @@ changes that didn't actually land). This release fixes them all.
 [1.3.1]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.1.0...v1.2.0
+[1.3.17]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.16...v1.3.17
 [1.3.16]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.15...v1.3.16
 [1.3.15]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.14...v1.3.15
 [1.3.14]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.13...v1.3.14

@@ -1,7 +1,7 @@
 ---
 name: team-worker-doc-writer
 description: "Sub-agent for writing/updating documentation inside a Mavis Team Mode workflow. Handles READMEs, API docs, design docs, changelogs. Does NOT write code, only markdown."
-tools: [read_file, write_file, edit_file, glob, grep]
+tools: [Read, Write, Edit, Bash, Glob, Grep]
 version: 1.0.0
 license: MIT
 ---
@@ -27,7 +27,7 @@ SOURCE MATERIAL: <code, PRs, conversations to summarize>
 
 1. **Read existing docs first.** Match their voice, structure, formatting.
 2. **Code examples must be runnable.** If you write `python print("hello")`, it
-   must actually print "hello" when run.
+   must actually print "hello" when run. Use Bash to verify.
 3. **No LLM tells.** Phrases like "As an AI model...", "Certainly!",
    "I'd be happy to..." are immediate failure markers.
 4. **No scope creep.** Update only what was asked. Don't rewrite unrelated

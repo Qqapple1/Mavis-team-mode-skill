@@ -37,6 +37,17 @@ Use this when self-verifying (when you don't have a separate Verifier agent).
 - [ ] Examples are runnable
 - [ ] No copy-paste artifacts from LLM ("as an AI...", etc.)
 
+## Non-ASCII text (Chinese, emoji, accented chars, etc.)
+- [ ] Files written with non-ASCII content use `json.dumps(value, ensure_ascii=False)` (not the default ensure_ascii=True that escapes to `\uXXXX`)
+- [ ] Files read with explicit `encoding="utf-8"` (not the system default which may be GBK / Latin-1)
+- [ ] At least one test case in the test suite exercises a non-ASCII keyword end-to-end (search, filter, match)
+- [ ] Round-trip check: write a Chinese / emoji value, read it back, assert `value in open(file, encoding='utf-8').read()`
+
+## CLI output & test compatibility
+- [ ] If the CLI emits ANSI color codes, tests either (a) strip ANSI before asserting (`re.sub(r'\x1b\[[0-9;]*m', '', output)`) or (b) the CLI has a `--no-color` / `NO_COLOR=1` mode they use
+- [ ] Test assertion wording matches actual program output (copy-pasted from a real run, not guessed at)
+- [ ] If CLI uses unicode box-drawing / arrows / Chinese punctuation, terminal width assumptions don't break the output
+
 ## Across-the-board
 - [ ] Could a junior dev read this and understand it?
 - [ ] If the user saw this in 6 months, would they recognize their own task?
