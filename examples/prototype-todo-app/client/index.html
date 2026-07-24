@@ -283,7 +283,7 @@ newTag.addEventListener("input", validateTag);
 
 addForm.addEventListener("submit", async (e) => {
   e.preventDefault();
-  if (!validateTitle() | !validateTag()) return;
+  if (!validateTitle() || !validateTag()) return;
   submitBtn.disabled = true;
   const r = await api("POST", "/todos", { title: newTitle.value.trim(), tag: newTag.value.trim() });
   submitBtn.disabled = false;

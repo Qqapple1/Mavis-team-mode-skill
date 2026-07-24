@@ -5,6 +5,76 @@ All notable changes to this skill are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.3.11] - 2026-07-24
+
+### Fixed
+
+#### 1 code bug
+- **client/index.html L286: bitwise `|` → logical `||`**
+  ```js
+  // Before
+  if (!validateTitle() | !validateTag()) return;
+  // After
+  if (!validateTitle() || !validateTag()) return;
+  ```
+  Behaviour for booleans was identical (`true|false === 1`,
+  `false|true === 1`, `false|false === 0` — same as `||`), but:
+  - `|` is bitwise OR, not logical — eslint/standard-js flags it
+  - Lint tools (e.g. JSHint `bitwise: true`) report this as a warning
+  - `||` is short-circuit; `|` is not — could matter if validateTitle
+    or validateTag had side effects
+  User-visible impact: none for this specific code path, but it's a
+  textbook bug that any future contributor might mistakenly extend.
+
+#### 4 documentation accuracy issues
+- **Python version: 3.6+ → 3.8+** (matches CI matrix)
+  - README.md:31 requirement
+  - docs/PLATFORMS.md:127 compatibility note
+  - examples/prototype-todo-app/README.md:90 requirements
+  Python 3.6 (2021-12) and 3.7 (2023-06) are EOL. CI tests on
+  3.8-3.12. README still said "3.6+" because that's the minimum
+  f-strings version, but the practical minimum is now 3.8.
+
+- **README badge: `validate-22/22` → `validate-23/23`**
+  The actual format check count from `scripts/validate.sh` is 23
+  (Pass counter goes to 23 each run). Badge image URL was stale.
+
+- **README + index.html repo tree: added `docs/PLATFORMS.md`**
+  docs/ has 6 files (ADR-001, ADR-002, ARCHITECTURE, PERFORMANCE,
+  PLATFORMS, WINDOWS), but the README tree only listed 5. PLATFORMS
+  was added in v1.3.7 but the tree was never updated.
+
+- **docs/PLATFORMS.md: "4 archives" → "5 archives"**
+  package.sh produces 5 archives (core, bash, windows, source-tar,
+  source-zip) since v1.3.7+. The "Why split into 4 archives?"
+  section and "Build all 4 archives" example were stale from
+  pre-v1.3.7 (when there were 4). Also added an explanatory
+  paragraph: "That's 5 archives: core (cross-platform), bash
+  (Linux/macOS/Git Bash/WSL), windows (PowerShell), source-tar
+  (contributors), and source-zip (Windows contributors)."
+
+- **docs/ARCHITECTURE.md: docs/ `(5 files)` → `(6 files)`**
+  Match actual count after PLATFORMS.md was added.
+
+### Notes
+- An external review pass also suggested 2 issues that were
+  verified as FALSE (not fixed):
+  - test_e2e_extended.py "DELETE paths missing /api/" — grep
+    confirms all DELETE calls use `/api/todos/{id}`. False.
+  - worker-reviewer.md "should not have bash" — bash is required
+    to run tests during code review; coder/tester/verifier all
+    also have bash. Consistent design. False.
+
+### Verified
+- shellcheck: 0 warnings
+- bash -n: 0 errors
+- python -m py_compile: 0 errors
+- client JS braces: 47/47 balanced
+- validate.sh: 23/23
+- validate_yaml.py: 15/15 OK
+- e2e (3 consecutive runs): 20+23+5 = 48/48 each
+- make package: 5/5 archives, all self-test pass, SHA256 verified
+
 ## [1.3.10] - 2026-07-24
 
 ### Fixed
@@ -437,6 +507,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 [1.3.1]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.1.0...v1.2.0
+[1.3.11]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.10...v1.3.11
 [1.3.10]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.9...v1.3.10
 [1.3.9]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.8...v1.3.9
 [1.1.0]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.0.0...v1.1.0

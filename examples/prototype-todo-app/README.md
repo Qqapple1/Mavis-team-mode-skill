@@ -87,6 +87,6 @@ Passed: 5, Failed: 0  (advanced)
 
 ## Requirements
 
-- Python 3.6+ (uses only stdlib; f-strings are the minimum language feature required)
+- Python 3.8+ (uses only stdlib; f-strings are the minimum language feature required)
 - Modern browser for the client
 - No npm, no pip packages, no build step

@@ -125,7 +125,7 @@ flowchart TB
 
 ## File-level architecture
 
-> Line counts and test counts as of 2026-07-24 (v1.3.10). Run `make info`
+> Line counts and test counts as of 2026-07-24 (v1.3.11). Run `make info`
 > or `wc -l` for current numbers — these can drift.
 
 ```
@@ -164,7 +164,7 @@ mavis-team-mode-skill/
 │   ├── validate_yaml.py            (224 lines) — pure-Python YAML
 │   └── benchmark_tokens.py         (224 lines) — token cost estimator
 │
-├── docs/                          (5 files) — architecture & decision logs
+├── docs/                          (6 files) — architecture & decision logs
 │   ├── ADR-001-team-mode-recreation.md
 │   ├── ADR-002-security.md
 │   ├── PERFORMANCE.md

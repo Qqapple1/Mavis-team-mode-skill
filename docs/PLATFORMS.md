@@ -39,7 +39,7 @@ users — install from [git-scm.com](https://git-scm.com/download/win)) or
 just `bash` from WSL. The bash installer auto-detects your platform and
 falls back to copy mode on Windows Git Bash.
 
-## Why split into 4 archives?
+## Why split into 5 archives?
 
 Because the bash scripts (`*.sh`) are useless on Windows PowerShell,
 and the PowerShell scripts (`*.ps1`) are useless on Linux/macOS bash.
@@ -48,8 +48,8 @@ Bundling them all into one archive works, but:
 1. **Smaller download** — bash users don't pull 3 useless `.ps1` files
 2. **Less confusion** — a Linux user never sees `install.ps1` and
    wonders if they should run it
-3. **Cleaner release notes** — you can see "bash release 1.3.10" and
-   "Windows release 1.3.10" are the same content, different installer
+3. **Cleaner release notes** — you can see "bash release 1.3.11" and
+   "Windows release 1.3.11" are the same content, different installer
 4. **Easier to verify** — the SHA256SUMS file lists each archive
    independently
 
@@ -59,7 +59,7 @@ Bundling them all into one archive works, but:
 # Show what would be packaged (no write)
 bash scripts/package.sh --dry-run
 
-# Build all 4 archives to dist/
+# Build all 5 archives to dist/
 bash scripts/package.sh
 
 # Or via Makefile
@@ -69,11 +69,11 @@ make package-dry-run
 
 After running, `dist/` contains:
 ```
-mavis-team-mode-skill-1.3.10-core.zip        (38 files, ~120KB)
-mavis-team-mode-skill-1.3.10-bash.tar.gz     (41 files, ~127KB)
-mavis-team-mode-skill-1.3.10-windows.zip     (41 files, ~130KB)
-mavis-team-mode-skill-1.3.10-source.tar.gz   (48 files, ~150KB)
-mavis-team-mode-skill-1.3.10-source.zip      (48 files, ~155KB)
+mavis-team-mode-skill-1.3.11-core.zip        (38 files, ~120KB)
+mavis-team-mode-skill-1.3.11-bash.tar.gz     (41 files, ~127KB)
+mavis-team-mode-skill-1.3.11-windows.zip     (41 files, ~130KB)
+mavis-team-mode-skill-1.3.11-source.tar.gz   (48 files, ~150KB)
+mavis-team-mode-skill-1.3.11-source.zip      (48 files, ~155KB)
 SHA256SUMS                                  (checksums)
 ```
 
@@ -124,6 +124,6 @@ is invoked directly).
 
 The 48 e2e tests + 23 skill format checks + 15 YAML checks = **86
 verification points** (PowerShell: 48 e2e + 24 format + 15 YAML = **87**),
-all runnable on any platform with Python 3.6+
+all runnable on any platform with Python 3.8+
 (plus bash for the bash installer, or PowerShell for the PowerShell
-installer).
+installer). 3.6/3.7 are EOL.

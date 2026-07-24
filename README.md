@@ -2,21 +2,21 @@
 
 把 MiniMax **Mavis Team Mode**（Leader + Workers + Verifier）的能力搬到 Zcode 3.4.2+。
 
-> **Pick your platform → [Download v1.3.10](https://github.com/Qqapple1/Mavis-team-mode-skill/releases/tag/v1.3.10)**:
-> - macOS / Linux / Git Bash / WSL → `mavis-team-mode-skill-1.3.10-bash.tar.gz`
-> - Windows PowerShell → `mavis-team-mode-skill-1.3.10-windows.zip`
-> - Just want to read it → `mavis-team-mode-skill-1.3.10-core.zip`
-> - Contributor / CI → `mavis-team-mode-skill-1.3.10-source.tar.gz`
+> **Pick your platform → [Download v1.3.11](https://github.com/Qqapple1/Mavis-team-mode-skill/releases/tag/v1.3.11)**:
+> - macOS / Linux / Git Bash / WSL → `mavis-team-mode-skill-1.3.11-bash.tar.gz`
+> - Windows PowerShell → `mavis-team-mode-skill-1.3.11-windows.zip`
+> - Just want to read it → `mavis-team-mode-skill-1.3.11-core.zip`
+> - Contributor / CI → `mavis-team-mode-skill-1.3.11-source.tar.gz`
 > - [Which archive should I download? →](docs/PLATFORMS.md)
 
 > 基于 Zcode 3.4.2+ 的子智能体系统 + Agent Skills 标准实现，
 > 完整复刻 MiniMax 官方 Mavis 2026-05 公告的 TeamEngine 工作流。
 
 [![CI](https://github.com/Qqapple1/Mavis-team-mode-skill/actions/workflows/validate-skill.yml/badge.svg)](https://github.com/Qqapple1/Mavis-team-mode-skill/actions)
-[![Skill tests](https://img.shields.io/badge/validate-22%2F22%20passing-brightgreen)](VALIDATION.md)
+[![Skill tests](https://img.shields.io/badge/validate-23%2F23%20passing-brightgreen)](VALIDATION.md)
 [![Prototype tests](https://img.shields.io/badge/prototype%20e2e-48%2F48%20passing-brightgreen)](examples/prototype-todo-app/)
 [![YAML](https://img.shields.io/badge/yaml-15%2F15%20passing-brightgreen)](scripts/validate_yaml.py)
-[![Version](https://img.shields.io/badge/version-1.3.10-blue)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-1.3.11-blue)](CHANGELOG.md)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 [![Zcode 3.x](https://img.shields.io/badge/zcode-3.x-purple)](https://zcode-ai.com)
 [![Security](https://img.shields.io/badge/security-policy-green)](SECURITY.md)
@@ -208,6 +208,7 @@ mavis-team-mode/
 │   ├── ADR-002-security.md
 │   ├── ARCHITECTURE.md              # 流程图 + Mermaid + 决策边界
 │   ├── PERFORMANCE.md               # Token 成本 + 加速分析
+│   ├── PLATFORMS.md                 # 平台分类 + archive 选择
 │   └── WINDOWS.md                   # Windows 专项指南
 ├── .github/
 │   ├── workflows/validate-skill.yml # CI（12 jobs：lint x3、py x5、win、integration、stats、package）
@@ -275,7 +276,7 @@ Prototype server 默认：
 
 **Token 成本（实测估算）**：
 
-> 下面数字是 `python3 scripts/benchmark_tokens.py` 在 v1.3.10 实跑出来的（1 token ≈ 4 字符，启发式估算，非 BPE 精确数）。重新跑会随文件大小变化。
+> 下面数字是 `python3 scripts/benchmark_tokens.py` 在 v1.3.11 实跑出来的（1 token ≈ 4 字符，启发式估算，非 BPE 精确数）。重新跑会随文件大小变化。
 
 | 加载模式 | Tokens | vs inline baseline |
 |---|---|---|
