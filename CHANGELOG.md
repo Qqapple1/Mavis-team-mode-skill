@@ -5,6 +5,62 @@ All notable changes to this skill are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.3.13] - 2026-07-24
+
+A 6th review pass + a friend surfaced 5 issues (4 user-reported +
+1 self-found while verifying them). Hotfix release.
+
+### Fixed
+
+- **scripts/package.sh: `mapfile` is bash 4+ only.**
+  SKILL.md / INSTALL.md / README.md all advertise `bash 3.2+`
+  (macOS still ships bash 3.2 by default), but package.sh used
+  `mapfile -t` which is a bash 4+ builtin. A Mac user with the
+  default bash would get "command not found" trying to build
+  release archives. Replaced with a portable `while read` loop
+  (works on bash 3.2+), shellcheck clean.
+- **test_e2e.py: test name said "returns 7 todos" but assertion
+  was `>= 5`.** A test called "returns 7 todos" that accepts >= 5
+  is misleading and allows silent regressions (e.g. seed data
+  drops a todo, the test still passes). Now asserts exactly 7 to
+  match seed data + test name. Same test also now verifies
+  `GET /api/todos/{id}` works (positive + 404 case).
+- **test_delete_todo: "404 after delete" was on a non-existent
+  route.** The test did `GET /api/todos/{new_id}` and asserted
+  404. But that route DIDN'T EXIST in the server (do_GET only
+  handled `/api/todos`, `/api/tags`, `/api/health`), so it would
+  404 even if delete silently did nothing. False-positive test.
+  Now: server.py has a real `GET /api/todos/{id}` endpoint, and
+  test_delete_todo does triple verification (single-GET 200
+  before, single-GET 404 after, list absence after).
+- **install.sh partial-recovery missed 3 worker agents.**
+  validate.sh checks 7 agents, but install.sh's `git checkout
+  HEAD -- <file>` recovery only restored 4 (SKILL.md, leader,
+  verifier, worker-coder, README.md). If a partial git pull lost
+  worker-tester.md / worker-researcher.md / worker-doc-writer.md
+  / worker-reviewer.md locally, install.sh would NOT restore
+  them and validate.sh would fail post-install. Now restores
+  11 files (all 7 agents + 4 entry-point docs).
+- **CI Linux job never ran test_e2e_advanced.py.**
+  `validate-skill.yml` had "Run base e2e" + "Run extended e2e"
+  steps but NO "Run advanced e2e" step. The 5 advanced tests
+  (200-char title, 1000 write/read consistency, /api/tags
+  sorted unique, /api/health ISO ts, OPTIONS no-body) only ran
+  on Windows PowerShell. So the much-vaunted "48/48 e2e in CI"
+  was actually "43/48 in the primary Linux job; 48/48 only on
+  Windows". Now: every PR runs all 48 tests on Linux before
+  merge.
+
+### Verified
+- shellcheck: 0 warnings
+- bash 3.2 portability: package.sh no longer uses bash 4+ builtins
+- validate.sh: 23/23
+- validate_yaml.py: 15/15 OK
+- CI matrix: 12/12 jobs (Linux integration now runs all 48 e2e)
+- make package: 5/5 archives, all self-test pass, SHA256 verified
+- GET /api/todos/1 returns todo 1
+- GET /api/todos/99999 returns 404 (unknown id)
+
 ## [1.3.12] - 2026-07-24
 
 A 5th review pass surfaced 20 issues; 15+ were real, including
@@ -613,6 +669,7 @@ changes that didn't actually land). This release fixes them all.
 [1.3.1]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.1.0...v1.2.0
+[1.3.13]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.12...v1.3.13
 [1.3.12]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.11...v1.3.12
 [1.3.11]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.10...v1.3.11
 [1.3.10]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.9...v1.3.10

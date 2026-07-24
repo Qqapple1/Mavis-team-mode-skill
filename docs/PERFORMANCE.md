@@ -13,7 +13,7 @@ using a 4-chars-per-token heuristic.
 
 For a typical complex task (refactor 1500-line module, 4-subtask plan):
 
-> Numbers are heuristic estimates from `scripts/benchmark_tokens.py` on v1.3.12. Re-run the script for current values; they drift as files change.
+> Numbers are heuristic estimates from `scripts/benchmark_tokens.py` on v1.3.13. Re-run the script for current values; they drift as files change.
 
 | Mode                          | Tokens in main context | Notes                            |
 |-------------------------------|------------------------:|----------------------------------|
