@@ -21,3 +21,9 @@ external-sources=true
 
 # Check sourced files
 check-sourced=true
+
+# Note: PowerShell scripts (*.ps1) are NOT linted by shellcheck — they have
+# a different grammar. CI's Windows job validates PS1 syntax via
+# `[System.Management.Automation.Language.Parser]::ParseFile` instead.
+# If you run `shellcheck scripts/install.ps1` locally, expect false
+# positives on `param(...)` — those are bash-grammar errors, not real bugs.

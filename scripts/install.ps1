@@ -22,11 +22,23 @@ $SKILL_NAME = "mavis-team-mode"
 $ZCODE_SKILLS_DIR = "$env:USERPROFILE\.zcode\skills"
 $ZCODE_LINK = "$ZCODE_SKILLS_DIR\$SKILL_NAME"
 
-# Colors
-function Log($msg) { Write-Host "[i] $msg" -ForegroundColor Cyan }
-function Ok($msg)   { Write-Host "[OK] $msg" -ForegroundColor Green }
-function Warn($msg) { Write-Host "[!] $msg" -ForegroundColor Yellow }
-function Err($msg)  { Write-Host "[X] $msg" -ForegroundColor Red }
+# Env var overrides (mirror bash install.sh's MAVIS_TEAM_* vars)
+# Priority: explicit param > env var > default
+if ($env:MAVIS_TEAM_REPO)   { $RepoUrl   = $env:MAVIS_TEAM_REPO }
+if ($env:MAVIS_TEAM_DIR)    { $InstallDir = $env:MAVIS_TEAM_DIR }
+if ($env:MAVIS_TEAM_NO_COLOR) {
+    # Disable colors when env var set
+    function Log($msg)  { Write-Host "[i] $msg" }
+    function Ok($msg)   { Write-Host "[OK] $msg" }
+    function Warn($msg) { Write-Host "[!] $msg" }
+    function Err($msg)  { Write-Host "[X] $msg" }
+} else {
+    # Colors
+    function Log($msg) { Write-Host "[i] $msg" -ForegroundColor Cyan }
+    function Ok($msg)   { Write-Host "[OK] $msg" -ForegroundColor Green }
+    function Warn($msg) { Write-Host "[!] $msg" -ForegroundColor Yellow }
+    function Err($msg)  { Write-Host "[X] $msg" -ForegroundColor Red }
+}
 function Die($msg)  { Err $msg; exit 1 }
 
 function Show-Usage {
@@ -42,6 +54,11 @@ Parameters:
   -InstallDir <path>   Where to clone (default: `$env:USERPROFILE\mavis-team-mode-skill)
   -RepoUrl <url>       Git URL (default: GitHub Qqapple1 repo)
   -NoVerify            Skip post-install validation
+
+Environment variables (override defaults, mirror bash install.sh):
+  MAVIS_TEAM_REPO      Git URL (same as -RepoUrl)
+  MAVIS_TEAM_DIR       Where to clone (same as -InstallDir)
+  MAVIS_TEAM_NO_COLOR  Disable color output (any non-empty value)
 
 Notes:
   - On Windows, this script uses COPY mode (no symlink support here)

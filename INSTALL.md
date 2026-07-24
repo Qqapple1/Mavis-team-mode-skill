@@ -21,7 +21,7 @@ bash install.sh
 1. 检测平台（Linux / macOS / Windows Git Bash / WSL）
 2. clone 仓库到 `~/mavis-team-mode-skill/`
 3. 软链（或 copy，看平台）到 `~/.zcode/skills/mavis-team-mode/`
-4. 跑 22 项格式自检
+4. 跑 23 项格式自检
 5. 提示你重启 Zcode
 
 **如果没 `curl` 用 `wget`**：
@@ -141,7 +141,7 @@ powershell -ExecutionPolicy Bypass -File scripts\install.ps1 -Doctor
 powershell -ExecutionPolicy Bypass -File scripts\validate.ps1
 ```
 
-期望看到 `Passed: 22 / Failed: 0`（或类似数字）。
+期望看到 `Passed: 23 / Failed: 0`（或类似数字）。
 
 或手动：
 ```bash

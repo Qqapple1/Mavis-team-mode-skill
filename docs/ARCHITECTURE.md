@@ -155,11 +155,12 @@ mavis-team-mode-skill/
 │   ├── deepseek-setup.md
 │   └── troubleshooting.md
 │
-├── scripts/                       (5 files) — install/validate/benchmark
-│   ├── install.sh                  (483 lines) — bash, all platforms
-│   ├── install.ps1                 (224 lines) — PowerShell, Windows native
-│   ├── validate.sh                 (142 lines) — bash
+├── scripts/                       (7 files) — install/validate/benchmark/package
+│   ├── install.sh                  (498 lines) — bash, all platforms
+│   ├── install.ps1                 (241 lines) — PowerShell, Windows native
+│   ├── validate.sh                 (145 lines) — bash
 │   ├── validate.ps1                (104 lines) — PowerShell
+│   ├── package.sh                  (348 lines) — build platform-specific archives
 │   ├── validate_yaml.py            (224 lines) — pure-Python YAML
 │   └── benchmark_tokens.py         (224 lines) — token cost estimator
 │
@@ -210,8 +211,8 @@ mavis-team-mode-skill/
 > 4-chars-per-token heuristic numbers.
 
 - **Without skill**: average task plan = ~3,000 tokens in main context (Leader writes detailed prompts inline)
-- **With skill (progressive load)**: ~5,229 tokens on activation, additional agents loaded only if invoked
-- **Net change**: skill costs **+74%** vs inline baseline, but enables parallel execution
+- **With skill (progressive load)**: ~5,586 tokens on activation, additional agents loaded only if invoked
+- **Net change**: skill costs **+86%** vs inline baseline, but enables parallel execution
 - The skill is a **time-saver, not a token-saver** — use it when wall-clock matters more than tokens.
 
 

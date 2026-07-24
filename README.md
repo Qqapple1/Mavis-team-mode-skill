@@ -175,7 +175,8 @@ mavis-team-mode/
 │   ├── install.ps1                  # PowerShell 一键安装（Windows 原生）
 │   ├── validate.sh                  # bash 23 项格式自检
 │   ├── validate.ps1                 # PowerShell 验证
-│   ├── validate_yaml.py             # 12 项 YAML 校验（无 PyYAML 依赖）
+│   ├── package.sh                   # 平台分类打包（5 个 release 压缩包）
+│   ├── validate_yaml.py             # 15 项 YAML 校验（无 PyYAML 依赖）
 │   └── benchmark_tokens.py          # Token 成本估算
 ├── agents/                          # Sub-agent 配置（7 个）
 │   ├── leader.md                    #   Leader (6 阶段流程)
@@ -209,7 +210,7 @@ mavis-team-mode/
 │   ├── PERFORMANCE.md               # Token 成本 + 加速分析
 │   └── WINDOWS.md                   # Windows 专项指南
 ├── .github/
-│   ├── workflows/validate-skill.yml # CI（11 jobs：lint x3、py x5、win、integration、stats）
+│   ├── workflows/validate-skill.yml # CI（12 jobs：lint x3、py x5、win、integration、stats、package）
 │   └── ISSUE_TEMPLATE/              # Bug / Feature 模板
 ├── Makefile                         # make help/install/test/lint 快捷方式
 ├── index.html                       # GitHub Pages 风格落地页
@@ -274,13 +275,15 @@ Prototype server 默认：
 
 **Token 成本（实测估算）**：
 
+> 下面数字是 `python3 scripts/benchmark_tokens.py` 在 v1.3.8 实跑出来的（1 token ≈ 4 字符，启发式估算，非 BPE 精确数）。重新跑会随文件大小变化。
+
 | 加载模式 | Tokens | vs inline baseline |
 |---|---|---|
 | 内联 Team plan（无 skill） | ~3,000 | — |
-| 一次全加载 | ~39,795 | +1227% |
-| **渐进加载（默认）** | ~5,229 | **+74%** |
+| 一次全加载 | ~56,832 | +1794% |
+| **渐进加载（默认）** | ~5,586 | **+86%** |
 
-Skill 本身**多耗 ~74% tokens**（比内联 baseline），但换来 2-2.5x 并行加速。**用 skill = 换时间，不省钱**。
+Skill 本身**多耗 ~86% tokens**（比内联 baseline），但换来 2-2.5x 并行加速。**用 skill = 换时间，不省钱**。
 
 ## 路线图
 

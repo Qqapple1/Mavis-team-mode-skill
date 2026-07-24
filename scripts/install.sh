@@ -199,6 +199,21 @@ case "${1:-}" in
   *) die "Unknown arg: $1 (try --help)" ;;
 esac
 
+# ---- Signal handlers ----
+# Ensure Ctrl+C / SIGTERM / install-time errors give a clean message and
+# non-zero exit, instead of leaving a half-cloned repo or partial link.
+# We only install these traps once we know the action (so --help/--version
+# aren't burdened), and we do NOT trap in --doctor mode (read-only).
+cleanup_on_signal() {
+  printf '\n' >&2
+  err "Interrupted. $INSTALL_DIR or $ZCODE_LINK may be in a partial state."
+  err "Re-run with the same arguments to resume, or 'bash install.sh --uninstall' to clean up."
+  exit 130  # 128 + SIGINT(2)
+}
+if [ "$ACTION" = "install" ] || [ "$ACTION" = "uninstall" ]; then
+  trap 'cleanup_on_signal' INT TERM
+fi
+
 # ---- Prerequisite checks ----
 check_prereqs() {
   local missing=0

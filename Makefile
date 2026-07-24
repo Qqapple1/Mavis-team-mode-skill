@@ -147,16 +147,18 @@ info: ## Show skill metadata
 	@echo "Skill: mavis-team-mode"
 	@echo "Version: $$(grep '^version:' SKILL.md | head -1 | awk '{print $$2}')"
 	@echo "License: MIT"
-	@echo "Files:   $$(find . -type f -not -path './.git/*' | wc -l | tr -d ' ')"
-	@echo "Lines:   $$(find . -type f \( -name '*.md' -o -name '*.py' -o -name '*.sh' -o -name '*.html' -o -name '*.yml' \) -not -path './.git/*' -exec cat {} + | wc -l | tr -d ' ')"
+	@echo "Files:   $$(find . -type f -not -path './.git/*' -not -path './dist/*' -not -path '*/__pycache__/*' -not -name '*.pyc' | wc -l | tr -d ' ')"
+	@echo "Lines:   $$(find . -type f \( -name '*.md' -o -name '*.py' -o -name '*.sh' -o -name '*.html' -o -name '*.yml' \) -not -path './.git/*' -not -path './dist/*' -not -path '*/__pycache__/*' -not -name '*.pyc' -exec cat {} + | wc -l | tr -d ' ')"
 
 .PHONY: stats
 stats: ## Show file count by type
-	@echo "Markdown: $$(find . -name '*.md' -not -path './.git/*' | wc -l | tr -d ' ')"
-	@echo "Python:   $$(find . -name '*.py' -not -path './.git/*' | wc -l | tr -d ' ')"
+	@echo "Markdown: $$(find . -name '*.md' -not -path './.git/*' -not -path './dist/*' | wc -l | tr -d ' ')"
+	@echo "Python:   $$(find . -name '*.py' -not -path './.git/*' -not -path '*/__pycache__/*' | wc -l | tr -d ' ')"
 	@echo "Bash:     $$(find . -name '*.sh' -not -path './.git/*' | wc -l | tr -d ' ')"
+	@echo "PowerShell: $$(find . -name '*.ps1' -not -path './.git/*' | wc -l | tr -d ' ')"
 	@echo "YAML:     $$(find . -name '*.yml' -not -path './.git/*' | wc -l | tr -d ' ')"
 	@echo "HTML:     $$(find . -name '*.html' -not -path './.git/*' | wc -l | tr -d ' ')"
+	@echo "Other:    $$(find . -type f -not -path './.git/*' -not -path './dist/*' -not -path '*/__pycache__/*' -not -name '*.pyc' \( ! -name '*.md' -a ! -name '*.py' -a ! -name '*.sh' -a ! -name '*.ps1' -a ! -name '*.yml' -a ! -name '*.html' \) | wc -l | tr -d ' ')"
 
 # ---- Packaging ----
 .PHONY: package

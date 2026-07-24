@@ -56,6 +56,38 @@ NAME="mavis-team-mode-skill"
 DIST="$REPO_ROOT/dist"
 STAGE="$REPO_ROOT/.package-stage"
 
+# ---- OS noise filter (excluded from any archive) ----
+# These are accidental artifacts that pollute release archives if a
+# developer builds on macOS or Windows. Filter them out before staging.
+OS_NOISE_FILES=(
+  ".DS_Store"
+  "Thumbs.db"
+  "desktop.ini"
+  ".AppleDouble"
+  ".LSOverride"
+  "._*"
+)
+
+# Filter helper: returns the input array with any OS-noise entries removed.
+filter_noise() {
+  local item
+  for item in "$@"; do
+    local base
+    base=$(basename "$item")
+    local skip=0
+    for noise in "${OS_NOISE_FILES[@]}"; do
+      # shellcheck disable=SC2053  # intentional glob compare
+      if [[ "$base" == $noise ]]; then
+        skip=1
+        break
+      fi
+    done
+    if [ "$skip" = "0" ]; then
+      printf '%s\n' "$item"
+    fi
+  done
+}
+
 # ---- Clean ----
 if [ "$DRY_RUN" = "0" ]; then
   rm -rf "$DIST" "$STAGE"
@@ -133,7 +165,7 @@ SOURCE_FILES=(
   .github/workflows/validate-skill.yml
 )
 # Dedupe source list
-SOURCE_FILES=($(printf '%s\n' "${SOURCE_FILES[@]}" | sort -u))
+mapfile -t SOURCE_FILES < <(printf '%s\n' "${SOURCE_FILES[@]}" | sort -u)
 
 # ---- Sanity check ----
 missing=0
@@ -151,7 +183,7 @@ fi
 # ---- Tar/zip helper ----
 package() {
   local label="$1"
-  local outname="$2"
+  local outname="$2"   # basename for display (e.g. "bash", "windows")
   local outfile="$3"
   local format="$4"  # tar.gz | zip
   shift 4
@@ -171,11 +203,31 @@ package() {
   # Stage files into a clean dir
   rm -rf "$STAGE"
   mkdir -p "$STAGE/$NAME-$VERSION"
+  local staged_count=0
+  local skipped_noise=()
   for f in "${files[@]}"; do
+    local base
+    base=$(basename "$f")
+    local skip=0
+    for noise in "${OS_NOISE_FILES[@]}"; do
+      # shellcheck disable=SC2053  # intentional glob compare
+      if [[ "$base" == $noise ]]; then
+        skip=1
+        skipped_noise+=("$f")
+        break
+      fi
+    done
+    if [ "$skip" = "1" ]; then
+      continue
+    fi
     # Preserve directory structure
     mkdir -p "$STAGE/$NAME-$VERSION/$(dirname "$f")"
     cp "$f" "$STAGE/$NAME-$VERSION/$f"
+    staged_count=$((staged_count + 1))
   done
+  if [ "${#skipped_noise[@]}" -gt 0 ]; then
+    echo "  Filtered ${#skipped_noise[@]} OS noise file(s): ${skipped_noise[*]}"
+  fi
 
   # Verify chmod +x for scripts (so users can run after untar)
   # Only mark executables for the appropriate platform
@@ -230,11 +282,35 @@ EOF
   if [ -f "$outfile" ]; then
     local size
     size=$(du -h "$outfile" 2>/dev/null | awk '{print $1}')
-    echo "  Size: $size"
+    # outname is the short variant id (e.g. "bash", "windows") used for log filtering
+    echo "  Size: $size  (variant: ${outname})"
   else
     echo "  ERROR: archive not created!" >&2
     exit 1
   fi
+
+  # Self-test: verify archive is openable and contains expected files.
+  # Counts the entries that start with our package prefix.
+  local actual_count
+  case "$format" in
+    tar.gz)
+      actual_count=$(tar -tzf "$outfile" 2>/dev/null | grep -c "^$NAME-$VERSION/" || true)
+      ;;
+    zip)
+      # Last line of `unzip -l` looks like:
+      #   "   205861                     48 files"
+      # Field NF-1 is the count when the last field is "files".
+      actual_count=$(unzip -l "$outfile" 2>/dev/null | awk '$NF=="files" {print $(NF-1); exit}')
+      ;;
+  esac
+  # Archive should contain at least every staged file (plus implicit dir
+  # entries for zip). We only require >= staged_count; an exact equality
+  # check is too brittle across tar/zip versions.
+  if [ -z "$actual_count" ] || [ "$actual_count" -lt "$staged_count" ]; then
+    echo "  ERROR: archive contains $actual_count entries, expected >= $staged_count (after noise filter)" >&2
+    exit 1
+  fi
+  echo "  Self-test: archive opens, $actual_count entries (staged: $staged_count files)"
 }
 
 # ---- Build all 4 packages ----

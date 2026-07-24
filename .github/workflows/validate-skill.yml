@@ -46,6 +46,10 @@ jobs:
         if: runner.os != 'Windows'
         run: shellcheck scripts/validate.sh
 
+      - name: shellcheck package.sh
+        if: runner.os != 'Windows'
+        run: shellcheck scripts/package.sh
+
       - name: bash syntax check
         shell: bash
         run: |
@@ -284,6 +288,7 @@ jobs:
         run: |
           shellcheck scripts/install.sh
           shellcheck scripts/validate.sh
+          shellcheck scripts/package.sh
 
       - name: bash syntax
         run: |
