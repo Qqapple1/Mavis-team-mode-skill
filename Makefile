@@ -48,7 +48,7 @@ validate: ## Run all skill format checks (23 checks)
 	bash scripts/validate.sh
 
 .PHONY: validate-yaml
-validate-yaml: ## Run YAML frontmatter validation (12 files)
+validate-yaml: ## Run YAML frontmatter validation (15 files)
 	$(PYTHON) scripts/validate_yaml.py
 
 .PHONY: validate-all

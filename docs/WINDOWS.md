@@ -133,7 +133,7 @@ powershell -ExecutionPolicy Bypass -File scripts\install.ps1 -Doctor
 powershell -ExecutionPolicy Bypass -File scripts\validate.ps1
 ```
 
-期望看到 `Passed: 23`（bash）或 `Passed: 17`（PowerShell 验证项比 bash 少一些）。
+期望看到 `Passed: 23`（bash）或 `Passed: 24`（PowerShell 验证项比 bash 多一些）。
 
 ---
 

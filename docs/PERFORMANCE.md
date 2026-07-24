@@ -99,7 +99,7 @@ the Leader decides to dispatch a coding sub-agent. `references/troubleshooting.m
 
 Good description (~150 chars):
 ```yaml
-description: "Recreates the Mavis Team Mode workflow (Leader + Workers + Verifier) inside Zcode 3.0. Use for: 'team mode', 'split into subtasks', 'verify the result', '用 team 模式'."
+description: "Recreates the Mavis Team Mode workflow (Leader + Workers + Verifier) inside Zcode 3.4.2+. Use for: 'team mode', 'split into subtasks', 'verify the result', '用 team 模式'."
 ```
 
 Bad description (500+ chars):

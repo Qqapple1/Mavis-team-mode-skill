@@ -1,6 +1,6 @@
 # Mavis Team Mode Skill for Zcode
 
-把 MiniMax **Mavis Team Mode**（Leader + Workers + Verifier）的能力搬到 Zcode 3.0。
+把 MiniMax **Mavis Team Mode**（Leader + Workers + Verifier）的能力搬到 Zcode 3.4.2+。
 
 > **Pick your platform → [Download v1.3.9](https://github.com/Qqapple1/Mavis-team-mode-skill/releases/tag/v1.3.9)**:
 > - macOS / Linux / Git Bash / WSL → `mavis-team-mode-skill-1.3.9-bash.tar.gz`
@@ -9,7 +9,7 @@
 > - Contributor / CI → `mavis-team-mode-skill-1.3.9-source.tar.gz`
 > - [Which archive should I download? →](docs/PLATFORMS.md)
 
-> 基于 Zcode 3.0 的子智能体系统 + Agent Skills 标准实现，
+> 基于 Zcode 3.4.2+ 的子智能体系统 + Agent Skills 标准实现，
 > 完整复刻 MiniMax 官方 Mavis 2026-05 公告的 TeamEngine 工作流。
 
 [![CI](https://github.com/Qqapple1/Mavis-team-mode-skill/actions/workflows/validate-skill.yml/badge.svg)](https://github.com/Qqapple1/Mavis-team-mode-skill/actions)
