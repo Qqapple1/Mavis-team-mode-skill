@@ -13,12 +13,12 @@ using a 4-chars-per-token heuristic.
 
 For a typical complex task (refactor 1500-line module, 4-subtask plan):
 
-> Numbers are heuristic estimates from `scripts/benchmark_tokens.py` on v1.3.8. Re-run the script for current values; they drift as files change.
+> Numbers are heuristic estimates from `scripts/benchmark_tokens.py` on v1.3.9. Re-run the script for current values; they drift as files change.
 
 | Mode                          | Tokens in main context | Notes                            |
 |-------------------------------|------------------------:|----------------------------------|
 | Inline team plan (no skill)   |                  ~3,000 | User writes everything in chat   |
-| Eager load (load everything)  |                 ~56,832 | Loads all .md / .py / .sh / .html|
+| Eager load (load everything)  |                 ~58,946 | Loads all .md / .py / .sh / .html|
 | **Progressive load (default)**|       **~5,586**       | SKILL.md + 5 sub-files used      |
 
 **Progressive load costs ~86% MORE than inline baseline.**

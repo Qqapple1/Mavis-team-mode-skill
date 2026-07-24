@@ -5,6 +5,48 @@ All notable changes to this skill are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.3.9] - 2026-07-24
+
+### Fixed
+- **install.sh partial-state recovery**: If a user accidentally deletes
+  a tracked file (e.g. `rm SKILL.md`) from the install dir, or a
+  partial `git pull` left files in an inconsistent state, re-running
+  `install.sh` now detects the missing required files and runs
+  `git checkout HEAD -- <file>` to restore them. Previously, the
+  install would silently fail with "Missing required file" and
+  the user had to manually `rm -rf` and re-clone.
+- **Token number drift**: Eager-load estimate drifted from ~56,832
+  to ~58,946 after the v1.3.8 changes added more lines to
+  install.sh / install.ps1 / package.sh. Updated README, index.html,
+  docs/PERFORMANCE.md, docs/ARCHITECTURE.md to match.
+  Re-run `make benchmark` to verify against current code.
+
+### Added
+- **`make benchmark` / `make benchmark-json`**: Convenient target
+  for `scripts/benchmark_tokens.py` (was only runnable directly
+  before; users naturally try `make benchmark` first).
+- **5-round idempotency tests**: Verified install / install --copy
+  / install + doctor / install + uninstall all work cleanly across
+  5 consecutive runs without state corruption.
+
+### Verified
+- shellcheck: 0 warnings (3 .sh scripts)
+- bash -n: 0 errors
+- python -m py_compile: 0 errors (6 .py scripts)
+- PowerShell brace balance: 62/62 + 26/26 + 14/14
+- make validate-all: 23/23 format + 15/15 YAML
+- make test-all: 48/48 e2e (20 + 23 + 5)
+- make package: 5/5 archives, all self-test pass
+- make install: 5x consecutive, all clean
+- make install --copy: 5x consecutive, all clean
+- make reinstall: clean (uninstall + install)
+- make prototype-bg + make prototype-stop: clean
+- install with broken symlink at ZCODE_LINK: recovered, replaced
+- install with existing non-git dir at INSTALL_DIR: clean error
+- install with partial clone (deleted SKILL.md): recovered via new logic
+- install with INSTALL_DIR as symlink: clean
+- Cross-archive real install (extracted bash.tar.gz): clean
+
 ## [1.3.8] - 2026-07-24
 
 ### Fixed
@@ -351,6 +393,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 [1.3.1]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.1.0...v1.2.0
+[1.3.9]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.8...v1.3.9
 [1.1.0]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/Qqapple1/Mavis-team-mode-skill/releases/tag/v1.0.0
 [1.3.8]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.7...v1.3.8

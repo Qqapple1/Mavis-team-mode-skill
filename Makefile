@@ -160,6 +160,14 @@ stats: ## Show file count by type
 	@echo "HTML:     $$(find . -name '*.html' -not -path './.git/*' | wc -l | tr -d ' ')"
 	@echo "Other:    $$(find . -type f -not -path './.git/*' -not -path './dist/*' -not -path '*/__pycache__/*' -not -name '*.pyc' \( ! -name '*.md' -a ! -name '*.py' -a ! -name '*.sh' -a ! -name '*.ps1' -a ! -name '*.yml' -a ! -name '*.html' \) | wc -l | tr -d ' ')"
 
+.PHONY: benchmark
+benchmark: ## Run token cost benchmark (human-readable output)
+	$(PYTHON) scripts/benchmark_tokens.py
+
+.PHONY: benchmark-json
+benchmark-json: ## Run token cost benchmark (JSON output)
+	$(PYTHON) scripts/benchmark_tokens.py --json
+
 # ---- Packaging ----
 .PHONY: package
 package: ## Build platform-specific archives to dist/

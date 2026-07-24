@@ -27,7 +27,7 @@
 set -euo pipefail
 
 # ---- Version ----
-INSTALLER_VERSION="1.3.8"
+INSTALLER_VERSION="1.3.9"
 
 # ---- Platform detection ----
 detect_platform() {
@@ -403,6 +403,18 @@ install() {
     if ! git pull --rebase --autostash 2>&1 | tail -5; then
       warn "git pull had issues; continuing with current state"
     fi
+    # Recovery: if any of our required files are missing locally
+    # (e.g. user rm'd them, or partial git pull), restore from HEAD.
+    # This is safe because we only restore files the user is
+    # explicitly trying to install (not their own untracked work).
+    for f in SKILL.md agents/leader.md agents/verifier.md agents/worker-coder.md README.md; do
+      if [ ! -f "$f" ]; then
+        warn "Missing $f locally — restoring from HEAD"
+        if ! git checkout HEAD -- "$f" 2>&1 | tail -2; then
+          warn "  failed to restore $f (you may need to re-clone manually)"
+        fi
+      fi
+    done
     ok "Updated"
   else
     if [ -d "$INSTALL_DIR" ]; then
