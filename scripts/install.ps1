@@ -14,13 +14,14 @@ param(
     [switch]$NoVerify,
     [switch]$Help,
     [string]$InstallDir = "$env:USERPROFILE\mavis-team-mode-skill",
+    [string]$SkillsDir = "$env:USERPROFILE\.zcode\skills",
     [string]$RepoUrl = "https://github.com/Qqapple1/Mavis-team-mode-skill.git",
     [string]$GitRef = ""
 )
 
 $VERSION = "1.3.19"
 $SKILL_NAME = "mavis-team-mode"
-$ZCODE_SKILLS_DIR = "$env:USERPROFILE\.zcode\skills"
+$ZCODE_SKILLS_DIR = $SkillsDir
 $ZCODE_LINK = "$ZCODE_SKILLS_DIR\$SKILL_NAME"
 
 # Env var overrides (mirror bash install.sh's MAVIS_TEAM_* vars)
@@ -28,6 +29,7 @@ $ZCODE_LINK = "$ZCODE_SKILLS_DIR\$SKILL_NAME"
 if ($env:MAVIS_TEAM_REPO)   { $RepoUrl   = $env:MAVIS_TEAM_REPO }
 if ($env:MAVIS_TEAM_DIR)    { $InstallDir = $env:MAVIS_TEAM_DIR }
 if ($env:MAVIS_TEAM_REF)    { $GitRef    = $env:MAVIS_TEAM_REF }
+if ($env:MAVIS_TEAM_SKILLS_DIR) { $ZCODE_SKILLS_DIR = $env:MAVIS_TEAM_SKILLS_DIR; $ZCODE_LINK = "$ZCODE_SKILLS_DIR\$SKILL_NAME" }
 if ($env:MAVIS_TEAM_NO_COLOR) {
     # Disable colors when env var set
     function Log($msg)  { Write-Host "[i] $msg" }

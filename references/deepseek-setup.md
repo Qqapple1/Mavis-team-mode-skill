@@ -64,10 +64,10 @@ category: setup
 
 | 任务类型 | 推荐模型 |
 |----------|----------|
-| 写代码、改 bug | `deepseek-chat` |
-| 复杂调研、长任务 | `deepseek-reasoner` |
-| 测试/Review | `deepseek-chat`（快）|
-| 大型重构 | `deepseek-reasoner`（深） |
+| 写代码、改 bug | `deepseek-v4-flash`（快） |
+| 复杂调研、长任务 | `deepseek-v4-pro`（强推理） |
+| 测试/Review | `deepseek-v4-flash`（快） |
+| 大型重构 | `deepseek-v4-pro`（深） |
 
 ## 6. 已知限制
 

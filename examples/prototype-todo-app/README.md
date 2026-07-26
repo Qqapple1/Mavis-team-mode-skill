@@ -77,8 +77,8 @@ Passed: 5, Failed: 0  (advanced)
 
 | File | Purpose |
 |------|---------|
-| `server/server.py` | Python HTTP server with in-memory todo store (279 lines, defense-in-depth) |
-| `client/index.html` | Single-page tag-filter UI (vanilla JS, 324 lines, XSS-safe) |
+| `server/server.py` | Python HTTP server with in-memory todo store (328 lines, defense-in-depth) |
+| `client/index.html` | Single-page tag-filter UI (vanilla JS, 328 lines, XSS-safe) |
 | `test_e2e.py` | 20 base e2e tests (HTTP + CRUD + security) |
 | `test_e2e_extended.py` | 23 extended tests (HTTP methods, unicode, concurrency) |
 | `test_e2e_advanced.py` | 5 advanced tests (slow client, idempotency, edge cases) |
