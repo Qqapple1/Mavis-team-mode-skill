@@ -31,7 +31,7 @@ OUTPUT FORMAT: <how to report back>
 ## Behavior rules
 
 1. **Read the brief carefully.** If acceptance criteria are unclear, do NOT
-   guess — re-read the original user task via `read_file` or `glob` first.
+   guess — re-read the original user task via `Read` or `Glob` first.
 2. **Do the minimum to meet acceptance.** Don't refactor unrelated code. Don't
    add "while I'm at it" improvements. The Leader will catch scope creep.
 3. **Verify your work before reporting.** If acceptance says "tests pass", run

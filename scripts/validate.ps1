@@ -3,6 +3,10 @@ param(
     [string]$SkillDir = "$env:USERPROFILE\.zcode\skills\mavis-team-mode"
 )
 
+# Force UTF-8 output on Windows terminals
+$OutputEncoding = [System.Text.UTF8Encoding]::new($false)
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+
 $PASS = 0
 $FAIL = 0
 
@@ -52,7 +56,7 @@ foreach ($field in @("name", "description", "version")) {
 
 # 4. Agents exist
 $agentsDir = Join-Path $SkillDir "agents"
-foreach ($a in @("leader", "verifier", "worker-coder", "worker-tester", "worker-researcher", "worker-doc-writer", "worker-reviewer")) {
+foreach ($a in @("leader", "verifier", "worker-coder", "worker-tester", "worker-researcher", "worker-doc-writer", "worker-reviewer", "worker-fixer")) {
     $f = Join-Path $agentsDir "$a.md"
     if (Test-Path $f) {
         Ok "agents/$a.md present"
@@ -101,4 +105,4 @@ if ($FAIL -gt 0) {
     exit 1
 }
 Write-Host "All checks passed. Skill is properly installed."
-Write-Host "Restart Zcode to use: '用 mavis team mode 帮我...'"
+Write-Host "Restart Zcode to use: mavis team mode"

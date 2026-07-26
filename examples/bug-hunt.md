@@ -9,6 +9,8 @@ category: bug-fix
 
 **User task**: "用户报告说下单成功后偶尔会扣两次款。找出根因并修。"
 
+> **流程对应**: 本文 Phase 1-4 对应 `leader.md` Phase 1-4 和 `SKILL.md` Step 2-5。完整 7 步流程含 Iterate/修复循环见 SKILL.md Step 6。
+
 ## Phase 1: Leader Plan
 
 ```markdown
@@ -59,19 +61,20 @@ category: bug-fix
 - **dependency**: depends-on-subtask-1
 - **estimated_minutes**: 20
 
-### Subtask 4: 实施修复
+### Subtask 4: 实施修复（使用 worker-fixer）
 - **type**: general-purpose
-- **prompt**: 修复扣两次款的问题。要求：
-  1. 最小改动
-  2. 保持对外 API 不变
+- **prompt**: 你是 Worker-Fixer。基于 Subtask 3 的复现测试，精准修复扣两次款的问题：
+  1. 读取 `src/payment/` 相关代码
+  2. 实施最小修复（只改根因，不重构）
   3. 修复后 Subtask 3 的测试必须通过
   4. 不破坏其他测试
+  5. 报告：根因 + 修改内容 + 修复验证结果
 - **acceptance**:
   - [ ] Subtask 3 的测试现在通过
   - [ ] 全部现有测试通过
-  - [ ] 改动文件清单 + 改动说明
+  - [ ] 改动不超过 30 行（fixer 规则：超过 30 行升级给 coder）
 - **dependency**: depends-on-subtask-3
-- **estimated_minutes**: 30
+- **estimated_minutes**: 20
 
 ### Subtask 5: 加回归测试
 - **type**: general-purpose

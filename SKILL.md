@@ -12,7 +12,7 @@ metadata:
     - "prototype-todo-app e2e (20+23+5 tests, 48/48 passing) — included in this repo"
     - "skill format + YAML frontmatter validation (23+15 checks) — included"
     - "GitHub Actions CI: Ubuntu 24.04 + macOS + Windows (PowerShell install + Python startup), Python 3.8-3.12 — 12/12 jobs passing"
-    - "Real Zcode runtime: tested 3+ times by community users (builds: frename CLI, mnote CLI, cquote CLI). P0-P3 fixes from real-world feedback shipped in v1.3.14-v1.3.19. See CHANGELOG for details."
+    - "Real Zcode runtime: tested 5+ times by community users (builds: frename CLI, mnote CLI, cquote CLI, hitokoto CLI, infrastructure audit). P0-P3 fixes from real-world feedback shipped in v1.3.14-v1.3.19. See CHANGELOG for details."
 ---
 
 # Mavis Team Mode for Zcode
@@ -86,9 +86,18 @@ reference these worker roles by name when dispatching sub-tasks.
 **Verify these are installed alongside SKILL.md:**
 
 ```bash
+# Linux / macOS / Git Bash / WSL
 ls ~/.zcode/skills/mavis-team-mode/agents/
-# should show: leader.md verifier.md worker-coder.md worker-tester.md
-#              worker-researcher.md worker-doc-writer.md worker-reviewer.md
+```
+```powershell
+# Windows PowerShell
+dir $env:USERPROFILE\.zcode\skills\mavis-team-mode\agents\
+```
+```text
+# should show (8 files):
+#   leader.md  verifier.md
+#   worker-coder.md  worker-tester.md  worker-researcher.md
+#   worker-doc-writer.md  worker-reviewer.md  worker-fixer.md
 ```
 
 If missing, see INSTALL.md.

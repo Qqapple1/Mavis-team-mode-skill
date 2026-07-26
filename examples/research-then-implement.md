@@ -9,7 +9,22 @@ category: research
 
 **User task**: "我们公司想用 WebSocket 替代轮询。给我一个 demo，连接公司 mock server，接收实时消息。"
 
-## Phase 1: Leader Plan
+> **流程对应**: 本文 Phase 1-4 对应 `leader.md` Phase 1-4 和 `SKILL.md` Step 2-5。完整 7 步流程见 SKILL.md。
+
+## Phase 1: Leader Plan（含 CONTRACT）
+
+Leader 先发布接口契约，再拆子任务：
+
+```markdown
+# CONTRACT
+
+## WebSocket Demo 接口
+- Server: `ws://localhost:8080`，每 2 秒推送 `{"type":"message","text":"...","ts":"..."}`
+- Client: 浏览器原生 WebSocket，显示消息流 + 时间戳 + 连接状态
+- 心跳: 每 30 秒 ping/pong，断线自动重连（最多 5 次，间隔 3 秒）
+- 不引入第三方 WebSocket 库（浏览器原生 API）
+- 产物: server/index.js + client/index.html + README.md
+```
 
 ```markdown
 # Team Plan
@@ -21,7 +36,7 @@ category: research
 
 ### Subtask 1: 调研 WebSocket 库选型
 - **type**: explore
-- **tools**: [read_file, grep, glob, web_search, web_fetch]
+- **tools**: [Read, Glob, Grep, WebSearch, WebFetch]
 - **prompt**: 调研：
   1. Node.js 主流 WebSocket 库对比（ws / socket.io / uWebSockets.js）
   2. 浏览器原生 WebSocket API 现状

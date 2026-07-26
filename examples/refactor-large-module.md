@@ -9,6 +9,8 @@ category: refactor
 
 **User task**: "重构 src/legacy_auth.py（1500 行），按职责拆成 3 个模块，不改对外行为。"
 
+> **流程对应**: 本文 Phase 1-4 对应 `leader.md` Phase 1-4 和 `SKILL.md` Step 2-5。完整 7 步流程见 SKILL.md。
+
 ## Phase 1: Leader Plan
 
 ```markdown

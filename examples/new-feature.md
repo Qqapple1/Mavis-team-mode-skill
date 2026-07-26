@@ -9,7 +9,22 @@ category: feature
 
 **User task**: "给 Todo app 加一个'按标签筛选'功能：左侧显示所有标签，点击标签过滤右侧任务列表。"
 
-## Phase 1: Leader Plan
+> **流程对应**: 本文 Phase 1-4 对应 `leader.md` Phase 1-4 和 `SKILL.md` Step 2-5。完整 7 步流程见 SKILL.md。
+
+## Phase 1: Leader Plan（含 CONTRACT）
+
+Leader 先发布接口契约，再拆子任务：
+
+```markdown
+# CONTRACT
+
+## 标签筛选功能接口
+- 左侧标签列表组件：`<TagList />`，props: `tags: string[]`, `selected: string|null`, `onSelect: (tag) => void`
+- 右侧任务列表修改：`<TaskList />` 新增 prop `filterTag: string|null`，为 null 时显示全部
+- 状态提升到父组件：`selectedTag` state
+- 不引入新依赖
+- 不改 API 接口
+```
 
 ```markdown
 # Team Plan
