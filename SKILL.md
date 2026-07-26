@@ -220,13 +220,14 @@ See `examples/` for full worked examples:
 ## Sub-agent prompt templates
 
 See `agents/` directory for ready-to-use prompt templates:
+- `agents/leader.md` — Leader 主控 (Phase 1-6 流程)
+- `agents/verifier.md` — 验收 verifier
 - `agents/worker-coder.md` — 写代码 worker
 - `agents/worker-tester.md` — 写测试 worker
 - `agents/worker-researcher.md` — 调研 worker
 - `agents/worker-doc-writer.md` — 文档 worker
 - `agents/worker-reviewer.md` — code review worker
-- `agents/worker-fixer.md` — 精准修复 worker (Step 6 Iterate, v1.3.17+)
-- `agents/verifier.md` — 验收 verifier
+- `agents/worker-fixer.md` — 精准修复 worker (Step 6 Iterate, v1.4.0+)
 
 ## Advanced: DeepSeek + Zcode
 
