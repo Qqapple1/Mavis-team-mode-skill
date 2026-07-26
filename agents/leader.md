@@ -65,6 +65,23 @@ Output a **Team Plan** in this exact format:
 **Always show this plan to the user BEFORE dispatching sub-agents**, and let
 them confirm or adjust.
 
+### Phase 1.5: Publish Interface Contract (CONTRACT)
+
+Before dispatching ANY workers, write a CONTRACT.md in the team workspace
+(or embed the contract in every Worker prompt). This is mandatory when
+multiple workers produce interdependent artifacts (code + tests + docs).
+
+The contract must include:
+- CLI interface (`--help`-style output, even if code doesn't exist yet)
+- Shared file formats (JSON schema, Markdown templates, etc.)
+- Non-ASCII text handling requirements (ensure_ascii=False, UTF-8)
+- CLI output format declaration (plain / ANSI / JSON)
+- List of expected deliverable files
+
+See SKILL.md Step 2.5 for full rationale. Skipping this step is the #1
+cause of worker-output incompatibility (e.g. Coder implements `--prefix`
+but Doc-Writer documents `--number`).
+
 ### Phase 2: Dispatch (parallel where possible)
 
 After user confirms, dispatch sub-agents. Use Zcode's sub-agent tool:

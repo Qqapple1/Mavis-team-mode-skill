@@ -44,11 +44,11 @@ doctor: ## Diagnose current install state (no changes)
 
 # ---- Validation ----
 .PHONY: validate
-validate: ## Run all skill format checks (23 checks)
+validate: ## Run all skill format checks (24 checks)
 	bash scripts/validate.sh
 
 .PHONY: validate-yaml
-validate-yaml: ## Run YAML frontmatter validation (15 files)
+validate-yaml: ## Run YAML frontmatter validation (16 files)
 	$(PYTHON) scripts/validate_yaml.py
 
 .PHONY: validate-all

@@ -5,8 +5,8 @@
 | Version | Supported           |
 |---------|---------------------|
 | 1.3.x   | ✅ Active           |
-| 1.2.x   | ✅ Active           |
-| 1.1.x   | ⚠️ Critical fixes only |
+| 1.2.x   | ⚠️ Critical fixes only |
+| 1.1.x   | ❌ No longer supported |
 | 1.0.x   | ❌ No longer supported |
 | < 1.0   | ❌ No longer supported |
 
