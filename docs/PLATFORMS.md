@@ -119,11 +119,11 @@ After install on any platform:
 bash scripts/install.sh --doctor   # or install.ps1 -Doctor
 ```
 
-Expected: `Doctor: no issues found` (or `Passed: 23` if validate.sh
+Expected: `Doctor: no issues found` (or `Passed: 24` if validate.sh
 is invoked directly).
 
-The 48 e2e tests + 23 skill format checks + 15 YAML checks = **86
-verification points** (PowerShell: 48 e2e + 24 format + 15 YAML = **87**),
+The 48 e2e tests + 24 skill format checks + 16 YAML checks = **88
+verification points** (PowerShell: 48 e2e + 25 format + 16 YAML = **89**),
 all runnable on any platform with Python 3.8+
 (plus bash for the bash installer, or PowerShell for the PowerShell
 installer). 3.6/3.7 are EOL.

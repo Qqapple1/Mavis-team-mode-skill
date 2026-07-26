@@ -173,7 +173,7 @@ mavis-team-mode/
 │   ├── validate.sh                  # bash 24 项格式自检
 │   ├── validate.ps1                 # PowerShell 验证
 │   ├── package.sh                   # 平台分类打包（5 个 release 压缩包）
-│   ├── validate_yaml.py             # 15 项 YAML 校验（无 PyYAML 依赖）
+│   ├── validate_yaml.py             # 16 项 YAML 校验（无 PyYAML 依赖）
 │   └── benchmark_tokens.py          # Token 成本估算
 ├── agents/                          # Sub-agent 配置（8 个）
 │   ├── leader.md                    #   Leader (6 阶段流程)
@@ -236,7 +236,7 @@ mavis-team-mode/
 # 24 项格式自检
 bash scripts/validate.sh
 
-# 15 项 YAML 校验（无外部依赖）
+# 16 项 YAML 校验（无外部依赖）
 python3 scripts/validate_yaml.py
 
 # 48 项端到端 prototype 测试（20 + 23 + 5）
