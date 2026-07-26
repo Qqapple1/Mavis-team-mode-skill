@@ -68,6 +68,7 @@ git clone https://github.com/Qqapple1/Mavis-team-mode-skill.git ~/mavis-team-mod
 cd ~/mavis-team-mode-skill
 bash scripts/install.sh
 ```
+> **提示**：`install.sh` 也能自动 clone（如果你单独下载 `install.sh` 直接运行，它会自动 clone 到默认路径）。上面的手动 clone 方式让你能自定义安装路径。
 
 **已知坑**：
 - 默认 **copy 模式**（不是真 NTFS symlink）
@@ -95,15 +96,18 @@ git clone https://github.com/Qqapple1/Mavis-team-mode-skill.git $env:USERPROFILE
 cd $env:USERPROFILE\mavis-team-mode-skill
 powershell -ExecutionPolicy Bypass -File scripts\install.ps1
 ```
+> **提示**：`install.ps1` 也能自动 clone（如果你单独下载 `install.ps1` 直接运行，它会自动 clone 到默认路径）。上面的手动 clone 方式让你能自定义安装路径。
 
 PowerShell 版**功能等价**（clone + copy + 验证 + 卸载），只是永远 copy 模式（PowerShell 不支持 symlink）。
 
 **PowerShell 参数**：
 - `-Doctor` 诊断（不改）
 - `-Uninstall` 卸载
+- `-Help` 显示帮助
 - `-NoVerify` 跳过验证
 - `-InstallDir <path>` 自定义安装路径
 - `-RepoUrl <url>` 自定义 Git 源
+- `-GitRef <ref>` 指定 branch/tag/commit 检出
 
 ---
 
@@ -133,7 +137,7 @@ powershell -ExecutionPolicy Bypass -File scripts\install.ps1 -Doctor
 powershell -ExecutionPolicy Bypass -File scripts\validate.ps1
 ```
 
-期望看到 `Passed: 23`（bash）或 `Passed: 24`（PowerShell 验证项比 bash 多一些）。
+期望看到 `Passed: 24`（bash）或 `Passed: 25`（PowerShell 验证项比 bash 多一些）。
 
 ---
 

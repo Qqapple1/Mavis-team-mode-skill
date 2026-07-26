@@ -159,7 +159,7 @@ bash scripts/install.sh
 
 ```
 mavis-team-mode/
-├── SKILL.md                         # 核心 skill 定义 (201 lines)
+├── SKILL.md                         # 核心 skill 定义 (270 lines)
 ├── README.md
 ├── INSTALL.md                       # 安装指南（4 种方式）
 ├── VALIDATION.md                    # 验证清单（8 步）
@@ -170,7 +170,7 @@ mavis-team-mode/
 ├── scripts/
 │   ├── install.sh                   # bash 一键安装（macOS / Linux / Git Bash / WSL）
 │   ├── install.ps1                  # PowerShell 一键安装（Windows 原生）
-│   ├── validate.sh                  # bash 23 项格式自检
+│   ├── validate.sh                  # bash 24 项格式自检
 │   ├── validate.ps1                 # PowerShell 验证
 │   ├── package.sh                   # 平台分类打包（5 个 release 压缩包）
 │   ├── validate_yaml.py             # 15 项 YAML 校验（无 PyYAML 依赖）
@@ -190,8 +190,8 @@ mavis-team-mode/
 │   ├── new-feature.md
 │   ├── research-then-implement.md
 │   └── prototype-todo-app/
-│       ├── server/server.py         #     Python HTTP server (279 lines, 安全加固)
-│       ├── client/index.html        #     浏览器 UI (324 lines)
+│       ├── server/server.py         #     Python HTTP server (328 lines, 安全加固)
+│       ├── client/index.html        #     浏览器 UI (328 lines)
 │       ├── test_e2e.py              #     20 个端到端测试
 │       ├── test_e2e_extended.py     #     23 个扩展测试
 │       ├── test_e2e_advanced.py     #     5 个高级测试
@@ -233,7 +233,7 @@ mavis-team-mode/
 ## 测试
 
 ```bash
-# 23 项格式自检
+# 24 项格式自检
 bash scripts/validate.sh
 
 # 15 项 YAML 校验（无外部依赖）

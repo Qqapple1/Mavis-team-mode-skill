@@ -1,7 +1,7 @@
 # ADR-001: Recreate Mavis Team Mode as a portable Skill
 
 **Status**: Accepted
-**Date**: 2026-07-23
+**Date**: 2026-07-25
 **Author**: Community port (Mavis CLI agent)
 
 > **Note**: This ADR was written before I had access to the MiniMax Mavis
@@ -32,14 +32,14 @@ workflow explicitly.
 We recreate the Mavis Team Mode workflow as a **portable Agent Skill**
 that can be installed in any tool that supports the Agent Skills standard.
 This skill is built and tested against Zcode 3.4.2+ (per
-[zcode-ai.com](https://zcode-ai.com) download page, 2026-07-23).
+[zcode-ai.com](https://zcode-ai.com) download page, 2026-07-25).
 Cross-tool compatibility (Claude Code, Codex CLI, Cursor, etc.) is
 plausible based on the shared Agent Skills standard, but **not
 independently tested** in this repo.
 
 The skill provides:
 - A `SKILL.md` defining the workflow and triggers
-- A `agents/` directory with role templates for Leader and 5 Worker types
+- A `agents/` directory with role templates for Leader and 6 Worker types
 - 4 worked examples (refactor, bug-hunt, new-feature, research-then-implement)
 - A real, runnable Todo prototype to verify end-to-end
 
@@ -55,6 +55,7 @@ Skill (SKILL.md)
 ├── worker-researcher.md — investigator
 ├── worker-doc-writer.md — documenter
 ├── worker-reviewer.md — code reviewer
+├── worker-fixer.md  — legacy fix & audit remediation
 └── verifier.md      — independent quality check
 ```
 
@@ -127,7 +128,7 @@ incrementally improved.
 
 - MiniMax Mavis Team Mode announcement: May 2026 (cited per public Mavis docs; original URL not captured)
 - Agent Skills specification: Anthropic's published standard for skills (no specific URL retained; see any Claude Code / Zcode docs for current spec)
-- Zcode 3.x sub-agent system: per [zcode-ai.com](https://zcode-ai.com) public documentation, 2026-07-23
+- Zcode 3.x sub-agent system: per [zcode-ai.com](https://zcode-ai.com) public documentation, 2026-07-25
 
 
 ## See also

@@ -31,3 +31,12 @@ htmlcov/
 dist/
 .package-stage/
 token-benchmark.json
+*.zip
+*.tar.gz
+
+# Prototype server logs
+server.log
+server.err.log
+
+# Audit temporary files
+audit/

@@ -17,7 +17,7 @@ done
 bash scripts/validate.sh
 ```
 
-期望输出：`Passed: 23, Failed: 0`（23 项格式自检）。
+期望输出：`Passed: 24, Failed: 0`（24 项格式自检）。
 
 ## 3. YAML frontmatter 验证（10 秒）
 
