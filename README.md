@@ -31,7 +31,7 @@
 - **Git**: 2.0+ （install.sh 用 `--depth 1` shallow clone）
 - **Bash**: 3.2+（我用的语法都兼容 bash 3.2，包括 macOS 默认 bash）
 - **Disk**: ~600KB 安装空间
-- **Zcode**: 3.4.2+（per [zcode-ai.com](https://zcode-ai.com) download page, 2026-07-23）
+- **Zcode**: 3.4.2+（per [zcode-ai.com](https://zcode-ai.com) download page, 2026-07-26）
 - **Windows 用户**: 见 [docs/WINDOWS.md](docs/WINDOWS.md) — 推荐 WSL2
 
 > **真 Zcode runtime 实测**: 社区用户已在真实 Zcode 对话中测试 5+ 次（frename / mnote / cquote / hitokoto CLI 工具 + 基础设施审计），P0-P3 修复已随 v1.3.14-v1.3.19 发布。详见 CHANGELOG。

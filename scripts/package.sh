@@ -3,16 +3,16 @@
 #
 # Produces 5 archives under dist/:
 #   1. {ver}-core.zip          - Cross-platform core (no installer scripts)
-#                                38 files: SKILL.md + agents + examples + ...
+#                                40 files: SKILL.md + agents + examples + ...
 #                                For: browsing source, embedding into other tools
 #   2. {ver}-bash.tar.gz       - bash + cross-platform (Linux/macOS/Git Bash/WSL)
-#                                41 files: core + install.sh + validate.sh + package.sh
+#                                43 files: core + install.sh + validate.sh + package.sh
 #                                For: most users on Unix-like systems
 #   3. {ver}-windows.zip       - PowerShell + cross-platform
-#                                41 files: core + install.ps1 + validate.ps1 + run_e2e.ps1
+#                                44 files: core + install.ps1 + validate.ps1 + run_e2e.ps1
 #                                For: Windows users without Git Bash
 #   4. {ver}-source.tar.gz     - Full source (including CI workflow + Issue templates)
-#                                48 files: everything
+#                                50 files: everything
 #                                For: contributors, CI, GitHub release auto-attach
 #   5. {ver}-source.zip        - Same as 4 but zip (for Windows contributors)
 #

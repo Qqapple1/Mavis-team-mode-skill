@@ -11,7 +11,7 @@ category: setup
 > at the provider level. It does **not** test that DeepSeek + this skill
 > actually produces good Team Mode output. Model behavior in multi-agent
 > workflows depends on each model's tool-use reliability, which DeepSeek
-> has not officially documented for Zcode 3.x as of 2026-07-23. The
+> has not officially documented for Zcode 3.x as of 2026-07-26. The
 > "model selection" table below is general DeepSeek knowledge, not
 > measured in this repo.
 

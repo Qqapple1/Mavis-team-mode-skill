@@ -6,7 +6,7 @@ license: MIT
 metadata:
   author: Community port (Mavis CLI agent)
   origin: Recreated from MiniMax Mavis TeamEngine (May 2026 announcement)
-  compatibility: Zcode 3.4.2+ (per zcode-ai.com download page, as of 2026-07-23). Model-agnostic: works with whatever model your Zcode is configured for (Zcode 3.x supports multiple providers per its docs; not independently tested for each).
+  compatibility: Zcode 3.4.2+ (per zcode-ai.com download page, as of 2026-07-26). Model-agnostic: works with whatever model your Zcode is configured for (Zcode 3.x supports multiple providers per its docs; not independently tested for each).
   category: workflow
   tested-on-ranges:
     - "prototype-todo-app e2e (20+23+5 tests, 48/48 passing) — included in this repo"
