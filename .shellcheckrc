@@ -1,0 +1,30 @@
+# ShellCheck configuration
+# https://github.com/koalaman/shellcheck/blob/master/shellcheckrc
+
+# Set the shell to bash for accurate checking
+shell=bash
+
+# Allow optional words like "local" in non-bash scripts
+disable=SC3043
+
+# Declare and assign separately to avoid masking return values
+# (e.g., export foo="$(bar)" should be foo="$(bar)"; export foo)
+disable=SC2155
+
+# Suggest using cd ... || exit (we handle errors differently)
+disable=SC2164
+
+# Useless echo — prefer running the command directly instead of echo $(cmd)
+disable=SC2005
+
+# Use POSIX sh dialect by default
+external-sources=true
+
+# Check sourced files
+check-sourced=true
+
+# Note: PowerShell scripts (*.ps1) are NOT linted by shellcheck — they have
+# a different grammar. CI's Windows job validates PS1 syntax via
+# `[System.Management.Automation.Language.Parser]::ParseFile` instead.
+# If you run `shellcheck scripts/install.ps1` locally, expect false
+# positives on `param(...)` — those are bash-grammar errors, not real bugs.

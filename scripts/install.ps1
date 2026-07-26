@@ -1,0 +1,297 @@
+# Install Mavis Team Mode skill into Zcode (Windows PowerShell)
+#
+# For Windows users who don't have Git Bash or WSL.
+# This is a fallback when bash isn't available.
+#
+# Usage:
+#   powershell -ExecutionPolicy Bypass -File install.ps1
+#   .\install.ps1 -Uninstall
+#   .\install.ps1 -Doctor
+
+param(
+    [switch]$Uninstall,
+    [switch]$Doctor,
+    [switch]$NoVerify,
+    [switch]$Help,
+    [string]$InstallDir = "$env:USERPROFILE\mavis-team-mode-skill",
+    [string]$SkillsDir = "$env:USERPROFILE\.zcode\skills",
+    [string]$RepoUrl = "https://github.com/Qqapple1/Mavis-team-mode-skill.git",
+    [string]$GitRef = ""
+)
+
+$VERSION = "1.4.0"
+$SKILL_NAME = "mavis-team-mode"
+$ZCODE_SKILLS_DIR = $SkillsDir
+$ZCODE_LINK = "$ZCODE_SKILLS_DIR\$SKILL_NAME"
+
+# Env var overrides (mirror bash install.sh's MAVIS_TEAM_* vars)
+# Priority: explicit param > env var > default
+if ($env:MAVIS_TEAM_REPO)   { $RepoUrl   = $env:MAVIS_TEAM_REPO }
+if ($env:MAVIS_TEAM_DIR)    { $InstallDir = $env:MAVIS_TEAM_DIR }
+if ($env:MAVIS_TEAM_REF)    { $GitRef    = $env:MAVIS_TEAM_REF }
+if ($env:MAVIS_TEAM_SKILLS_DIR) { $ZCODE_SKILLS_DIR = $env:MAVIS_TEAM_SKILLS_DIR; $ZCODE_LINK = "$ZCODE_SKILLS_DIR\$SKILL_NAME" }
+if ($env:MAVIS_TEAM_NO_COLOR) {
+    # Disable colors when env var set
+    function Log($msg)  { Write-Host "[i] $msg" }
+    function Ok($msg)   { Write-Host "[OK] $msg" }
+    function Warn($msg) { Write-Host "[!] $msg" }
+    function Err($msg)  { Write-Host "[X] $msg" }
+} else {
+    # Colors
+    function Log($msg) { Write-Host "[i] $msg" -ForegroundColor Cyan }
+    function Ok($msg)   { Write-Host "[OK] $msg" -ForegroundColor Green }
+    function Warn($msg) { Write-Host "[!] $msg" -ForegroundColor Yellow }
+    function Err($msg)  { Write-Host "[X] $msg" -ForegroundColor Red }
+}
+function Die($msg)  { Err $msg; exit 1 }
+
+function Show-Usage {
+    @"
+Mavis Team Mode installer v$VERSION (PowerShell)
+
+Usage:
+  powershell -ExecutionPolicy Bypass -File install.ps1         Install
+  powershell -ExecutionPolicy Bypass -File install.ps1 -Uninstall
+  powershell -ExecutionPolicy Bypass -File install.ps1 -Doctor
+
+Parameters:
+  -InstallDir <path>   Where to clone (default: `$env:USERPROFILE\mavis-team-mode-skill)
+  -SkillsDir <path>    Zcode skills directory (default: `$env:USERPROFILE\.zcode\skills)
+  -RepoUrl <url>       Git URL (default: GitHub Qqapple1 repo)
+  -GitRef <ref>        Branch/tag/SHA to checkout (default: latest)
+  -NoVerify            Skip post-install validation
+
+Environment variables (override defaults, mirror bash install.sh):
+  MAVIS_TEAM_REPO         Git URL (same as -RepoUrl)
+  MAVIS_TEAM_DIR          Where to clone (same as -InstallDir)
+  MAVIS_TEAM_REF          Git ref to checkout (branch/tag/SHA, same as -GitRef)
+  MAVIS_TEAM_SKILLS_DIR   Zcode skills directory (same as -SkillsDir)
+  MAVIS_TEAM_NO_COLOR     Disable color output (any non-empty value)
+
+  Note: MAVIS_TEAM_FORCE_COPY is bash-only (PowerShell installer is always
+  copy mode, no symlink on Windows PS).
+
+Notes:
+  - On Windows, this script uses COPY mode (no symlink support here)
+  - For real symlinks, use Git Bash or WSL
+  - Tested on PowerShell 5.1+ (default on Windows 10/11)
+"@
+}
+
+if ($Help) { Show-Usage; exit 0 }
+
+function Test-Git {
+    return (Get-Command git -ErrorAction SilentlyContinue) -ne $null
+}
+
+function Test-Python {
+    return (Get-Command python -ErrorAction SilentlyContinue) -ne $null
+}
+
+function Invoke-Install {
+    Log "Installing $SKILL_NAME (Windows PowerShell)..."
+    Write-Host
+
+    if (-not (Test-Git)) {
+        Die "git not found in PATH. Install from https://git-scm.com/download/win"
+    }
+    if (-not (Test-Python)) {
+        Warn "python not found in PATH — needed for the prototype server"
+        Warn "  Install from https://www.python.org/downloads/windows/"
+    }
+
+    # Install interruption handler: if the inner install throws (e.g. network
+    # failure, missing files, etc.) we print a helpful message and remove any
+    # partially-staged copy. Mirrors the bash install.sh trap.
+    # Note: PowerShell try/catch only handles terminating errors. For Ctrl+C,
+    # PowerShell terminates by default; user can re-run or use -Uninstall to
+    # clean up.
+    try {
+        Invoke-InstallInner
+    } catch {
+        Err "Install interrupted: $($_.Exception.Message)"
+        Err "$InstallDir or $ZCODE_LINK may be in a partial state."
+        Err "Re-run with the same arguments to resume, or 'install.ps1 -Uninstall' to clean up."
+        # Best-effort cleanup of the link (not the clone, in case the user wants to debug)
+        if (Test-Path $ZCODE_LINK) {
+            try {
+                Remove-Item -Recurse -Force $ZCODE_LINK
+                Warn "Removed partial install at $ZCODE_LINK"
+            } catch {
+                Warn "Could not remove partial install: $($_.Exception.Message)"
+            }
+        }
+        exit 130
+    }
+}
+
+function Invoke-InstallInner {
+    # 1. Create Zcode skills dir
+    if (-not (Test-Path $ZCODE_SKILLS_DIR)) {
+        Log "Creating $ZCODE_SKILLS_DIR..."
+        New-Item -ItemType Directory -Path $ZCODE_SKILLS_DIR -Force | Out-Null
+        Ok "Created"
+    } else {
+        Ok "Zcode skills dir exists"
+    }
+
+    # 2. Clone or update
+    if (Test-Path "$InstallDir\.git") {
+        Log "Existing clone found, pulling latest..."
+        Push-Location $InstallDir
+        try {
+            git pull --rebase --autostash 2>&1 | Select-Object -Last 5
+        } catch {
+            Warn "git pull had issues; continuing with current state"
+        }
+        # If a specific ref was requested, check it out
+        if ($GitRef) {
+            Log "Checking out ref: $GitRef"
+            try {
+                git fetch --depth 1 origin $GitRef 2>&1 | Select-Object -Last 3
+                if ($LASTEXITCODE -ne 0) { throw "fetch failed" }
+                git checkout $GitRef 2>&1 | Select-Object -Last 3
+                if ($LASTEXITCODE -ne 0) { throw "checkout failed" }
+            } catch {
+                Warn "Failed to checkout $GitRef (continuing on current ref)"
+            }
+        }
+        Pop-Location
+        Ok "Updated"
+    } else {
+        if (Test-Path $InstallDir) {
+            Err "$InstallDir exists but is not a git repo. Remove it and re-run."
+            throw "Repository state error"
+        }
+        Log "Cloning $RepoUrl..."
+        if ($GitRef) {
+            git clone --depth 1 --branch $GitRef $RepoUrl $InstallDir 2>&1 | Select-Object -Last 5
+        } else {
+            git clone --depth 1 $RepoUrl $InstallDir 2>&1 | Select-Object -Last 5
+        }
+        if ($LASTEXITCODE -ne 0) {
+            Err "git clone failed. Check URL and network."
+            throw "git clone failed"
+        }
+        Ok "Cloned to $InstallDir"
+    }
+
+    # 3. Verify required files
+    $missing = 0
+    foreach ($f in @("SKILL.md", "agents\leader.md", "agents\verifier.md", "agents\worker-coder.md", "agents\worker-fixer.md", "README.md")) {
+        if (-not (Test-Path "$InstallDir\$f")) {
+            Err "Missing required file: $f"
+            $missing = 1
+        }
+    }
+    if ($missing) {
+        Err "Repository is missing required files."
+        throw "Repository is missing required files"
+    }
+    Ok "All required files present"
+
+    # 4. Copy to Zcode skills dir (no symlink on Windows PS)
+    if (Test-Path $ZCODE_LINK) {
+        Warn "Existing install found at $ZCODE_LINK, removing..."
+        Remove-Item -Recurse -Force $ZCODE_LINK
+    }
+    Log "Copying to $ZCODE_LINK (Windows: copy mode, no symlink)..."
+    Copy-Item -Recurse -Path $InstallDir -Destination $ZCODE_LINK -Force
+    Ok "Copied"
+
+    # 5. Post-install verify
+    if (-not $NoVerify) {
+        Write-Host
+        Log "Running post-install verification..."
+        $validateScript = "$InstallDir\scripts\validate.ps1"
+        if (Test-Path $validateScript) {
+            & powershell -ExecutionPolicy Bypass -File $validateScript
+        } else {
+            Warn "validate.ps1 not found, skipping"
+        }
+    }
+
+    Write-Host
+    Ok "Installation complete!"
+    Write-Host @"
+
+Next steps:
+  1. Restart Zcode (fully quit, not minimize)
+  2. Open a new conversation in Zcode
+  3. Just talk naturally: '用 mavis team mode 帮我...'
+     or 'team mode', '拆成子任务', etc.
+  4. See examples/ for worked examples
+
+Install: $InstallDir
+Copy:    $ZCODE_LINK
+
+To uninstall later:
+  powershell -ExecutionPolicy Bypass -File install.ps1 -Uninstall
+"@
+}
+
+function Invoke-Uninstall {
+    Log "Uninstalling $SKILL_NAME..."
+    Write-Host
+    if (Test-Path $ZCODE_LINK) {
+        Remove-Item -Recurse -Force $ZCODE_LINK
+        Ok "Removed $ZCODE_LINK"
+    } else {
+        Warn "No install at $ZCODE_LINK"
+    }
+    if (Test-Path $InstallDir) {
+        Warn "$InstallDir still exists (your code, kept by default)"
+        Warn "Remove manually if desired: Remove-Item -Recurse -Force '$InstallDir'"
+    }
+    Ok "Uninstall complete."
+}
+
+function Invoke-Doctor {
+    Log "Doctor: checking current install state (Windows PowerShell)..."
+    Write-Host
+    $issues = 0
+    if (Test-Path $ZCODE_SKILLS_DIR) {
+        Ok "Zcode skills dir exists: $ZCODE_SKILLS_DIR"
+    } else {
+        Warn "Zcode skills dir does not exist: $ZCODE_SKILLS_DIR"
+    }
+    if (Test-Path $ZCODE_LINK) {
+        if (Test-Path "$ZCODE_LINK\SKILL.md") {
+            Ok "Install at $ZCODE_LINK contains SKILL.md"
+        } else {
+            Err "Install at $ZCODE_LINK but no SKILL.md"
+            $issues++
+        }
+    } else {
+        Warn "No install at $ZCODE_LINK"
+    }
+    if (Test-Path "$InstallDir\.git") {
+        Ok "Clone exists: $InstallDir"
+    } else {
+        Warn "No clone at $InstallDir"
+    }
+    foreach ($f in @("SKILL.md", "agents\leader.md", "agents\verifier.md", "agents\worker-coder.md", "agents\worker-fixer.md", "README.md")) {
+        if (Test-Path "$InstallDir\$f") {
+            Ok "$f present"
+        } else {
+            Err "$f MISSING"
+            $issues++
+        }
+    }
+    Write-Host
+    if ($issues -eq 0) {
+        Ok "Doctor: no issues found"
+        exit 0
+    } else {
+        Err "Doctor: $issues issue(s) found"
+        exit 1
+    }
+}
+
+if ($Doctor) {
+    Invoke-Doctor
+} elseif ($Uninstall) {
+    Invoke-Uninstall
+} else {
+    Invoke-Install
+}

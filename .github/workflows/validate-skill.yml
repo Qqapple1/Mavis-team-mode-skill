@@ -1,0 +1,452 @@
+name: Validate Skill
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+
+# Minimal permissions: read-only by default; jobs can opt in if needed
+permissions:
+  contents: read
+
+# Cancel in-progress runs for the same branch
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ============ Static checks (fast, all OS in matrix) ============
+  lint:
+    name: Lint (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install shellcheck (Ubuntu)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y shellcheck
+
+      - name: Install shellcheck (macOS)
+        if: runner.os == 'macOS'
+        run: brew install shellcheck
+
+      - name: shellcheck install.sh
+        if: runner.os != 'Windows'
+        run: shellcheck scripts/install.sh
+
+      - name: shellcheck validate.sh
+        if: runner.os != 'Windows'
+        run: shellcheck scripts/validate.sh
+
+      - name: shellcheck package.sh
+        if: runner.os != 'Windows'
+        run: shellcheck scripts/package.sh
+
+      - name: bash syntax check
+        shell: bash
+        run: |
+          set -e
+          for f in $(find . -name "*.sh" -not -path "./.git/*"); do
+            echo "Checking $f..."
+            bash -n "$f"
+          done
+
+  # ============ Python multi-version ============
+  python-lint:
+    name: Python ${{ matrix.python-version }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.9', '3.10', '3.11', '3.12', '3.13']
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: python syntax check
+        shell: bash
+        run: |
+          set -e
+          for f in $(find . -name "*.py" -not -path "./.git/*"); do
+            echo "Checking $f on Python ${{ matrix.python-version }}..."
+            python -m py_compile "$f"
+          done
+
+      - name: YAML validation
+        run: python scripts/validate_yaml.py
+
+  # ============ Windows compatibility test ============
+  windows-install:
+    name: Windows install (PowerShell)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Test PowerShell install script syntax
+        shell: pwsh
+        run: |
+          $tokens = $null
+          $errors = $null
+          [System.Management.Automation.Language.Parser]::ParseFile(
+            '${{ github.workspace }}/scripts/install.ps1',
+            [ref]$tokens,
+            [ref]$errors
+          ) | Out-Null
+          if ($errors.Count -gt 0) {
+            Write-Host 'PowerShell syntax errors:'
+            $errors | ForEach-Object { Write-Host $_ }
+            exit 1
+          }
+          Write-Host 'install.ps1 syntax OK'
+
+      - name: Test PowerShell validate script syntax
+        shell: pwsh
+        run: |
+          $tokens = $null
+          $errors = $null
+          [System.Management.Automation.Language.Parser]::ParseFile(
+            '${{ github.workspace }}/scripts/validate.ps1',
+            [ref]$tokens,
+            [ref]$errors
+          ) | Out-Null
+          if ($errors.Count -gt 0) {
+            Write-Host 'PowerShell syntax errors:'
+            $errors | ForEach-Object { Write-Host $_ }
+            exit 1
+          }
+          Write-Host 'validate.ps1 syntax OK'
+
+      - name: Test PowerShell run_e2e script syntax
+        shell: pwsh
+        run: |
+          $tokens = $null
+          $errors = $null
+          [System.Management.Automation.Language.Parser]::ParseFile(
+            '${{ github.workspace }}/examples/prototype-todo-app/run_e2e.ps1',
+            [ref]$tokens,
+            [ref]$errors
+          ) | Out-Null
+          if ($errors.Count -gt 0) {
+            Write-Host 'PowerShell syntax errors:'
+            $errors | ForEach-Object { Write-Host $_ }
+            exit 1
+          }
+          Write-Host 'run_e2e.ps1 syntax OK'
+
+      - name: Run install.ps1 (copy mode)
+        shell: pwsh
+        run: |
+          $env:MAVIS_TEAM_REPO = '${{ github.workspace }}'
+          $env:MAVIS_TEAM_DIR = "$env:USERPROFILE\mavis-team-mode-skill-test"
+          & ./scripts/install.ps1 -NoVerify
+
+      - name: Verify install (PowerShell)
+        shell: pwsh
+        run: |
+          # Same env vars as install step so doctor inspects the right location
+          $env:MAVIS_TEAM_DIR = "$env:USERPROFILE\mavis-team-mode-skill-test"
+          & ./scripts/install.ps1 -Doctor
+
+      - name: Run install (--copy explicit)
+        shell: pwsh
+        run: |
+          # Force copy mode
+          $env:MAVIS_TEAM_FORCE_COPY = '1'
+          & ./scripts/install.ps1 -NoVerify
+
+      - name: Test server starts on Windows
+        shell: pwsh
+        run: |
+          # Use 'py' (Windows Python launcher) which is more reliable than 'python'
+          # in fresh CI environments. Fall back to 'python' if not found.
+          $pythonCmd = Get-Command py -ErrorAction SilentlyContinue
+          if (-not $pythonCmd) {
+            $pythonCmd = Get-Command python -ErrorAction SilentlyContinue
+          }
+          if (-not $pythonCmd) {
+            Write-Host 'ERROR: no python on PATH'
+            exit 1
+          }
+          $server = Start-Process $pythonCmd.Name -ArgumentList 'examples/prototype-todo-app/server/server.py' -PassThru -NoNewWindow -RedirectStandardOutput 'server.log' -RedirectStandardError 'server.err.log'
+          Write-Host "Server PID: $($server.Id)"
+          # Wait up to 15s for server to come up (Windows can be slow)
+          $ready = $false
+          for ($i = 0; $i -lt 15; $i++) {
+            Start-Sleep -Seconds 1
+            try {
+              $r = Invoke-WebRequest -Uri 'http://127.0.0.1:8765/api/health' -UseBasicParsing -TimeoutSec 2
+              if ($r.StatusCode -eq 200) {
+                $ready = $true
+                break
+              }
+            } catch {
+              # still starting
+            }
+          }
+          if (-not $ready) {
+            Write-Host 'Server did not respond within 15s'
+            Write-Host '--- server.log ---'
+            if (Test-Path server.log) { Get-Content server.log }
+            Write-Host '--- server.err.log ---'
+            if (Test-Path server.err.log) { Get-Content server.err.log }
+            Stop-Process -Id $server.Id -Force -ErrorAction SilentlyContinue
+            exit 1
+          }
+          Write-Host 'Server is healthy'
+          Stop-Process -Id $server.Id -Force -ErrorAction SilentlyContinue
+
+      - name: Run e2e tests on Windows
+        shell: pwsh
+        run: |
+          # Use 'py' Windows launcher if available, else python
+          $pythonCmd = Get-Command py -ErrorAction SilentlyContinue
+          if (-not $pythonCmd) {
+            $pythonCmd = Get-Command python -ErrorAction SilentlyContinue
+          }
+          if (-not $pythonCmd) {
+            Write-Host 'ERROR: no python on PATH'
+            exit 1
+          }
+          $server = Start-Process $pythonCmd.Name -ArgumentList 'examples/prototype-todo-app/server/server.py' -PassThru -NoNewWindow -RedirectStandardOutput 'server.log' -RedirectStandardError 'server.err.log'
+          # Wait for server to be ready
+          $ready = $false
+          for ($i = 0; $i -lt 15; $i++) {
+            Start-Sleep -Seconds 1
+            try {
+              $r = Invoke-WebRequest -Uri 'http://127.0.0.1:8765/api/health' -UseBasicParsing -TimeoutSec 2
+              if ($r.StatusCode -eq 200) { $ready = $true; break }
+            } catch { }
+          }
+          if (-not $ready) {
+            Write-Host 'Server did not respond within 15s'
+            if (Test-Path server.log) { Get-Content server.log }
+            if (Test-Path server.err.log) { Get-Content server.err.log }
+            Stop-Process -Id $server.Id -Force -ErrorAction SilentlyContinue
+            exit 1
+          }
+          $failed = $false
+          try {
+            $totalPass = 0
+            $totalFail = 0
+            foreach ($testFile in @('test_e2e.py', 'test_e2e_extended.py', 'test_e2e_advanced.py')) {
+              Write-Host "Running $testFile..."
+              $output = & $pythonCmd.Name "examples/prototype-todo-app/$testFile" 2>&1
+              $output | ForEach-Object { Write-Host $_ }
+              $lastLines = $output | Select-Object -Last 5
+              foreach ($line in $lastLines) {
+                if ($line -match 'Passed:\s*(\d+)') { $totalPass += [int]$matches[1] }
+                if ($line -match 'Failed:\s*(\d+)') { $totalFail += [int]$matches[1] }
+              }
+            }
+            Write-Host "Total: Passed=$totalPass Failed=$totalFail"
+            if ($totalFail -gt 0) { $failed = $true }
+          } finally {
+            Stop-Process -Id $server.Id -Force -ErrorAction SilentlyContinue
+          }
+          if ($failed) { exit 1 }
+
+      - name: Test uninstall
+        shell: pwsh
+        run: |
+          # Same env vars as install step so uninstall removes the right clone
+          $env:MAVIS_TEAM_DIR = "$env:USERPROFILE\mavis-team-mode-skill-test"
+          & ./scripts/install.ps1 -Uninstall
+
+  # ============ Full integration test (Linux only — most thorough) ============
+  integration:
+    name: Integration test (Linux)
+    runs-on: ubuntu-latest
+    needs: [lint, python-lint]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install shellcheck
+        run: sudo apt-get update -qq && sudo apt-get install -y shellcheck
+
+      - name: shellcheck (full)
+        run: |
+          shellcheck scripts/install.sh
+          shellcheck scripts/validate.sh
+          shellcheck scripts/package.sh
+
+      - name: bash syntax
+        run: |
+          for f in $(find . -name "*.sh" -not -path "./.git/*"); do
+            bash -n "$f"
+          done
+
+      - name: python syntax
+        shell: bash
+        run: |
+          for f in $(find . -name "*.py" -not -path "./.git/*"); do
+            python -m py_compile "$f"
+          done
+
+      - name: YAML frontmatter
+        run: python scripts/validate_yaml.py
+
+      - name: Install (first time)
+        run: MAVIS_TEAM_REPO="file://$GITHUB_WORKSPACE" bash scripts/install.sh --no-verify
+
+      - name: Validate after install
+        run: bash scripts/validate.sh
+
+      - name: Start prototype server
+        run: |
+          cd examples/prototype-todo-app
+          nohup python server/server.py > /tmp/server.log 2>&1 &
+          sleep 2
+          # Verify it started
+          curl -fsS http://127.0.0.1:8765/api/health || { cat /tmp/server.log; exit 1; }
+
+      - name: Run base e2e tests
+        run: python examples/prototype-todo-app/test_e2e.py
+
+      - name: Run extended e2e tests
+        run: python examples/prototype-todo-app/test_e2e_extended.py
+
+      - name: Run advanced e2e tests
+        run: python examples/prototype-todo-app/test_e2e_advanced.py
+
+      - name: Token benchmark
+        run: |
+          python scripts/benchmark_tokens.py
+          python scripts/benchmark_tokens.py --json > token-benchmark.json
+
+      - name: Stop prototype server
+        if: always()
+        run: pkill -f "python server/server.py" || true
+
+      - name: Idempotency re-install
+        run: MAVIS_TEAM_REPO="file://$GITHUB_WORKSPACE" bash scripts/install.sh --no-verify
+
+      - name: Idempotency re-validate
+        run: bash scripts/validate.sh
+
+      - name: Idempotency 3rd install
+        run: MAVIS_TEAM_REPO="file://$GITHUB_WORKSPACE" bash scripts/install.sh --no-verify
+
+      - name: Idempotency 3rd validate
+        run: bash scripts/validate.sh
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "::notice::Full integration test complete"
+
+  # ============ Stats / coverage report ============
+  stats:
+    name: Stats
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: File count
+        run: |
+          echo "### File counts" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          for ext in md py sh html yml yaml; do
+            count=$(find . -name "*.$ext" -not -path "./.git/*" | wc -l)
+            if [ "$count" -gt 0 ]; then
+              echo "- .$ext: $count" >> $GITHUB_STEP_SUMMARY
+            fi
+          done
+          total=$(find . -type f -not -path "./.git/*" | wc -l)
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Total**: $total files" >> $GITHUB_STEP_SUMMARY
+          cat $GITHUB_STEP_SUMMARY
+
+  # ============ Build platform-specific release archives ============
+  package:
+    name: Build release archives
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install zip
+        run: sudo apt-get update -qq && sudo apt-get install -y zip
+
+      - name: Build archives
+        run: bash scripts/package.sh
+
+      - name: Verify archive contents
+        run: |
+          echo "### Archive contents" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          for f in dist/*.zip dist/*.tar.gz; do
+            if [ -f "$f" ]; then
+              size=$(du -h "$f" | awk '{print $1}')
+              count=$(tar -tzf "$f" 2>/dev/null | wc -l || unzip -l "$f" 2>/dev/null | tail -1 | awk '{print $2}')
+              echo "- \`$(basename $f)\`: $count entries, $size" >> $GITHUB_STEP_SUMMARY
+            fi
+          done
+          cat $GITHUB_STEP_SUMMARY
+
+      - name: Test bash archive
+        run: |
+          tar -xzf dist/mavis-team-mode-skill-*-bash.tar.gz -C /tmp
+          ls /tmp/mavis-team-mode-skill-*/
+          /tmp/mavis-team-mode-skill-*/scripts/install.sh --version
+
+      - name: Test core archive
+        run: |
+          mkdir -p /tmp/core-test
+          unzip -q dist/mavis-team-mode-skill-*-core.zip -d /tmp/core-test
+          # Verify no install scripts leaked into core
+          if [ -f /tmp/core-test/mavis-team-mode-skill-*/scripts/install.sh ]; then
+            echo "ERROR: install.sh should not be in core archive"
+            exit 1
+          fi
+          if [ -f /tmp/core-test/mavis-team-mode-skill-*/scripts/install.ps1 ]; then
+            echo "ERROR: install.ps1 should not be in core archive"
+            exit 1
+          fi
+          # Verify SKILL.md + agents are there
+          test -f /tmp/core-test/mavis-team-mode-skill-*/SKILL.md || { echo "SKILL.md missing"; exit 1; }
+          test -d /tmp/core-test/mavis-team-mode-skill-*/agents || { echo "agents/ missing"; exit 1; }
+          echo "core archive: clean (no installers) ✓"
+
+      - name: Verify SHA256SUMS
+        run: |
+          cd dist
+          for f in *.zip *.tar.gz; do
+            [ -f "$f" ] || continue
+            expected=$(grep "$f" SHA256SUMS | awk '{print $1}')
+            actual=$(sha256sum "$f" | awk '{print $1}')
+            if [ "$expected" != "$actual" ]; then
+              echo "FAIL: $f checksum mismatch"
+              echo "  expected: $expected"
+              echo "  actual:   $actual"
+              exit 1
+            fi
+            echo "  ✓ $f"
+          done
+          echo "All SHA256 checksums match"
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-archives
+          path: dist/
+          retention-days: 14

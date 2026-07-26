@@ -1,0 +1,42 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Test artifacts
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+node_modules/
+coverage/
+.coverage
+htmlcov/
+
+# Secrets — never commit these
+.env
+.env.local
+*.pem
+*.key
+
+# Local install tracking
+.installed
+
+# Build artifacts
+dist/
+.package-stage/
+token-benchmark.json
+*.zip
+*.tar.gz
+
+# Prototype server logs
+server.log
+server.err.log
+
+# Audit temporary files
+audit/
