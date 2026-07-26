@@ -27,7 +27,7 @@
 set -euo pipefail
 
 # ---- Version ----
-INSTALLER_VERSION="1.3.19"
+INSTALLER_VERSION="1.4.0"
 
 # ---- Platform detection ----
 detect_platform() {

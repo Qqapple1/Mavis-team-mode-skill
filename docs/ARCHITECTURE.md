@@ -125,7 +125,7 @@ flowchart TB
 
 ## File-level architecture
 
-> Line counts and test counts as of 2026-07-26 (v1.3.19). Run `make info`
+> Line counts and test counts as of 2026-07-26 (v1.4.0). Run `make info`
 > or `wc -l` for current numbers — these can drift.
 
 ```

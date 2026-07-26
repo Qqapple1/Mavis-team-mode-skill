@@ -5,6 +5,30 @@ All notable changes to this skill are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.4.0] - 2026-07-26
+
+Milestone release after 15 rounds of real-world Zcode testing.
+103 fixes shipped across rounds 1-15, covering:
+
+- P0-P3: allowed-tools, Explore vs general-purpose, CONTRACT mechanism,
+  Windows support, Verifier bias mitigation
+- Chinese/UTF-8 round-trip (ensure_ascii=False), ANSI output compatibility
+- install.ps1: -SkillsDir parameter, validate parity, git-pull recovery
+- leader.md: Phase 1.5 (CONTRACT), language detection fix
+- index.html: token numbers, agent count, badges, dates
+- deepseek-setup: retired model names → v4-flash/v4-pro
+- CI: Python 3.8 EOL → 3.13, redundant Node removal, PowerShell exit fix
+- prototype-todo-app: JS event binding bug fix, line counts
+- .gitignore: *.zip, *.tar.gz, server.log, audit/
+- Cross-document consistency: 24 format + 16 YAML checks verified
+
+### Verified
+- validate.ps1: 25/25
+- validate.sh: 24/24
+- validate_yaml.py: 16/16
+- e2e tests: 48/48
+- benchmark_tokens.py: ~7,430 progressive / ~72,826 eager
+
 ## [1.3.19] - 2026-07-25
 
 A long deep-audit pass (not tied to one user feedback round) surfaced
@@ -1076,3 +1100,4 @@ changes that didn't actually land). This release fixes them all.
 [1.1.0]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/Qqapple1/Mavis-team-mode-skill/releases/tag/v1.0.0
 [1.3.8]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.7...v1.3.8
+[1.4.0]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.19...v1.4.0

@@ -2,11 +2,11 @@
 
 把 MiniMax **Mavis Team Mode**（Leader + Workers + Verifier）的能力搬到 Zcode 3.4.2+。
 
-> **Pick your platform → [Download v1.3.19](https://github.com/Qqapple1/Mavis-team-mode-skill/releases/tag/v1.3.19)**:
-> - macOS / Linux / Git Bash / WSL → `mavis-team-mode-skill-1.3.19-bash.tar.gz`
-> - Windows PowerShell → `mavis-team-mode-skill-1.3.19-windows.zip`
-> - Just want to read it → `mavis-team-mode-skill-1.3.19-core.zip`
-> - Contributor / CI → `mavis-team-mode-skill-1.3.19-source.tar.gz`
+> **Pick your platform → [Download v1.4.0](https://github.com/Qqapple1/Mavis-team-mode-skill/releases/tag/v1.4.0)**:
+> - macOS / Linux / Git Bash / WSL → `mavis-team-mode-skill-1.4.0-bash.tar.gz`
+> - Windows PowerShell → `mavis-team-mode-skill-1.4.0-windows.zip`
+> - Just want to read it → `mavis-team-mode-skill-1.4.0-core.zip`
+> - Contributor / CI → `mavis-team-mode-skill-1.4.0-source.tar.gz`
 > - [Which archive should I download? →](docs/PLATFORMS.md)
 
 > 基于 Zcode 3.4.2+ 的子智能体系统 + Agent Skills 标准实现，
@@ -16,7 +16,7 @@
 [![Skill tests](https://img.shields.io/badge/validate-24%2F24%20passing-brightgreen)](VALIDATION.md)
 [![Prototype tests](https://img.shields.io/badge/prototype%20e2e-48%2F48%20passing-brightgreen)](examples/prototype-todo-app/)
 [![YAML](https://img.shields.io/badge/yaml-16%2F16%20passing-brightgreen)](scripts/validate_yaml.py)
-[![Version](https://img.shields.io/badge/version-1.3.19-blue)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-1.4.0-blue)](CHANGELOG.md)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 [![Zcode 3.x](https://img.shields.io/badge/zcode-3.x-purple)](https://zcode-ai.com)
 [![Security](https://img.shields.io/badge/security-policy-green)](SECURITY.md)
@@ -34,7 +34,7 @@
 - **Zcode**: 3.4.2+（per [zcode-ai.com](https://zcode-ai.com) download page, 2026-07-26）
 - **Windows 用户**: 见 [docs/WINDOWS.md](docs/WINDOWS.md) — 推荐 WSL2
 
-> **真 Zcode runtime 实测**: 社区用户已在真实 Zcode 对话中测试 5+ 次（frename / mnote / cquote / hitokoto CLI 工具 + 基础设施审计），P0-P3 修复已随 v1.3.14-v1.3.19 发布。详见 CHANGELOG。
+> **真 Zcode runtime 实测**: 社区用户已在真实 Zcode 对话中测试 5+ 次（frename / mnote / cquote / hitokoto CLI 工具 + 基础设施审计），P0-P3 修复已随 v1.3.14-v1.4.0 发布。详见 CHANGELOG。
 
 ### 网络访问注意
 
@@ -183,7 +183,7 @@ mavis-team-mode/
 │   ├── worker-researcher.md         #   Worker: 调研
 │   ├── worker-doc-writer.md         #   Worker: 文档
 │   ├── worker-reviewer.md           #   Worker: code review
-│   └── worker-fixer.md              #   Worker: 精准修复 (v1.3.19+)
+│   └── worker-fixer.md              #   Worker: 精准修复 (v1.4.0+)
 ├── examples/                        # 4 个案例 + 1 个真实 prototype
 │   ├── refactor-large-module.md
 │   ├── bug-hunt.md
@@ -274,7 +274,7 @@ Prototype server 默认：
 
 **Token 成本（实测估算）**：
 
-> 下面数字是 `python3 scripts/benchmark_tokens.py` 在 v1.3.19 实跑出来的（1 token ≈ 4 字符，启发式估算，非 BPE 精确数）。重新跑会随文件大小变化。
+> 下面数字是 `python3 scripts/benchmark_tokens.py` 在 v1.4.0 实跑出来的（1 token ≈ 4 字符，启发式估算，非 BPE 精确数）。重新跑会随文件大小变化。
 
 | 加载模式 | Tokens | vs inline baseline |
 |---|---|---|
