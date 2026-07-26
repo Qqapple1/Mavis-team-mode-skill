@@ -56,15 +56,17 @@ Usage:
 
 Parameters:
   -InstallDir <path>   Where to clone (default: `$env:USERPROFILE\mavis-team-mode-skill)
+  -SkillsDir <path>    Zcode skills directory (default: `$env:USERPROFILE\.zcode\skills)
   -RepoUrl <url>       Git URL (default: GitHub Qqapple1 repo)
   -GitRef <ref>        Branch/tag/SHA to checkout (default: latest)
   -NoVerify            Skip post-install validation
 
 Environment variables (override defaults, mirror bash install.sh):
-  MAVIS_TEAM_REPO      Git URL (same as -RepoUrl)
-  MAVIS_TEAM_DIR       Where to clone (same as -InstallDir)
-  MAVIS_TEAM_REF       Git ref to checkout (branch/tag/SHA, same as -GitRef)
-  MAVIS_TEAM_NO_COLOR  Disable color output (any non-empty value)
+  MAVIS_TEAM_REPO         Git URL (same as -RepoUrl)
+  MAVIS_TEAM_DIR          Where to clone (same as -InstallDir)
+  MAVIS_TEAM_REF          Git ref to checkout (branch/tag/SHA, same as -GitRef)
+  MAVIS_TEAM_SKILLS_DIR   Zcode skills directory (same as -SkillsDir)
+  MAVIS_TEAM_NO_COLOR     Disable color output (any non-empty value)
 
   Note: MAVIS_TEAM_FORCE_COPY is bash-only (PowerShell installer is always
   copy mode, no symlink on Windows PS).

@@ -66,7 +66,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12']
+        python-version: ['3.9', '3.10', '3.11', '3.12', '3.13']
     steps:
       - uses: actions/checkout@v4
 
@@ -241,6 +241,7 @@ jobs:
             Stop-Process -Id $server.Id -Force -ErrorAction SilentlyContinue
             exit 1
           }
+          $failed = $false
           try {
             $totalPass = 0
             $totalFail = 0
@@ -255,10 +256,11 @@ jobs:
               }
             }
             Write-Host "Total: Passed=$totalPass Failed=$totalFail"
-            if ($totalFail -gt 0) { exit 1 }
+            if ($totalFail -gt 0) { $failed = $true }
           } finally {
             Stop-Process -Id $server.Id -Force -ErrorAction SilentlyContinue
           }
+          if ($failed) { exit 1 }
 
       - name: Test uninstall
         shell: pwsh
@@ -280,11 +282,6 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
       - name: Install shellcheck
         run: sudo apt-get update -qq && sudo apt-get install -y shellcheck
 
@@ -304,11 +301,11 @@ jobs:
         shell: bash
         run: |
           for f in $(find . -name "*.py" -not -path "./.git/*"); do
-            python3 -m py_compile "$f"
+            python -m py_compile "$f"
           done
 
       - name: YAML frontmatter
-        run: python3 scripts/validate_yaml.py
+        run: python scripts/validate_yaml.py
 
       - name: Install (first time)
         run: MAVIS_TEAM_REPO="file://$GITHUB_WORKSPACE" bash scripts/install.sh --no-verify
@@ -319,28 +316,28 @@ jobs:
       - name: Start prototype server
         run: |
           cd examples/prototype-todo-app
-          nohup python3 server/server.py > /tmp/server.log 2>&1 &
+          nohup python server/server.py > /tmp/server.log 2>&1 &
           sleep 2
           # Verify it started
           curl -fsS http://127.0.0.1:8765/api/health || { cat /tmp/server.log; exit 1; }
 
       - name: Run base e2e tests
-        run: python3 examples/prototype-todo-app/test_e2e.py
+        run: python examples/prototype-todo-app/test_e2e.py
 
       - name: Run extended e2e tests
-        run: python3 examples/prototype-todo-app/test_e2e_extended.py
+        run: python examples/prototype-todo-app/test_e2e_extended.py
 
       - name: Run advanced e2e tests
-        run: python3 examples/prototype-todo-app/test_e2e_advanced.py
+        run: python examples/prototype-todo-app/test_e2e_advanced.py
 
       - name: Token benchmark
         run: |
-          python3 scripts/benchmark_tokens.py
-          python3 scripts/benchmark_tokens.py --json > token-benchmark.json
+          python scripts/benchmark_tokens.py
+          python scripts/benchmark_tokens.py --json > token-benchmark.json
 
       - name: Stop prototype server
         if: always()
-        run: pkill -f "python3 server/server.py" || true
+        run: pkill -f "python server/server.py" || true
 
       - name: Idempotency re-install
         run: MAVIS_TEAM_REPO="file://$GITHUB_WORKSPACE" bash scripts/install.sh --no-verify

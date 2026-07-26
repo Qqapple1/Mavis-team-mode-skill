@@ -200,7 +200,7 @@ function renderTags(tags) {
   tagsEl.innerHTML = tags
     .map(t => `<div class="tag" data-tag="${escapeHtml(t)}">#${escapeHtml(t)}</div>`)
     .join("");
-  document.querySelectorAll(".tag").forEach(el => {
+  document.querySelectorAll("#tags .tag").forEach(el => {
     el.addEventListener("click", () => {
       activeTag = el.dataset.tag;
       document.querySelectorAll(".tag").forEach(t => t.classList.remove("active"));
@@ -280,6 +280,14 @@ function validateTag() {
 
 newTitle.addEventListener("input", validateTitle);
 newTag.addEventListener("input", validateTag);
+
+// One-time binding for the static "All" tag (not re-created by renderTags, avoid duplicate listeners)
+document.querySelector(".tag.all").addEventListener("click", () => {
+  activeTag = "";
+  document.querySelectorAll(".tag").forEach(t => t.classList.remove("active"));
+  document.querySelector(".tag.all").classList.add("active");
+  renderTodos();
+});
 
 addForm.addEventListener("submit", async (e) => {
   e.preventDefault();

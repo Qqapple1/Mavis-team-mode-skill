@@ -47,7 +47,11 @@
 - [ ] 新增/修改的 skill 自己跑过一遍
 - [ ] 改了 SKILL.md 就对应改 README
 - [ ] 改了 agents 就对应改 examples 里引用它的地方
+- [ ] 添加/删除 agent 时更新 `scripts/validate.ps1` 的 agent 列表
+- [ ] 添加/删除 agent 时更新 `SKILL.md` 的 Required companion files 和 Sub-agent prompt templates
 - [ ] 改了行数 / 文件数声明的话，跑 `make package` 重新生成
+- [ ] 改行数/文件数声明时跑 `scripts/benchmark_tokens.py` 更新 token 基准数据
+- [ ] 改 `scripts/install.ps1` 参数时同步更新 `docs/WINDOWS.md` 文档
 - [ ] 没有改 LICENSE
 
 ## 提 Issue

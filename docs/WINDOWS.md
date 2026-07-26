@@ -106,6 +106,7 @@ PowerShell 版**功能等价**（clone + copy + 验证 + 卸载），只是永�
 - `-Help` 显示帮助
 - `-NoVerify` 跳过验证
 - `-InstallDir <path>` 自定义安装路径
+- `-SkillsDir <path>` 自定义 Zcode skills 目录
 - `-RepoUrl <url>` 自定义 Git 源
 - `-GitRef <ref>` 指定 branch/tag/commit 检出
 
