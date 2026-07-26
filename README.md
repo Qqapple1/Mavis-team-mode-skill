@@ -13,9 +13,9 @@
 > 完整复刻 MiniMax 官方 Mavis 2026-05 公告的 TeamEngine 工作流。
 
 [![CI](https://github.com/Qqapple1/Mavis-team-mode-skill/actions/workflows/validate-skill.yml/badge.svg)](https://github.com/Qqapple1/Mavis-team-mode-skill/actions)
-[![Skill tests](https://img.shields.io/badge/validate-23%2F23%20passing-brightgreen)](VALIDATION.md)
+[![Skill tests](https://img.shields.io/badge/validate-24%2F24%20passing-brightgreen)](VALIDATION.md)
 [![Prototype tests](https://img.shields.io/badge/prototype%20e2e-48%2F48%20passing-brightgreen)](examples/prototype-todo-app/)
-[![YAML](https://img.shields.io/badge/yaml-15%2F15%20passing-brightgreen)](scripts/validate_yaml.py)
+[![YAML](https://img.shields.io/badge/yaml-16%2F16%20passing-brightgreen)](scripts/validate_yaml.py)
 [![Version](https://img.shields.io/badge/version-1.3.19-blue)](CHANGELOG.md)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 [![Zcode 3.x](https://img.shields.io/badge/zcode-3.x-purple)](https://zcode-ai.com)
@@ -24,10 +24,9 @@
 ## Requirements
 
 - **Platform**: macOS / Linux / Windows（基于 [Zcode 官方下载页](https://zcode-ai.com) 列出的 Windows x64 / ARM64 / macOS / Linux x64 / Linux ARM64）
-  - **install.sh 是 bash 脚本**：Windows 上需要 Git Bash 或 WSL
-  - **PowerShell / CMD 原生跑不了**（需要 bash 环境）
+  - **install.sh 是 bash 脚本**：Linux / macOS / Git Bash / WSL 上用
+  - **install.ps1 是 PowerShell 脚本**：Windows PowerShell 原生可用（无需 Git Bash）
   - **prototype server 是 Python**：跨平台（只用了 stdlib）
-  - **我没在真 Windows 上跑过整套**——你要是 Windows 用户，欢迎提 issue 反馈
 - **Python**: 3.8+ （`f-strings` 是 server.py / scripts/*.py 的最低要求；3.6/3.7 已 EOL，跟 CI matrix 一致）
 - **Git**: 2.0+ （install.sh 用 `--depth 1` shallow clone）
 - **Bash**: 3.2+（我用的语法都兼容 bash 3.2，包括 macOS 默认 bash）
@@ -35,9 +34,7 @@
 - **Zcode**: 3.4.2+（per [zcode-ai.com](https://zcode-ai.com) download page, 2026-07-23）
 - **Windows 用户**: 见 [docs/WINDOWS.md](docs/WINDOWS.md) — 推荐 WSL2
 
-> **真 Zcode runtime 还没测过**——这套 skill 跑通的部分是 e2e tests
-> + CI matrix + 真机 install/validate/uninstall 流程。Skill 实际触发
-> 取决于你机器上的 Zcode 3.x 行为。
+> **真 Zcode runtime 实测**: 社区用户已在真实 Zcode 对话中测试 5+ 次（frename / mnote / cquote / hitokoto CLI 工具 + 基础设施审计），P0-P3 修复已随 v1.3.14-v1.3.19 发布。详见 CHANGELOG。
 
 ### 网络访问注意
 

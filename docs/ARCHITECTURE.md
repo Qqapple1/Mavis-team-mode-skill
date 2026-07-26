@@ -95,7 +95,7 @@ flowchart TB
     P2[Phase 2: Dispatch]
     P2 --> W1["Worker Coder<br/>(general-purpose)"]
     P2 --> W2["Worker Tester<br/>(general-purpose)"]
-    P2 --> W3["Worker Researcher<br/>(Explore, read-only)"]
+    P2 --> W3["Worker Researcher<br/>(general-purpose or Explore)"]
     P2 --> W4["Worker Doc-writer"]
 
     W1 --> P3
@@ -213,8 +213,8 @@ mavis-team-mode-skill/
 > 4-chars-per-token heuristic numbers.
 
 - **Without skill**: average task plan = ~3,000 tokens in main context (Leader writes detailed prompts inline)
-- **With skill (progressive load)**: ~5,588 tokens on activation, additional agents loaded only if invoked
-- **Net change**: skill costs **+86%** vs inline baseline, but enables parallel execution
+- **With skill (progressive load)**: ~7,430 tokens on activation, additional agents loaded only if invoked
+- **Net change**: skill costs **+148%** vs inline baseline, but enables parallel execution
 - The skill is a **time-saver, not a token-saver** — use it when wall-clock matters more than tokens.
 
 

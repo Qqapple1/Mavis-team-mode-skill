@@ -1,6 +1,6 @@
 # Performance & Token Efficiency
 
-> **TL;DR**: This skill trades some **token overhead** (~86% more vs
+> **TL;DR**: This skill trades some **token overhead** (~148% more vs
 > inline baseline) for a **theoretical 2-2.5x wall-clock speedup** on
 > complex tasks. The 6-phase workflow with parallel Workers + Verifier
 > amortizes planning cost over parallel execution. **The speedup number
@@ -21,7 +21,7 @@ For a typical complex task (refactor 1500-line module, 4-subtask plan):
 | Eager load (load everything)  |                 ~72,826 | Loads all .md / .py / .sh / .html|
 | **Progressive load (default)**|       **~7,430**       | SKILL.md + 5 sub-files used      |
 
-**Progressive load costs ~86% MORE than inline baseline.**
+**Progressive load costs ~148% MORE than inline baseline.**
 
 So why use the skill? **Time, not tokens.**
 
