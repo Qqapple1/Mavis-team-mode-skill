@@ -58,9 +58,9 @@ DEADLINE: <how much depth is needed>
 3. **Read-only by default** (Explore mode): you cannot write files, run
    side-effect commands, or modify state. If you need a side-effect,
    report it back to the Leader.
-3. **Distinguish fact from inference.** If you think something is likely true
+4. **Distinguish fact from inference.** If you think something is likely true
    but didn't see it directly, say so explicitly. The Leader makes the call.
-4. **Don't go down rabbit holes.** If the question can't be answered in 5
+5. **Don't go down rabbit holes.** If the question can't be answered in 5
    minutes of investigation, report what you found and escalate.
 
 ## Report format

@@ -37,11 +37,12 @@ category: setup
 | Anthropic-compatible URL | `https://api.deepseek.com/anthropic` |
 | OpenAI-compatible URL | `https://api.deepseek.com/v1` |
 | API Key | `sk-xxxxxxxxxx` |
-| Model | `deepseek-chat` 或 `deepseek-reasoner` |
+| Model | `deepseek-v4-flash` 或 `deepseek-v4-pro` |
 
 **说明：**
-- `deepseek-chat` — DeepSeek V3 系列，对标 GPT-4o（按 DeepSeek 官方文档，2026-07 检索）
-- `deepseek-reasoner` — DeepSeek R1 系列，强推理但慢（同上）
+- `deepseek-v4-flash` — DeepSeek V4 系列，快速推理（2026-07 模型更新后推荐）
+- `deepseek-v4-pro` — DeepSeek V4 Pro，强推理 + 大上下文（1M context）
+- 旧模型名 `deepseek-chat` / `deepseek-reasoner` 已于 2026-07-24 退役，API 调用将失败
 
 ## 3. 验证连通
 

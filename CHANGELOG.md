@@ -983,7 +983,6 @@ changes that didn't actually land). This release fixes them all.
 - validate.sh: total-size threshold bumped 5-500KB → 5-1500KB (skill
   is now ~592KB with all the new docs/examples/tests)
 
-## [1.2.0]
 ## [1.2.0] - 2026-07-23
 
 ### Added
@@ -1054,6 +1053,7 @@ changes that didn't actually land). This release fixes them all.
 - 3 reference documents
 - `README.md`, `LICENSE`, `.gitignore`
 
+[1.3.7]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.6...v1.3.7
 [1.3.6]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.5...v1.3.6
 [1.3.5]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.4...v1.3.5
 [1.3.4]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.3...v1.3.4
