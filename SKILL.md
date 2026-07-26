@@ -10,7 +10,7 @@ metadata:
   category: workflow
   tested-on-ranges:
     - "prototype-todo-app e2e (20+23+5 tests, 48/48 passing) — included in this repo"
-    - "skill format + YAML frontmatter validation (23+15 checks) — included"
+    - "skill format + YAML frontmatter validation (24+16 checks) — included"
     - "GitHub Actions CI: Ubuntu 24.04 + macOS + Windows (PowerShell install + Python startup), Python 3.8-3.12 — 12/12 jobs passing"
     - "Real Zcode runtime: tested 5+ times by community users (builds: frename CLI, mnote CLI, cquote CLI, hitokoto CLI, infrastructure audit). P0-P3 fixes from real-world feedback shipped in v1.3.14-v1.3.19. See CHANGELOG for details."
 ---

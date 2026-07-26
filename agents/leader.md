@@ -136,7 +136,7 @@ Output:
 
 ## Output rules
 
-- Speak Chinese by default (user's language)
+- Match the user's language (detect from conversation; don't hardcode)
 - Use `##` headings for sections, `###` for sub-sections
 - Code blocks with language tags (`python`, `bash`, etc.)
 - For long file outputs, write to file and reference path, don't paste inline

@@ -58,7 +58,7 @@
 - ✅ 模型无关（Zcode 支持什么模型，这个 skill 就能用什么 — 见 requirements 段）
 - ✅ 渐进式加载（Zcode 默认只读 name/description，节省 token）
 - ✅ 4 个真实可运行 example + 1 个 Todo prototype
-- ✅ 48 项端到端测试（20 + 23 + 5）+ 23 项 skill 格式自检 + 15 项 YAML 校验
+- ✅ 48 项端到端测试（20 + 23 + 5）+ 24 项 skill 格式自检 + 16 项 YAML 校验
 
 ## 5 分钟快速开始
 
@@ -70,7 +70,7 @@ bash scripts/install.sh --no-verify   # 跳过校验
 bash scripts/install.sh --doctor      # 不修改只诊断
 bash scripts/install.sh --version     # 看版本
 
-# 2. 验证（23 项格式自检）
+# 2. 验证（24 项格式自检）
 bash scripts/validate.sh
 
 # 3. 跑 prototype（48 项 e2e = 20 + 23 + 5）

@@ -116,8 +116,8 @@ bash scripts/install.sh --doctor    # or: powershell -File scripts\install.ps1 -
 <div class="card">
   <p class="honest">⚠️ This is a community port, not affiliated with MiniMax.</p>
   <ul>
-    <li><b>Verified</b>: 48/48 e2e + 23/23 skill format + 15/15 YAML + 12/12 CI jobs on Linux + macOS + Windows (PowerShell install + Python startup).</li>
-    <li><b>Not yet verified</b>: Real Zcode runtime — the actual sub-agent dispatch + Verifier independence behavior depends on your Zcode 3.x version, which I can't run in CI.</li>
+    <li><b>Verified</b>: 48/48 e2e + 24/24 skill format + 16/16 YAML + 12/12 CI jobs on Linux + macOS + Windows (PowerShell install + Python startup).</li>
+    <li><b>Verified in real Zcode runtime</b>: Community tested 5+ times (frename, mnote, cquote, hitokoto CLI + infrastructure audit). P0-P3 fixes shipped in v1.3.14-v1.3.19.</li>
     <li><b>Estimated</b>: The "2-2.5× speedup" in docs is a paper projection, not a measured number.</li>
   </ul>
 </div>
@@ -172,7 +172,7 @@ bash scripts/install.sh --doctor    # or: powershell -File scripts\install.ps1 -
     <p>Only SKILL.md loads on trigger. Agents / examples / references load on demand.</p>
   </div>
   <div class="feature">
-    <h4>7 sub-agent roles</h4>
+    <h4>8 sub-agent roles</h4>
     <p>leader, verifier, worker-coder, worker-tester, worker-researcher, worker-doc-writer, worker-reviewer.</p>
   </div>
   <div class="feature">
@@ -206,8 +206,8 @@ bash scripts/install.sh --doctor    # or: powershell -File scripts\install.ps1 -
   </thead>
   <tbody>
     <tr><td>Inline team plan (no skill)</td><td>~3,000</td><td>—</td></tr>
-    <tr><td>Eager load (everything)</td><td>~60,909</td><td>+1930%</td></tr>
-    <tr><td><b>Progressive load (default)</b></td><td>~5,588</td><td>+86%</td></tr>
+    <tr><td>Eager load (everything)</td><td>~72,826</td><td>+2327%</td></tr>
+    <tr><td><b>Progressive load (default)</b></td><td>~7,430</td><td>+148%</td></tr>
   </tbody>
 </table>
 <p>
