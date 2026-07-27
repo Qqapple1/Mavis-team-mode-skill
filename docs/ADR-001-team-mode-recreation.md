@@ -55,7 +55,7 @@ Skill (SKILL.md)
 ├── worker-researcher.md — investigator
 ├── worker-doc-writer.md — documenter
 ├── worker-reviewer.md — code reviewer
-├── worker-fixer.md  — legacy fix & audit remediation
+├── worker-fixer.md  — surgical bug repair (Step 6 Iterate, v1.4.0+)
 └── verifier.md      — independent quality check
 ```
 

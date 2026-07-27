@@ -65,7 +65,7 @@ OUTPUT FORMAT: <how to report back>
    ```python
    import os, sys
    def color(s, code):
-       if "--no-color" in sys.argv or os.environ.get("NO_COLOR"):
+       if "--no-color" in sys.argv or "NO_COLOR" in os.environ:
            return s
        return f"\x1b[{code}m{s}\x1b[0m"
    ```

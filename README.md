@@ -29,7 +29,7 @@
   - **install.sh 是 bash 脚本**：Linux / macOS / Git Bash / WSL 上用
   - **install.ps1 是 PowerShell 脚本**：Windows PowerShell 原生可用（无需 Git Bash）
   - **prototype server 是 Python**：跨平台（只用了 stdlib）
-- **Python**: 3.8+ （`f-strings` 是 server.py / scripts/*.py 的最低要求；3.6/3.7 已 EOL，跟 CI matrix 一致）
+- **Python**: 3.8+ （3.6/3.7 已 EOL；CI matrix 测试 3.9-3.13）
 - **Git**: 2.0+ （install.sh 用 `--depth 1` shallow clone）
 - **Bash**: 3.2+（我用的语法都兼容 bash 3.2，包括 macOS 默认 bash）
 - **Disk**: ~600KB 安装空间

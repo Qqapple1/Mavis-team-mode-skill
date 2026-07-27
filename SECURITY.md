@@ -55,6 +55,17 @@ The skill is a "best effort" recreation. Limitations:
 - **No supply chain guarantees**: the skill instructs the LLM to dispatch
   sub-agents. If the LLM is manipulated via prompt injection, it could
   cause unexpected behavior. Use within a trusted environment.
+- **WebFetch prompt injection risk**: worker-researcher uses WebFetch/WebSearch
+  to retrieve external content. Malicious web pages could inject instructions
+  into the Researcher's findings, which then propagate to the Leader's
+  decision chain. Mitigation: the Researcher is instructed to label sources
+  and distinguish fact from inference. Users should spot-check fetched content
+  against the Researcher's summary for high-stakes decisions.
+- **Sub-agent privilege escalation**: multiple agents (coder, tester, fixer)
+  have Bash/Write/Edit permissions. A compromised or misled agent could
+  modify files outside its intended scope. Mitigation: Leader should specify
+  exact file boundaries in CONTRACT.md (Step 2.5). Workers should refuse
+  tasks that fall outside their assigned file set.
 - **No sandboxing**: the prototype server runs with your user's permissions.
   Don't run on shared systems.
 - **No signing**: skills are not cryptographically signed. Verify sources
