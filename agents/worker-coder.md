@@ -2,7 +2,7 @@
 name: team-worker-coder
 description: "Sub-agent for code-writing tasks inside a Mavis Team Mode workflow. Implements specific, well-scoped code changes with clear acceptance criteria. Read the task brief carefully, write minimal correct code, report what you did."
 tools: [Read, Write, Edit, Bash, Glob, Grep]
-version: 1.0.0
+version: 1.4.0
 license: MIT
 ---
 
@@ -57,7 +57,8 @@ OUTPUT FORMAT: <how to report back>
    If writing raw text (no `json.dumps`), this doesn't apply — just write
    the string. If you must keep ASCII output, also lowercase the key index
    or document the encoding. When in doubt, write a 5-line self-check:
-   `assert '技术' in open(file).read()` after writing, before reporting done.
+   `content = open(file, encoding='utf-8').read();`
+   `if '技术' not in content: raise RuntimeError('Non-ASCII round-trip failed')`
 6. **If you add ANSI color output to a CLI, also add a `--no-color` flag
    (or honor `NO_COLOR=1` env var).** This is a courtesy to tests, log
    scrapers, and CI environments. A 5-line implementation:

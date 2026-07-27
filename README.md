@@ -1,5 +1,7 @@
 # Mavis Team Mode Skill for Zcode
 
+**Unofficial / 非官方** — 与 MiniMax 无关联、无背书。基于公开信息尽力还原的工作流模式。
+
 把 MiniMax **Mavis Team Mode**（Leader + Workers + Verifier）的能力搬到 Zcode 3.4.2+。
 
 > **Pick your platform → [Download v1.4.0](https://github.com/Qqapple1/Mavis-team-mode-skill/releases/tag/v1.4.0)**:
@@ -47,16 +49,17 @@
    bash ~/mavis-team-mode-skill/scripts/install.sh
    ```
 2. **用代理**（如有）：`export https_proxy=http://127.0.0.1:7890`
-3. **用 mirror**（如有）：`git clone https://ghfast.top/https://github.com/Qqapple1/Mavis-team-mode-skill`
+3. **用 GitHub 官方 release 包**：从 [Releases](https://github.com/Qqapple1/Mavis-team-mode-skill/releases) 下载对应平台的 zip/tar.gz，解压到 `~/.zcode/skills/mavis-team-mode/`
+<!-- 第三方镜像（如 ghfast.top）存在被篡改的供应链风险，不推荐。-->
 
 ## 功能
 
 - ✅ Leader 任务拆解（结构化 Team Plan）
-- ✅ Workers 并行执行（Zcode 内置 sub-agent + 自定义 agents/）
-- ✅ Verifier 独立验收（第二个 Zcode 会话 / 同会话自检）
+- ⚠️ Workers 并行执行（Zcode 前台并行，非后台）
+- ⚠️ Verifier 独立验收（需第二会话，同会话有偏见风险）
 - ✅ 迭代修正（最多 3 轮）
 - ✅ 模型无关（Zcode 支持什么模型，这个 skill 就能用什么 — 见 requirements 段）
-- ✅ 渐进式加载（Zcode 默认只读 name/description，节省 token）
+- ✅ 渐进式加载（相对一次性全加载，减少 ~90% 激活成本；但相较不用 skill 仍多 ~148% token）
 - ✅ 4 个真实可运行 example + 1 个 Todo prototype
 - ✅ 48 项端到端测试（20 + 23 + 5）+ 24 项 skill 格式自检 + 16 项 YAML 校验
 

@@ -48,7 +48,10 @@ ALLOWED_ORIGINS = {
     "http://localhost:8765",
     "http://127.0.0.1:5500",   # VS Code Live Server default
     "http://localhost:5500",
-    "null",                    # file:// origin for opening index.html directly
+    # "null" origin intentionally excluded:
+    # file:// sends Origin: null, which is also sent by sandboxed iframes,
+    # data: URIs, and some browser extensions — a known CORS bypass vector.
+    # Use http://127.0.0.1:8765/client/index.html instead of file://.
 }
 
 

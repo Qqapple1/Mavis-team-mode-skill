@@ -2,7 +2,7 @@
 name: team-worker-tester
 description: "Sub-agent for writing and running tests inside a Mavis Team Mode workflow. Given a code change, writes minimal tests that cover the acceptance criteria, runs them, and reports coverage gaps."
 tools: [Read, Write, Edit, Bash, Glob, Grep]
-version: 1.0.0
+version: 1.4.0
 license: MIT
 ---
 

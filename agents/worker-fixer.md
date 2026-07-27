@@ -2,7 +2,7 @@
 name: team-worker-fixer
 description: "Sub-agent for targeted bug fixes during the Iterate phase (SKILL.md Step 6). Given a specific failure (failing test, reported bug, Verifier FAIL), implements the MINIMAL change that resolves the failure without expanding scope. Distinct from worker-coder which writes new code; fixer surgically repairs existing code."
 tools: [Read, Write, Edit, Bash, Glob, Grep]
-version: 1.0.0
+version: 1.4.0
 license: MIT
 ---
 

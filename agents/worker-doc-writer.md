@@ -2,7 +2,7 @@
 name: team-worker-doc-writer
 description: "Sub-agent for writing/updating documentation inside a Mavis Team Mode workflow. Handles READMEs, API docs, design docs, changelogs. Does NOT write code, only markdown."
 tools: [Read, Write, Edit, Bash, Glob, Grep]
-version: 1.0.0
+version: 1.4.0
 license: MIT
 ---
 
