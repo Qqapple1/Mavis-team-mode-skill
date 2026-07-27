@@ -1,12 +1,12 @@
 # Windows 安装指南
 
-**TL;DR**: 3 个选项，**都支持**：
+**TL;DR**: 两条主要路径，都受完整支持：
 
-- **WSL2 (Ubuntu)** — 真 symlink，最完整，但需要重启一次
-- **Git Bash** — 最简单，install.sh 默认 copy 模式
-- **PowerShell** — Windows 原生，用 `install.ps1`
+- **WSL2 (Ubuntu) — 推荐**：真 symlink，Linux 兼容性最优，适合生产/长期使用（需要重启一次）
+- **PowerShell + `install.ps1` — 备选**：Windows 原生，无需 Git Bash，适合快速试用 / 纯 Windows 环境
+- **Git Bash + `install.sh`**：也支持，适合已有 Git Bash 的用户
 
-选哪个看你哪个舒服。下面有详细对比。
+选哪个看你场景。下面有详细对比。
 
 ---
 
@@ -55,31 +55,9 @@ explorer.exe .
 
 ---
 
-## 方案 B：Git Bash — 最简单（最常被推荐）
+## 方案 B：PowerShell — Windows 原生备选（不用装 Git Bash 或 WSL）
 
-如果你不想用 WSL，Git Bash 也能跑：
-
-1. 装 [Git for Windows](https://git-scm.com/download/win)
-2. 装 [Python 3.8+ for Windows](https://www.python.org/downloads/windows/)（**关键**：勾 "Add Python to PATH"）
-3. 装 [Zcode Windows 版](https://zcode-ai.com) (3.4.2+)
-4. 打开 **Git Bash**（不是 PowerShell / CMD），跑：
-```bash
-git clone https://github.com/Qqapple1/Mavis-team-mode-skill.git ~/mavis-team-mode-skill
-cd ~/mavis-team-mode-skill
-bash scripts/install.sh
-```
-> **提示**：`install.sh` 也能自动 clone（如果你单独下载 `install.sh` 直接运行，它会自动 clone 到默认路径）。上面的手动 clone 方式让你能自定义安装路径。
-
-**已知坑**：
-- 默认 **copy 模式**（不是真 NTFS symlink）
-- 想真 symlink：`export MSYS=winsymlinks:native`（需要 Win 10+ 开发者模式），或用 WSL
-- Git Bash 的 `~/` 是 `C:\Users\<you>\`，跟 Zcode Windows 客户端读的路径**可能不一致** — 如果不对，去 Zcode 设置里改 skills 目录
-
----
-
-## 方案 C：PowerShell — Windows 原生（不用装 Git Bash）
-
-如果你不想装 Git Bash，直接用 PowerShell：
+如果你不想装 WSL 或 Git Bash，直接用 PowerShell：
 
 ```powershell
 # 1. 装 Python (勾 "Add Python to PATH")
@@ -112,13 +90,33 @@ PowerShell 版**功能等价**（clone + copy + 验证 + 卸载），只是永�
 
 ---
 
+## 方案 C：Git Bash — 也支持（已有 Git Bash 的用户）
+
+如果你不想用 WSL，但已经装了 Git Bash，也能跑：
+
+1. 装 [Git for Windows](https://git-scm.com/download/win)
+2. 装 [Python 3.8+ for Windows](https://www.python.org/downloads/windows/)（**关键**：勾 "Add Python to PATH"）
+3. 装 [Zcode Windows 版](https://zcode-ai.com) (3.4.2+)
+4. 打开 **Git Bash**（不是 PowerShell / CMD），跑：
+```bash
+git clone https://github.com/Qqapple1/Mavis-team-mode-skill.git ~/mavis-team-mode-skill
+cd ~/mavis-team-mode-skill
+bash scripts/install.sh
+```
+> **提示**：`install.sh` 也能自动 clone（如果你单独下载 `install.sh` 直接运行，它会自动 clone 到默认路径）。上面的手动 clone 方式让你能自定义安装路径。
+
+**已知坑**：
+- 默认 **copy 模式**（不是真 NTFS symlink）
+- 想真 symlink：`export MSYS=winsymlinks:native`（需要 Win 10+ 开发者模式），或用 WSL
+- Git Bash 的 `~/` 是 `C:\Users\<you>\`，跟 Zcode Windows 客户端读的路径**可能不一致** — 如果不对，去 Zcode 设置里改 skills 目录
+
 ## 3 个方案对比
 
 | 方案 | Symlink | PowerShell 原生 | 难度 | 适用场景 |
-|---|---|---|---|---|
-| **WSL2** | ✅ 真 symlink | ❌（bash 替代） | ⭐⭐⭐ | 长期使用、Linux 重度用户 |
-| **Git Bash** | ⚠️ copy（默认）/ 真 symlink（设 MSYS env） | ❌ | ⭐ | 临时使用、不想重启 |
-| **PowerShell** | ❌ 永远 copy | ✅ | ⭐⭐ | 不装 Git Bash、纯 Windows |
+|---|---|---|---|---|---|
+| **WSL2（推荐）** | ✅ 真 symlink | ❌（bash 替代） | ⭐⭐⭐ | 生产/长期使用，Linux 重度用户 |
+| **PowerShell（备选）** | ❌ 永远 copy | ✅ | ⭐⭐ | 快速试用，纯 Windows 环境 |
+| **Git Bash** | ⚠️ copy（默认）/ 真 symlink（设 MSYS env） | ❌ | ⭐ | 已有 Git Bash，不想装 WSL |
 
 ---
 

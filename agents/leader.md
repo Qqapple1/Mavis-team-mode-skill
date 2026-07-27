@@ -74,8 +74,8 @@ multiple workers produce interdependent artifacts (code + tests + docs).
 The contract must include:
 - CLI interface (`--help`-style output, even if code doesn't exist yet)
 - Shared file formats (JSON schema, Markdown templates, etc.)
-- Non-ASCII text handling requirements (ensure_ascii=False, UTF-8)
-- CLI output format declaration (plain / ANSI / JSON)
+- Non-ASCII text handling requirements (ensure_ascii=False, UTF-8, ANSI/CLI output format).
+  See [`references/encoding-guidelines.md`](references/encoding-guidelines.md) for the complete spec.
 - List of expected deliverable files
 
 See SKILL.md Step 2.5 for full rationale. Skipping this step is the #1

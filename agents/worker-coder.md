@@ -39,43 +39,13 @@ OUTPUT FORMAT: <how to report back>
    checking.
 4. **Report in the exact OUTPUT FORMAT requested.** The Leader integrates your
    output; mismatched format = wasted work.
-5. **Non-ASCII text (中文, emoji, etc.) must round-trip correctly.** A common
-   bug: writing strings to files via `json.dumps(value)` (default
-   `ensure_ascii=True`) escapes non-ASCII as `\uXXXX`. If the file is later
-   read back and searched/scanned with the original Unicode keys (e.g. search
-   for "技术"), the lookup silently fails — everything else works, only
-   the matching breaks. **Rule**: any time you serialize strings to a
-   human-readable file (YAML / Markdown / JSON config / frontmatter / log
-   file) that will be read back by humans or by code doing string match,
-   pass `ensure_ascii=False`:
-   ```python
-   # WRONG (Chinese becomes \u4e2d\u6587 on disk)
-   lines.append(f"{key}: {json.dumps(value)}")
-   # RIGHT
-   lines.append(f"{key}: {json.dumps(value, ensure_ascii=False)}")
-   ```
-   If writing raw text (no `json.dumps`), this doesn't apply — just write
-   the string. If you must keep ASCII output, also lowercase the key index
-   or document the encoding. When in doubt, write a 5-line self-check:
-   `content = open(file, encoding='utf-8').read();`
-   `if '技术' not in content: raise RuntimeError('Non-ASCII round-trip failed')`
-6. **If you add ANSI color output to a CLI, also add a `--no-color` flag
-   (or honor `NO_COLOR=1` env var).** This is a courtesy to tests, log
-   scrapers, and CI environments. A 5-line implementation:
-   ```python
-   import os, sys
-   def color(s, code):
-       if "--no-color" in sys.argv or "NO_COLOR" in os.environ:
-           return s
-       return f"\x1b[{code}m{s}\x1b[0m"
-   ```
-   Without this, every test that touches your CLI output has to
-   strip ANSI escapes (see `worker-tester.md` rule #5). With it,
-   tests can just pass `--no-color` and use plain strings. The
-   `NO_COLOR=1` env var is the cross-tool standard
-   (see https://no-color.org). If the CLI uses a popular library
-   like `rich` / `click` / `colorama`, check whether they already
-   honor `NO_COLOR` (most do).
+5. **Non-ASCII text (中文, emoji, etc.) must round-trip correctly.**
+   Follow the encoding guidelines in [`references/encoding-guidelines.md`](../references/encoding-guidelines.md).
+   Key rules:
+   - `json.dumps(value, ensure_ascii=False)` — never default `ensure_ascii=True`
+   - `open(file, encoding="utf-8")` — never rely on system default encoding
+   - CLI tools must support `--no-color` / `NO_COLOR=1` for testability
+   - Self-check: `content = open(file, encoding='utf-8').read(); assert '技术' in content`
 
 ## Report format (default)
 

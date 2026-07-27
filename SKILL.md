@@ -133,12 +133,7 @@ If missing, see INSTALL.md.
 
 > **如果任务太简单**(单文件、< 50 行、单一函数)可以跳过 CONTRACT,但 Leader 必须在 prompt 里**写明完整的接口规范**作为 Worker 的输入。
 
-> **CONTRACT 里的文本处理要求**: 如果任务涉及中文/emoji/任何非 ASCII 文本存储、搜索、序列化,CONTRACT 必须明言:
-> - 写盘: `json.dumps(value, ensure_ascii=False)`(默认会转义为 `\uXXXX`,导致后续搜索/读取失败)
-> - 读盘: 优先用 `encoding="utf-8"`,不要用默认系统编码
-> - 验证: Coder 写完自检 1 轮,Tester 至少 1 个测试用例含非 ASCII
-> - **CLI 输出格式**: plain 文本 / ANSI 颜色高亮 / JSON 三选一,不能"装了 ANSI 但没告诉 Tester"。如果选 ANSI,Tester 必须用 ANSI-strip 后断言,或者 Coder 加 `--no-color` / 支持 `NO_COLOR=1` 环境变量
-> 常见反模式: Coder 用了 `json.dumps(value)`,Doc-Writer 文档里写"支持中文搜索",Tester 测试用例全是 ASCII,Verifier 集成测试中文才爆——返工。**在 CONTRACT 里就写明,不要在 Verifier 阶段才发现**。
+> **CONTRACT 里的文本处理要求**: 如果任务涉及中文/emoji/任何非 ASCII 文本存储、搜索、序列化,CONTRACT 必须明言写盘 (`ensure_ascii=False`)、读盘 (`encoding="utf-8"`)、验证（至少 1 个非 ASCII 测试用例）和 CLI 输出格式（plain / ANSI / JSON）。完整规范见 [`references/encoding-guidelines.md`](references/encoding-guidelines.md)。在 CONTRACT 里就写明,不要在 Verifier 阶段才发现。
 
 Leader 必须输出一个**结构化任务书**，格式见 `agents/leader.md` 的 Phase 1。
 
@@ -238,9 +233,16 @@ This skill is **model-agnostic**. See `references/deepseek-setup.md`.
 ### Windows users
 
 This SKILL.md uses Unix-style commands in examples (e.g. `ls`, `ln -s`,
-`~/.zcode/...`). For Windows-specific install paths, PowerShell quirks,
-and python launcher (`py` vs `python3`) troubleshooting, see
-[`docs/WINDOWS.md`](docs/WINDOWS.md). Common Windows gotchas:
+`~/.zcode/...`). For Windows users there are two paths, both fully
+supported — see [`docs/WINDOWS.md`](docs/WINDOWS.md) for detailed
+instructions:
+
+- **Recommended**: WSL2 + `install.sh` — true symlinks, Linux file
+  permissions, Zcode official support. Best for production / long-term use.
+- **Alternative**: Native PowerShell + `install.ps1` — no WSL or Git Bash
+  required. Best for quick trials or pure Windows environments.
+
+Common Windows gotchas:
 
 - `~` doesn't expand in PowerShell the way bash users expect — use
   `$env:USERPROFILE` instead of `~/.zcode/`

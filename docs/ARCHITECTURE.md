@@ -131,19 +131,19 @@ flowchart TB
 ```
 mavis-team-mode-skill/
 │
-├── SKILL.md                       (270 lines) — Zcode loads this on trigger
+├── SKILL.md                       (272 lines) — Zcode loads this on trigger
 │   ├── YAML frontmatter            triggers on description match
 │   └── Markdown body               instructions for Leader
 │
 ├── agents/                        (8 files) — sub-agent prompt templates
-│   ├── leader.md                   (150 lines) — Team Plan format, 6 phases
-│   ├── verifier.md                 (64 lines) — independent review checklist
-│   ├── worker-coder.md             (123 lines)
-│   ├── worker-tester.md            (77 lines)
-│   ├── worker-researcher.md        (88 lines)
-│   ├── worker-doc-writer.md        (54 lines)
-│   ├── worker-reviewer.md          (64 lines)
-│   └── worker-fixer.md             (97 lines) — surgical bug repair (v1.3.17+)
+│   ├── leader.md                   (168 lines) — Team Plan format, 6 phases
+│   ├── verifier.md                 (65 lines) — independent review checklist
+│   ├── worker-coder.md             (125 lines)
+│   ├── worker-tester.md            (78 lines)
+│   ├── worker-researcher.md        (89 lines)
+│   ├── worker-doc-writer.md        (55 lines)
+│   ├── worker-reviewer.md          (65 lines)
+│   └── worker-fixer.md             (98 lines) — surgical bug repair (v1.3.17+)
 │
 ├── examples/                      (4 files) — concrete use cases
 │   ├── refactor-large-module.md
@@ -157,13 +157,13 @@ mavis-team-mode-skill/
 │   └── troubleshooting.md
 │
 ├── scripts/                       (7 files) — install/validate/benchmark/package
-│   ├── install.sh                  (521 lines) — bash, all platforms
-│   ├── install.ps1                 (293 lines) — PowerShell, Windows native
-│   ├── validate.sh                 (148 lines) — bash
-│   ├── validate.ps1                (104 lines) — PowerShell
-│   ├── package.sh                  (359 lines) — build platform-specific archives
-│   ├── validate_yaml.py            (224 lines) — pure-Python YAML
-│   └── benchmark_tokens.py         (232 lines) — token cost estimator
+│   ├── install.sh                  (522 lines) — bash, all platforms
+│   ├── install.ps1                 (298 lines) — PowerShell, Windows native
+│   ├── validate.sh                 (149 lines) — bash
+│   ├── validate.ps1                (109 lines) — PowerShell
+│   ├── package.sh                  (360 lines) — build platform-specific archives
+│   ├── validate_yaml.py            (225 lines) — pure-Python YAML
+│   └── benchmark_tokens.py         (233 lines) — token cost estimator
 │
 ├── docs/                          (6 files) — architecture & decision logs
 │   ├── ADR-001-team-mode-recreation.md
@@ -171,11 +171,11 @@ mavis-team-mode-skill/
 │   ├── ARCHITECTURE.md             ← this file
 │   ├── PERFORMANCE.md
 │   ├── PLATFORMS.md                — platform matrix + archive selection
-│   └── WINDOWS.md                  (194 lines) — Windows-specific guide
+│   └── WINDOWS.md                  (200 lines) — Windows-specific guide
 │
 ├── examples/prototype-todo-app/   — real working web app
-│   ├── server/server.py            (328 lines, defense-in-depth HTTP)
-│   ├── client/index.html           (328 lines, validation + UI)
+│   ├── server/server.py            (332 lines, defense-in-depth HTTP)
+│   ├── client/index.html           (337 lines, validation + UI)
 │   ├── test_e2e.py                 (20 tests, base HTTP + CRUD)
 │   ├── test_e2e_extended.py        (23 tests, methods + unicode + concurrency)
 │   ├── test_e2e_advanced.py        (5 tests, slow client + idempotency)

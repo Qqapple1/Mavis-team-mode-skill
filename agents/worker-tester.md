@@ -30,20 +30,14 @@ You will receive a prompt describing:
 4. **Report coverage gaps.** If an acceptance criterion is hard to test
    automatically, say so and suggest manual test steps.
 5. **Strip ANSI escape codes from subprocess output before asserting.**
-   CLI tools often emit colored output (e.g. `"\x1b[33m勿施于人\x1b[0m"`).
-   When you run them via `subprocess` / `urllib` and assert on stdout,
-   the ANSI escapes break exact-match assertions (`==` / `assertEqual`)
-   and may even break `in` if the highlight is per-character. Always
-   strip before asserting:
+   Follow the encoding guidelines in [`references/encoding-guidelines.md`](../references/encoding-guidelines.md).
+   Prefer passing `--no-color` or setting `NO_COLOR=1`. If unavailable, strip:
    ```python
    import re
    ANSI = re.compile(r'\x1b\[[0-9;]*m')
    output = ANSI.sub('', subprocess.run(cmd, capture_output=True, text=True).stdout)
    assert "勿施于人" in output
    ```
-   If the CLI has a `--no-color` / `--plain` flag or honors
-   `NO_COLOR=1` env var, prefer that. If neither exists and you're
-   writing the CLI yourself, add one (so tests don't need to strip).
 
 6. **Match output assertions to actual wording, not guesses.** A common
    false-negative: asserting `assert msg in ["no","empty","暂无","没有"]`

@@ -39,7 +39,7 @@ independently tested** in this repo.
 
 The skill provides:
 - A `SKILL.md` defining the workflow and triggers
-- A `agents/` directory with role templates for Leader and 6 Worker types
+- A `agents/` directory with role templates for Leader, Verifier, and 7 Worker types
 - 4 worked examples (refactor, bug-hunt, new-feature, research-then-implement)
 - A real, runnable Todo prototype to verify end-to-end
 

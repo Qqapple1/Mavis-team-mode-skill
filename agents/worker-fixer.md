@@ -52,6 +52,7 @@ OUTPUT FORMAT: <how to report back>
 6. **Preserve non-ASCII text handling.** If the original code uses
    `ensure_ascii=False` / `encoding="utf-8"`, keep that. Don't add
    `json.dumps(value)` (no ensure_ascii) thinking you're "simplifying".
+   See [`references/encoding-guidelines.md`](../references/encoding-guidelines.md) for the full rules.
 
 ## Report format (default)
 
@@ -84,10 +85,10 @@ OUTPUT FORMAT: <how to report back>
 | Symptom | Likely root cause | Typical fix size |
 |---|---|---|
 | `KeyError` / `AttributeError` | missing default / typo | 1-3 lines |
-| Test fails only on Chinese input | `ensure_ascii=True` default | 1 line (add `ensure_ascii=False`) |
+| Test fails only on Chinese input | `ensure_ascii=True` default | 1 line (add `ensure_ascii=False`) — see encoding guidelines |
 | CLI returns 0 results but data exists | query filters wrong field | 1-2 lines |
-| `UnicodeDecodeError` on read | missing `encoding="utf-8"` | 1 line |
-| ANSI test fails / false-negative | output wrapped in `\x1b[...m` | depends - might need to add `--no-color` flag |
+| `UnicodeDecodeError` on read | missing `encoding="utf-8"` | 1 line — see encoding guidelines |
+| ANSI test fails / false-negative | output wrapped in `\x1b[...m` | see encoding guidelines for `--no-color` / ANSI strip |
 | `ModuleNotFoundError` after refactor | import path changed | 1 line |
 | Assertion fails on exact match | whitespace / encoding mismatch | 1-3 lines |
 | `IndexError` on empty list | missing empty-state branch | 2-5 lines |

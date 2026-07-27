@@ -407,7 +407,7 @@ install() {
     # (e.g. user rm'd them, or partial git pull), restore from HEAD.
     # This is safe because we only restore files the user is
     # explicitly trying to install (not their own untracked work).
-    # The list mirrors the 7 agents validated by validate.sh + the
+    # The list mirrors the 8 agents validated by validate.sh + the
     # 4 entry-point docs (SKILL.md, README.md, INSTALL.md, CHANGELOG.md).
     for f in \
       SKILL.md README.md INSTALL.md CHANGELOG.md \

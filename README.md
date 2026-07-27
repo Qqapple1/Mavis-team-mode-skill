@@ -2,7 +2,7 @@
 
 **Unofficial / 非官方** — 与 MiniMax 无关联、无背书。基于公开信息尽力还原的工作流模式。
 
-把 MiniMax **Mavis Team Mode**（Leader + Workers + Verifier）的能力搬到 Zcode 3.4.2+。
+基于 MiniMax **Mavis Team Mode**（Leader + Workers + Verifier）工作流理念，为 Zcode 3.4.2+ 提供的结构化协作 skill。
 
 > **Pick your platform → [Download v1.4.0](https://github.com/Qqapple1/Mavis-team-mode-skill/releases/tag/v1.4.0)**:
 > - macOS / Linux / Git Bash / WSL → `mavis-team-mode-skill-1.4.0-bash.tar.gz`
@@ -34,7 +34,9 @@
 - **Bash**: 3.2+（我用的语法都兼容 bash 3.2，包括 macOS 默认 bash）
 - **Disk**: ~600KB 安装空间
 - **Zcode**: 3.4.2+（per [zcode-ai.com](https://zcode-ai.com) download page, 2026-07-26）
-- **Windows 用户**: 见 [docs/WINDOWS.md](docs/WINDOWS.md) — 推荐 WSL2
+- **Windows 用户**: 见 [docs/WINDOWS.md](docs/WINDOWS.md)。两条路径，都受完整支持：
+  - **推荐**：WSL2 + `install.sh` — 真 symlink、Linux 文件权限、Zcode 官方支持，适合生产/长期使用
+  - **备选**：原生 PowerShell + `install.ps1`（无需 Git Bash）— 快速上手，纯 Windows 环境也能跑
 
 > **真 Zcode runtime 实测**: 社区用户已在真实 Zcode 对话中测试 5+ 次（frename / mnote / cquote / hitokoto CLI 工具 + 基础设施审计），P0-P3 修复已随 v1.3.14-v1.4.0 发布。详见 CHANGELOG。
 
@@ -93,32 +95,11 @@ kill %1
 
 ## 🚀 Quick Start for Windows（如果你是 Windows 用户）
 
-有 3 个选项，从最简单到最原生：
+两条主要路径，都受完整支持。选哪个取决于你的场景：
 
-### 选项 A：Git Bash（最简单，推荐）
+### 推荐：WSL2 + `install.sh`（生产/长期使用）
 
-1. 装 [Git for Windows](https://git-scm.com/download/win)
-2. 装 [Python 3.8+ for Windows](https://www.python.org/downloads/windows/)（**必须**勾 "Add Python to PATH"）
-3. 装 [Zcode Windows 版](https://zcode-ai.com) (3.4.2+)
-4. 打开 **Git Bash**（**不是** PowerShell / CMD），跑：
-
-```bash
-git clone https://github.com/Qqapple1/Mavis-team-mode-skill.git ~/mavis-team-mode-skill
-cd ~/mavis-team-mode-skill
-bash scripts/install.sh
-```
-
-### 选项 B：PowerShell（不用装 Git Bash）
-
-打开 PowerShell，跑：
-
-```powershell
-git clone https://github.com/Qqapple1/Mavis-team-mode-skill.git $env:USERPROFILE\mavis-team-mode-skill
-cd $env:USERPROFILE\mavis-team-mode-skill
-powershell -ExecutionPolicy Bypass -File scripts\install.ps1
-```
-
-### 选项 C：WSL2（功能最全）
+最完整的方案 — 真 symlink、Linux 文件权限、Zcode 官方支持。
 
 ```powershell
 # 一次性：管理员 PowerShell
@@ -133,12 +114,32 @@ cd ~/mavis-team-mode-skill
 bash scripts/install.sh
 ```
 
+### 备选：原生 PowerShell + `install.ps1`（快速试用 / 纯 Windows 环境）
+
+无需装 WSL 或 Git Bash，PowerShell 原生运行。install.ps1 功能等价（clone + copy + 验证 + 卸载），297 行维护。
+
+```powershell
+git clone https://github.com/Qqapple1/Mavis-team-mode-skill.git $env:USERPROFILE\mavis-team-mode-skill
+cd $env:USERPROFILE\mavis-team-mode-skill
+powershell -ExecutionPolicy Bypass -File scripts\install.ps1
+```
+
+### 也支持：Git Bash + `install.sh`（已有 Git Bash 的用户）
+
+如果你已经装了 Git for Windows，直接打开 Git Bash：
+
+```bash
+git clone https://github.com/Qqapple1/Mavis-team-mode-skill.git ~/mavis-team-mode-skill
+cd ~/mavis-team-mode-skill
+bash scripts/install.sh
+```
+
 **区别**：
-| 方案 | Symlink | PowerShell | 难度 |
+| 方案 | Symlink | 需要额外工具 | 适用场景 |
 |---|---|---|---|
-| Git Bash | copy（默认）/ symlink（设 MSYS env） | 不需要 | ⭐ 最简单 |
-| PowerShell | copy | 原生 | ⭐⭐ |
-| WSL2 | 真 symlink | 不需要（Linux bash） | ⭐⭐⭐ |
+| **WSL2（推荐）** | 真 symlink | WSL2（一次安装） | 生产/长期使用，Linux 重度用户 |
+| **PowerShell（备选）** | copy | 无（Windows 自带） | 快速试用，纯 Windows 环境 |
+| **Git Bash** | copy（默认）/ symlink（设 MSYS env） | Git for Windows | 已有 Git Bash，不想装 WSL |
 
 **详细 Windows 指南**：见 [docs/WINDOWS.md](docs/WINDOWS.md)
 
@@ -162,7 +163,7 @@ bash scripts/install.sh
 
 ```
 mavis-team-mode/
-├── SKILL.md                         # 核心 skill 定义 (270 lines)
+├── SKILL.md                         # 核心 skill 定义 (272 lines)
 ├── README.md
 ├── INSTALL.md                       # 安装指南（4 种方式）
 ├── VALIDATION.md                    # 验证清单（8 步）
@@ -193,8 +194,8 @@ mavis-team-mode/
 │   ├── new-feature.md
 │   ├── research-then-implement.md
 │   └── prototype-todo-app/
-│       ├── server/server.py         #     Python HTTP server (328 lines, 安全加固)
-│       ├── client/index.html        #     浏览器 UI (328 lines)
+│       ├── server/server.py         #     Python HTTP server (332 lines, 安全加固)
+│       ├── client/index.html        #     浏览器 UI (337 lines)
 │       ├── test_e2e.py              #     20 个端到端测试
 │       ├── test_e2e_extended.py     #     23 个扩展测试
 │       ├── test_e2e_advanced.py     #     5 个高级测试
