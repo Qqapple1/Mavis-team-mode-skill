@@ -2,7 +2,7 @@
 name: team-worker-support-meeting-facilitator
 description: 专职会议主持人，负责组织高效的多Agent讨论，确保每次会议产出清晰结论和行动项
 tools: [Read, Glob, Grep]
-version: 2.1.0
+version: 2.2.0
 license: MIT
 ---
 

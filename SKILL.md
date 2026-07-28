@@ -1,7 +1,7 @@
 ---
 name: teamforge
 description: "Recreates the TeamForge workflow (Leader + Workers + Verifier) inside Zcode 3.4.2+. Use this skill when the user wants parallel agent execution, structured task decomposition, independent quality verification, or multi-step work that benefits from sub-agents running concurrently. Triggers on: 'teamforge', 'team mode', 'multi-agent', 'split into subtasks', 'verify the result', '用 teamforge', '团队模式', '多智能体协作', '并行处理'. Do NOT use for simple single-step tasks."
-version: 2.1.0
+version: 2.2.0
 license: MIT
 metadata:
   author: Community port (TeamForge CLI agent)
@@ -137,7 +137,22 @@ If missing, see INSTALL.md.
 
 > **CONTRACT 里的文本处理要求**: 如果任务涉及中文/emoji/任何非 ASCII 文本存储、搜索、序列化,CONTRACT 必须明言写盘 (`ensure_ascii=False`)、读盘 (`encoding="utf-8"`)、验证（至少 1 个非 ASCII 测试用例）和 CLI 输出格式（plain / ANSI / JSON）。完整规范见 [`references/encoding-guidelines.md`](references/encoding-guidelines.md)。在 CONTRACT 里就写明,不要在 Verifier 阶段才发现。
 
-> **CONTRACT 字符串级验证**: Leader 在 Step 4 整合时,**必须**用 `grep` 或字符串搜索检查每个 Worker 产出是否包含 CONTRACT 中定义的接口字符串。例如: CONTRACT 定义了 `--prefix` 参数,则 Coder 的代码中必须出现 `--prefix` 字符串,Doc-Writer 的文档中也必须出现 `--prefix` 字符串。不匹配的视为 CONTRACT 违规,必须返工。**不可跳过此验证步骤。**
+> **CONTRACT 智能验证**: Leader 在 Step 4 整合时，**必须**验证 Worker 产出是否遵守 CONTRACT。验证策略按优先级：
+
+**Level 1 — 结构验证（必须）**：
+- 检查 CONTRACT 中定义的所有文件是否已创建（`ls` 命令）
+- 检查每个文件非空（`wc -l` 命令）
+
+**Level 2 — 接口验证（推荐）**：
+- 对 Python 代码：检查函数名是否存在（`grep -n "def function_name"` ）
+- 对 CLI 工具：运行 `--help` 并检查输出中是否包含 CONTRACT 定义的参数名
+- 对 JSON 输出：运行工具并用 `python -c "import json; ..."` 验证输出格式
+
+**Level 3 — 语义验证（高 stakes 任务）**：
+- 运行测试套件，确认所有测试通过
+- 对关键函数调用一次，验证返回值格式
+
+**验证失败处理**：如果 Level 1 失败 → 立即返工。如果 Level 2 失败 → 标记为 CONTRACT VIOLATION，派 Fixer 修复。如果 Level 3 失败 → 按正常 FAIL 流程处理。
 
 Leader 必须输出一个**结构化任务书**，格式见 `agents/leader.md` 的 Phase 1。
 
@@ -210,6 +225,32 @@ Leader 在主对话里调用 Zcode 的 sub-agent 机制。两种用法：
 
 > **Worker 超时**: 如果 sub-agent 超过 **5 分钟**未返回结果，Leader 应视为该 Worker 失败。处理方式：记录为 FAILED，不阻塞其他 Worker；在 Step 4 整合时决定是否重试。Zcode 的 sub-agent 没有内置超时机制，Leader 需要自行通过时间戳判断。
 
+**模板加载策略（Token 优化）**：
+
+当前策略是 Leader 在 prompt 中注入 Worker 模板的全部内容，这会消耗大量 Token。
+优化后的策略是"Worker 自读"：
+
+1. Leader 在 prompt 中只写**核心指令**（任务描述、验收标准、CONTRACT 路径）
+2. Leader 在 prompt 中附加一行：`请先读取你的角色定义文件: agents/worker-xxx.md`
+3. Worker 启动后使用 `Read` 工具自行读取角色定义，获取完整的行为规范
+
+**示例 prompt**：
+```
+TASK: 实现 xxx 功能
+ACCEPTANCE: [具体验收标准]
+CONTRACT: D:\Z code\project\CONTRACT.md
+CONTEXT: [相关文件列表]
+
+请先读取以下文件获取你的角色定义和行为规范:
+- agents/worker-coder.md
+- references/common-rules.md
+```
+
+**Token 节省效果**：
+- 旧策略：每个 Worker prompt ~2000 Token（注入完整模板）
+- 新策略：每个 Worker prompt ~300 Token（只写核心指令）
+- 3 个 Worker 节省 ~5100 Token（约 60-70%）
+
 ### Step 3.5: Wave 间产物交接协议
 
 当存在多个 Wave 时，Wave 间的产物交接**必须**通过文件显式传递，不能依赖 Leader 的记忆或摘要转述：
@@ -229,6 +270,21 @@ Wave 2: Tester 写 tests/test_auth.py → prompt 中引用 "参考 src/auth.py �
 **回退机制**: 如果 Wave N 的 Worker 发现 Wave N-1 的产物有致命问题：
 - Worker 在报告中标记 `NEEDS-ROLLBACK: <原因>`
 - Leader 评估后决定：(a) 派 Fixer 修复, (b) 重做 Wave N-1 的相关子任务, (c) 缩小范围跳过
+
+**失败传播规则**：
+- 如果 Wave N 中某个子任务 FAILED，Leader 必须立即检查 Wave N+1 中是否有子任务依赖它
+- 如果有依赖 → 该 Wave N+1 子任务标记为 **BLOCKED**，不派发，不消耗 Token
+- Leader 优先处理 FAILED 子任务（派 Fixer 修复），修复成功后再派发被 BLOCKED 的子任务
+- 如果 FAILED 子任务 3 轮修复失败 → 将 BLOCKED 子任务从计划中移除，输出降级版本
+
+**状态矩阵**：Leader 必须维护一个子任务状态矩阵，格式如下：
+```markdown
+| 子任务 | Wave | 状态 | 依赖 | 产出文件 |
+|--------|:----:|:----:|------|----------|
+| Subtask 1 | 1 | ✅ DONE | — | src/main.py |
+| Subtask 2 | 1 | ❌ FAILED | — | — |
+| Subtask 3 | 2 | ⏸️ BLOCKED | Subtask 2 | — |
+```
 
 ### Step 4: 收集子任务结果
 
@@ -295,6 +351,18 @@ Leader 收到所有子智能体的摘要后，**自己整合**成初版交付物
 ```
 
 **快照设计原则**：快照只记录子任务 ID、状态、文件路径等轻量信息。大段 Prompt 和 Team Plan 详情存为独立文件，快照中只记录引用路径，确保快照文件始终轻量（< 5KB）。
+
+**原子写入规则**：Leader 写入 `.teamforge_state.json` 时**必须**使用原子写入，防止并发损坏：
+1. 先写入临时文件 `.teamforge_state.tmp`
+2. 写入完成后，将 `.teamforge_state.tmp` 重命名为 `.teamforge_state.json`
+3. 这确保了即使写入过程中断，原文件也不会损坏
+
+```bash
+# 写入临时文件
+echo '{...}' > .teamforge_state.tmp
+# 原子替换
+mv .teamforge_state.tmp .teamforge_state.json
+```
 
 **恢复流程**: 如果会话中断，用户可以说 "恢复上次的 teamforge 任务"，Leader 读取 `.teamforge_state.json` 并从断点继续：
 1. 检查已完成 Wave 的产出文件是否仍然存在
