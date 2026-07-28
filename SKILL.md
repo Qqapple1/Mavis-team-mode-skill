@@ -1,7 +1,7 @@
 ---
 name: mavis-team-mode
 description: "Recreates the Mavis (MiniMax Agent) Team Mode workflow (Leader + Workers + Verifier) inside Zcode 3.4.2+. Use this skill when the user wants parallel agent execution, structured task decomposition, independent quality verification, or multi-step work that benefits from sub-agents running concurrently. Triggers on: 'team mode', 'mavis team', 'multi-agent', 'split into subtasks', 'verify the result', '用 team 模式', '团队模式', '多智能体协作', '并行处理'. Do NOT use for simple single-step tasks."
-version: 1.4.0
+version: 1.5.0
 license: MIT
 metadata:
   author: Community port (Mavis CLI agent)
@@ -120,7 +120,7 @@ If missing, see INSTALL.md.
 > **为什么需要这一步**: Zcode 的 sub-agent 完全隔离、各自独立的 tool context,没有共享内存。如果 Leader 拆解完直接派发 4 个 Worker,Coder / Tester / Doc-Writer 拿到的 prompt 是各自独立的,**没人同步接口规范**,结果就是: Coder 实现 `--prefix/--suffix/--replace/--regex/--index/--dry-run/--verbose`, Doc-Writer 文档里写 `--number/--name/--start/--digits/--recursive/--filter/--include-dirs`,根本不是同一个工具。
 
 **强制流程**:
-1. Leader 在派发 Worker 之前,**先**在团队共享目录写一个 `CONTRACT.md`(或在每个 Worker prompt 里塞同一段接口定义),内容包括:
+1. Leader 在派发 Worker 之前,**必须**在团队共享目录写一个 `CONTRACT.md`(或在每个 Worker prompt 里塞同一段接口定义),内容包括:
    - 所有公开函数/类的签名(参数、返回、异常)
    - CLI 工具的完整 `--help` 输出(即使 Coder 还没写完代码,先约定)
    - 任何共享文件格式(JSON schema / Markdown 模板 / etc.)
@@ -135,7 +135,51 @@ If missing, see INSTALL.md.
 
 > **CONTRACT 里的文本处理要求**: 如果任务涉及中文/emoji/任何非 ASCII 文本存储、搜索、序列化,CONTRACT 必须明言写盘 (`ensure_ascii=False`)、读盘 (`encoding="utf-8"`)、验证（至少 1 个非 ASCII 测试用例）和 CLI 输出格式（plain / ANSI / JSON）。完整规范见 [`references/encoding-guidelines.md`](references/encoding-guidelines.md)。在 CONTRACT 里就写明,不要在 Verifier 阶段才发现。
 
+> **CONTRACT 字符串级验证**: Leader 在 Step 4 整合时,**必须**用 `grep` 或字符串搜索检查每个 Worker 产出是否包含 CONTRACT 中定义的接口字符串。例如: CONTRACT 定义了 `--prefix` 参数,则 Coder 的代码中必须出现 `--prefix` 字符串,Doc-Writer 的文档中也必须出现 `--prefix` 字符串。不匹配的视为 CONTRACT 违规,必须返工。**不可跳过此验证步骤。**
+
 Leader 必须输出一个**结构化任务书**，格式见 `agents/leader.md` 的 Phase 1。
+
+### Step 2.7: 拆解质量自检
+
+Leader 在发布 Team Plan 之前，**必须**用以下 checklist 自检拆解质量：
+
+- [ ] 每个子任务有明确的输入/输出描述
+- [ ] 每个子任务有可验证的验收标准（不是"做好就行"）
+- [ ] 子任务之间依赖关系已标注（无遗漏的隐式依赖）
+- [ ] 没有重复工作（两个 Worker 不做同一件事）
+- [ ] 没有遗漏工作（所有需求都被某个子任务覆盖）
+- [ ] 子任务粒度合适（不会太粗以至于 Worker 不知从何下手，也不会太细以至于拆解本身比直接做还慢）
+- [ ] CONTRACT 已覆盖所有跨 Worker 的接口约定
+- [ ] Agent 类型选择正确（需要写文件的任务用 general-purpose，不误用 Explore）
+
+如果任何一项不通过，Leader 必须修正后再派发。
+
+### Step 2.8: 依赖图可视化
+
+Leader 在 Team Plan 中**必须**输出执行顺序，按 Wave 分批：
+
+```markdown
+## 执行顺序 (Execution Waves)
+
+### Wave 1（无依赖，立即并行执行）
+- Subtask A
+- Subtask B
+- Subtask D
+
+### Wave 2（依赖 Wave 1 完成）
+- Subtask C（依赖 A）
+- Subtask E（依赖 B + D）
+
+### Wave 3（依赖 Wave 2 完成）
+- Subtask F（依赖 C + E）
+```
+
+**规则**:
+- Wave 1: 所有没有依赖的子任务
+- Wave N: 所有依赖 Wave N-1（或更早 Wave）的子任务
+- 同一 Wave 内的子任务**必须并行**派发
+- 不同 Wave 之间**必须串行**（前一个 Wave 全部完成后才派发下一个）
+- 如果某个子任务跨 Wave 依赖（如 Wave 3 依赖 Wave 1），仍按最早依赖的 Wave 归组
 
 ### Step 3: Leader 启动并行子智能体
 
@@ -162,6 +206,8 @@ Leader 在主对话里调用 Zcode 的 sub-agent 机制。两种用法：
 3. 输出格式要求（统一格式方便后面聚合）
 4. 上下文限制（不读的目录、不用的工具）
 
+> **Worker 超时**: 如果 sub-agent 超过 **5 分钟**未返回结果，Leader 应视为该 Worker 失败。处理方式：记录为 FAILED，不阻塞其他 Worker；在 Step 4 整合时决定是否重试。Zcode 的 sub-agent 没有内置超时机制，Leader 需要自行通过时间戳判断。
+
 ### Step 4: 收集子任务结果
 
 Leader 收到所有子智能体的摘要后，**自己整合**成初版交付物。
@@ -170,6 +216,17 @@ Leader 收到所有子智能体的摘要后，**自己整合**成初版交付物
 - ✅ 只看摘要（Zcode 子智能体上下文已隔离）
 - ✅ 标出每个摘要的来源 subagent
 - ❌ 不要重做子任务的工作（信任 subagent 的摘要）
+
+**任务完成度 checklist**（Phase 3 整合前必须逐项对照）：
+
+- [ ] Team Plan 中每个子任务都有对应的 Worker 输出
+- [ ] 没有 Worker 返回 FAILED 或超时未返回
+- [ ] 每个 Worker 输出的文件路径与 CONTRACT 产物清单一致
+- [ ] 用 `grep` 验证 Worker 产出包含 CONTRACT 定义的接口字符串
+- [ ] 所有验收标准都有对应的证据（测试通过截图、文件存在性等）
+- [ ] 子任务之间没有接口冲突（如 Coder 的函数签名与 Tester 的调用一致）
+
+如果任何一项不通过，Leader 必须在整合前修复（重新派发对应 Worker 或手动补齐）。
 
 ### Step 5: Verifier 验收
 
@@ -188,6 +245,13 @@ Leader 收到所有子智能体的摘要后，**自己整合**成初版交付物
 - 如果必须用,用 `references/verification-checklist.md` 作硬 checklist,**逐项勾选不靠记忆**,不靠"应该没问题"
 - 接受 20-30% 漏检率;复杂任务用方法 A
 
+**方法 D（自动化）**：Verifier 作为 sub-agent 自动派发
+- Leader 在 Phase 4 中自动派发一个 Verifier sub-agent（使用 `agents/verifier.md` 模板）
+- 传入：(1) 原始任务描述, (2) 整合后的交付物, (3) 验收标准
+- Verifier sub-agent 独立执行检查，返回 PASS/FAIL 清单
+- **不需要用户手动操作**，Leader 自动完成整个验证流程
+- 推荐用于自动化流水线或用户希望"一键完成"的场景
+
 ### Step 6: 迭代修正
 
 如果 Verifier 标 FAIL：
@@ -196,6 +260,12 @@ Leader 收到所有子智能体的摘要后，**自己整合**成初版交付物
 - 最多迭代 3 轮（防止无限循环）
 - 第 3 轮仍 FAIL → 把失败清单交给用户决定
 
+**降级策略**：如果 3 轮迭代后仍有 FAIL 项：
+1. Leader 必须输出**当前可用的最小交付物**（标记哪些功能已通过、哪些未通过）
+2. 列出剩余 FAIL 项的具体原因和修复建议
+3. 将决策权交给用户：接受降级版本 / 手动修复 / 放弃
+4. **不可静默失败**——即使全部 FAIL 也必须输出报告
+
 ### Step 7: 交付
 
 最终交付物 + 一份 Team Execution Report：
@@ -203,6 +273,34 @@ Leader 收到所有子智能体的摘要后，**自己整合**成初版交付物
 - Verifier 验收结果
 - 迭代历史
 - 已知限制
+
+## Progress Reporting
+
+每个 Phase 完成后，Leader **必须**输出进度更新，格式如下：
+
+```
+## 进度报告 (Progress Update)
+
+### 当前 Phase: [Phase 名称]
+- 已完成: [N/M 个子任务]
+- 状态: [进行中/已完成/遇到阻塞]
+- 下一步: [即将执行的操作]
+
+### 子任务状态
+| 子任务 | Worker | 状态 | 备注 |
+|--------|--------|------|------|
+| Subtask A | Worker-Coder | ✅ 完成 | - |
+| Subtask B | Worker-Tester | ⏳ 进行中 | - |
+| Subtask C | Worker-Researcher | ❌ 失败 | 超时，已重新派发 |
+```
+
+**规则**:
+- Phase 1 完成后：输出 Team Plan 概要 + 子任务数量
+- Phase 2 完成后：输出每个 Wave 的派发状态
+- Phase 3 完成后：输出整合结果 + 完成度 checklist
+- Phase 4 完成后：输出 Verifier 验收结果
+- Phase 5 完成后：输出迭代历史（如有）
+- Phase 6：最终报告包含所有 Phase 的进度汇总
 
 ## Usage examples
 
@@ -223,6 +321,14 @@ See `agents/` directory for ready-to-use prompt templates:
 - `agents/worker-doc-writer.md` — 文档 worker
 - `agents/worker-reviewer.md` — code review worker
 - `agents/worker-fixer.md` — 精准修复 worker (Step 6 Iterate, v1.4.0+)
+
+## Common Pitfalls
+
+See [`references/common-pitfalls.md`](references/common-pitfalls.md) for lessons learned from real-world usage, including:
+- Explore agent 不能写文件
+- `ensure_ascii=False` 必须在 CONTRACT 中声明
+- Worker 角色不能越界
+- 以及更多来自 CHANGELOG 的经验教训
 
 ## Advanced: DeepSeek + Zcode
 
