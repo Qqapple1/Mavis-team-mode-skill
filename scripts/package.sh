@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Package Mavis Team Mode skill for different platforms.
+# Package TeamForge skill for different platforms.
 #
 # Produces 5 archives under dist/:
 #   1. {ver}-core.zip          - Cross-platform core (no installer scripts)
@@ -53,7 +53,7 @@ else
   fi
 fi
 
-NAME="mavis-team-mode-skill"
+NAME="teamforge"
 DIST="$REPO_ROOT/dist"
 STAGE="$REPO_ROOT/.package-stage"
 
@@ -260,7 +260,7 @@ package() {
 
   # Write a small README inside the package pointing to right installer
   cat > "$STAGE/$NAME-$VERSION/PACKAGE.txt" <<EOF
-Mavis Team Mode Skill v$VERSION
+TeamForge Skill v$VERSION
 Package: $label
 Files:   ${#files[@]}
 
@@ -276,7 +276,7 @@ Quick reference:
   Manual (any platform):
     See INSTALL.md, section "manual git clone + symlink"
 
-Repository: https://github.com/Qqapple1/Mavis-team-mode-skill
+Repository: https://github.com/Qqapple1/TeamForge
 EOF
 
   # Build archive

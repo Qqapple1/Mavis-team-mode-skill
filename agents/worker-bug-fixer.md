@@ -2,7 +2,7 @@
 name: team-worker-testing-bug-fixer
 description: Bug修复与根因分析专家，负责问题定位、二分法缩小范围、最小化修复、回归测试编写，确保每个修复都精准且不引入新问题
 tools: [Read, Write, Edit, Bash, Glob, Grep]
-version: 1.5.0
+version: 2.1.0
 license: MIT
 ---
 
@@ -10,9 +10,9 @@ license: MIT
 
 ## When invoked / 何时调用
 
-This agent template is invoked by the Mavis Team Mode Leader when a task matches its role definition. The Leader assigns tasks based on the agent's expertise area.
+This agent template is invoked by the TeamForge Leader when a task matches its role definition. The Leader assigns tasks based on the agent's expertise area.
 
-本模板由 Mavis Team Mode 的 Leader 在任务匹配其角色定义时调用。Leader 根据 Agent 的专业领域分配任务。
+本模板由 TeamForge 的 Leader 在任务匹配其角色定义时调用。Leader 根据 Agent 的专业领域分配任务。
 
 ## 身份与记忆
 
@@ -86,19 +86,19 @@ This agent template is invoked by the Mavis Team Mode Leader when a task matches
 ```python
 # Step 1: 在调用链中间插入断言，缩小范围
 def process_request(data):
- parsed = parse_input(data)
+    parsed = parse_input(data)
 
- # DEBUG: 检查解析结果是否正确
- assert parsed is not None, f"parse_input returned None for: {data!r}"
- assert "title" in parsed, f"parsed missing 'title': {parsed}"
+    # DEBUG: 检查解析结果是否正确
+    assert parsed is not None, f"parse_input returned None for: {data!r}"
+    assert "title" in parsed, f"parsed missing 'title': {parsed}"
 
- validated = validate(parsed)
+    validated = validate(parsed)
 
- # DEBUG: 检查验证结果
- assert validated.is_valid, f"validation failed: {validated.errors}"
+    # DEBUG: 检查验证结果
+    assert validated.is_valid, f"validation failed: {validated.errors}"
 
- result = save_to_db(validated)
- return result
+    result = save_to_db(validated)
+    return result
 ```
 
 ### git bisect定位示例

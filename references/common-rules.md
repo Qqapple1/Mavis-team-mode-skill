@@ -1,6 +1,6 @@
 # 通用行为规范 (Common Rules)
 
-所有 Mavis Team Mode 的 Agent（Leader、Worker、Verifier）在执行任务时必须遵守以下规则。
+所有 TeamForge 的 Agent（Leader、Worker、Verifier）在执行任务时必须遵守以下规则。
 
 ## 系统规则（不可违反）
 - 接到任务后先阅读任务文档了解历史上下文

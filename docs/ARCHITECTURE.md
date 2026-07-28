@@ -129,7 +129,7 @@ flowchart TB
 > or `wc -l` for current numbers — these can drift.
 
 ```
-teamforge-sync/
+teamforge/
 │
 ├── SKILL.md                       (272 lines) — Zcode loads this on trigger
 │   ├── YAML frontmatter            triggers on description match

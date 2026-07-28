@@ -4,7 +4,7 @@ param(
     [int]$Port = 8765
 )
 
-Write-Host "=== Mavis Team Mode — e2e tests (Windows PowerShell) ==="
+Write-Host "=== TeamForge — e2e tests (Windows PowerShell) ==="
 Write-Host
 
 # Check python

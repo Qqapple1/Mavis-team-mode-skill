@@ -2,7 +2,7 @@
 name: team-leader
 description: "Coordinates a TeamForge workflow in Zcode. Receives a complex user task, decomposes it into parallel sub-tasks, dispatches sub-agents, integrates their outputs, runs verification, and iterates until the deliverable meets all acceptance criteria. Use when invoking the `teamforge` skill."
 tools: [Agent, Read, Write, Edit, Bash, Glob, Grep, WebSearch, WebFetch]
-version: 1.5.0
+version: 2.1.0
 license: MIT
 ---
 
@@ -190,7 +190,7 @@ After user confirms, dispatch sub-agents. Use Zcode's sub-agent tool:
 
 ```
 任务类型是什么？
-├── 写新代码 → worker-coder
+├── 写新代码 → worker-coder (注：若涉及 API 接口、前端页面等特定领域，请优先向下查找专用角色)
 ├── 写测试 → worker-tester
 ├── 写文档/README → worker-doc-writer
 ├── 修 Bug → worker-fixer

@@ -1,6 +1,6 @@
-# Validate Mavis Team Mode skill (Windows PowerShell)
+# Validate TeamForge skill (Windows PowerShell)
 param(
-    [string]$SkillDir = "$env:USERPROFILE\.zcode\skills\mavis-team-mode"
+    [string]$SkillDir = "$env:USERPROFILE\.zcode\skills\teamforge"
 )
 
 # Force UTF-8 output on Windows terminals
@@ -15,7 +15,7 @@ function Fail { param($msg) Write-Host "[FAIL] $msg" -ForegroundColor Red; $scri
 function Warn { param($msg) Write-Host "[!] $msg" -ForegroundColor Yellow }
 function Info { param($msg) Write-Host "[i] $msg" -ForegroundColor Cyan }
 
-Write-Host "=== Mavis Team Mode Skill Validator (Windows PowerShell) ==="
+Write-Host "=== TeamForge Skill Validator (Windows PowerShell) ==="
 Write-Host
 
 Info "Checking skill directory: $SkillDir"

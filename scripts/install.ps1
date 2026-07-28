@@ -1,4 +1,4 @@
-# Install Mavis Team Mode skill into Zcode (Windows PowerShell)
+# Install TeamForge skill into Zcode (Windows PowerShell)
 #
 # For Windows users who don't have Git Bash or WSL.
 # This is a fallback when bash isn't available.
@@ -13,14 +13,14 @@ param(
     [switch]$Doctor,
     [switch]$NoVerify,
     [switch]$Help,
-    [string]$InstallDir = "$env:USERPROFILE\mavis-team-mode-skill",
+    [string]$InstallDir = "$env:USERPROFILE\teamforge",
     [string]$SkillsDir = "$env:USERPROFILE\.zcode\skills",
-    [string]$RepoUrl = "https://github.com/Qqapple1/Mavis-team-mode-skill.git",
+    [string]$RepoUrl = "https://github.com/Qqapple1/TeamForge.git",
     [string]$GitRef = ""
 )
 
 $VERSION = "1.4.0"
-$SKILL_NAME = "mavis-team-mode"
+$SKILL_NAME = "teamforge"
 $ZCODE_SKILLS_DIR = $SkillsDir
 $ZCODE_LINK = "$ZCODE_SKILLS_DIR\$SKILL_NAME"
 
@@ -47,7 +47,7 @@ function Die($msg)  { Err $msg; exit 1 }
 
 function Show-Usage {
     @"
-Mavis Team Mode installer v$VERSION (PowerShell)
+TeamForge installer v$VERSION (PowerShell)
 
 Usage:
   powershell -ExecutionPolicy Bypass -File install.ps1         Install
@@ -55,7 +55,7 @@ Usage:
   powershell -ExecutionPolicy Bypass -File install.ps1 -Doctor
 
 Parameters:
-  -InstallDir <path>   Where to clone (default: `$env:USERPROFILE\mavis-team-mode-skill)
+  -InstallDir <path>   Where to clone (default: `$env:USERPROFILE\teamforge)
   -SkillsDir <path>    Zcode skills directory (default: `$env:USERPROFILE\.zcode\skills)
   -RepoUrl <url>       Git URL (default: GitHub Qqapple1 repo)
   -GitRef <ref>        Branch/tag/SHA to checkout (default: latest)

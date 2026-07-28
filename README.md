@@ -6,7 +6,7 @@
 > 它用 **2-4 倍 Token** 换取 **结果的可预测性** 和 **质量的显著提升**。
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
-[![Version](https://img.shields.io/badge/version-2.0.0-blue)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-2.1.0-blue)](CHANGELOG.md)
 
 ---
 
@@ -86,7 +86,7 @@ bash scripts/install.sh
 powershell -ExecutionPolicy Bypass -File scripts/install.ps1
 
 # 方式 3: 手动 clone
-git clone https://github.com/Qqapple1/TeamForge-sync.git ~/.zcode/skills/teamforge
+git clone https://github.com/Qqapple1/TeamForge.git ~/.zcode/skills/teamforge
 ```
 
 ### 使用

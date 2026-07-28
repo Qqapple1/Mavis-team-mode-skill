@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Install Mavis Team Mode skill into Zcode
+# Install TeamForge skill into Zcode
 #
 # Works on:
 #   - Linux (any distro with bash 3.2+, git, python3)
@@ -16,8 +16,8 @@
 #   bash install.sh --copy       Force copy instead of symlink (Windows safe)
 #
 # Env vars:
-#   MAVIS_TEAM_REPO   Git URL to clone (default: GitHub)
-#   MAVIS_TEAM_DIR    Where to clone (default: $HOME/mavis-team-mode-skill)
+#   TEAMFORGE_REPO   Git URL to clone (default: GitHub)
+#   TEAMFORGE_DIR    Where to clone (default: $HOME/teamforge)
 #   MAVIS_TEAM_REF    Git ref to checkout (branch/tag/SHA) after clone
 #   MAVIS_TEAM_NO_COLOR  Set to non-empty to disable color output
 #   MAVIS_TEAM_FORCE_COPY  Set to non-empty to force copy over symlink
@@ -43,14 +43,14 @@ detect_platform() {
 PLATFORM="$(detect_platform)"
 
 # ---- Config ----
-REPO_URL="${MAVIS_TEAM_REPO:-https://github.com/Qqapple1/Mavis-team-mode-skill.git}"
-SKILL_NAME="mavis-team-mode"
+REPO_URL="${TEAMFORGE_REPO:-https://github.com/Qqapple1/TeamForge.git}"
+SKILL_NAME="teamforge"
 
 # Path defaults: handle Windows $HOME
-if [ -n "${MAVIS_TEAM_DIR:-}" ]; then
-  INSTALL_DIR="$MAVIS_TEAM_DIR"
+if [ -n "${TEAMFORGE_DIR:-}" ]; then
+  INSTALL_DIR="$TEAMFORGE_DIR"
 else
-  INSTALL_DIR="$HOME/mavis-team-mode-skill"
+  INSTALL_DIR="$HOME/teamforge"
 fi
 ZCODE_SKILLS_DIR="$HOME/.zcode/skills"
 ZCODE_LINK="$ZCODE_SKILLS_DIR/$SKILL_NAME"
@@ -160,7 +160,7 @@ make_link() {
 # ---- Usage ----
 usage() {
   cat <<EOF
-Mavis Team Mode installer v${INSTALLER_VERSION}
+TeamForge installer v${INSTALLER_VERSION}
 
 Usage:
   bash install.sh              Install (clone + link + verify)
@@ -172,8 +172,8 @@ Usage:
   bash install.sh --help       This help
 
 Environment:
-  MAVIS_TEAM_REPO       Git URL (default: GitHub Qqapple1 repo)
-  MAVIS_TEAM_DIR        Where to clone (default: \$HOME/mavis-team-mode-skill)
+  TEAMFORGE_REPO       Git URL (default: GitHub Qqapple1 repo)
+  TEAMFORGE_DIR        Where to clone (default: \$HOME/teamforge)
   MAVIS_TEAM_REF        Git ref to checkout after clone
   MAVIS_TEAM_NO_COLOR   Disable color output
   MAVIS_TEAM_FORCE_COPY Force copy over symlink
@@ -190,7 +190,7 @@ ACTION="install"
 DO_VERIFY=1
 case "${1:-}" in
   --help|-h)  usage; exit 0 ;;
-  --version)  echo "Mavis Team Mode installer v${INSTALLER_VERSION}"; exit 0 ;;
+  --version)  echo "TeamForge installer v${INSTALLER_VERSION}"; exit 0 ;;
   --uninstall) ACTION="uninstall" ;;
   --doctor)    ACTION="doctor" ;;
   --no-verify) ACTION="install"; DO_VERIFY=0 ;;

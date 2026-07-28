@@ -1,4 +1,4 @@
-# Mavis Team Mode Skill — Makefile
+# TeamForge Skill — Makefile
 # Common development tasks. Use `make help` to see all targets.
 #
 # This Makefile wraps the scripts/ directory. Prefer running scripts directly
@@ -9,15 +9,15 @@ PYTHON ?= python3
 SHELL := /bin/bash
 SKILL_DIR := $(shell pwd)
 ZCODE_SKILLS_DIR := $(HOME)/.zcode/skills
-ZCODE_LINK := $(ZCODE_SKILLS_DIR)/mavis-team-mode
-INSTALL_DIR := $(HOME)/mavis-team-mode-skill
-REPO_URL ?= https://github.com/Qqapple1/Mavis-team-mode-skill.git
+ZCODE_LINK := $(ZCODE_SKILLS_DIR)/teamforge
+INSTALL_DIR := $(HOME)/teamforge
+REPO_URL ?= https://github.com/Qqapple1/TeamForge.git
 GIT_REF ?=
 
 # ---- Help target ----
 .PHONY: help
 help: ## Show this help message
-	@echo "Mavis Team Mode Skill — make targets:"
+	@echo "TeamForge Skill — make targets:"
 	@echo ""
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | \
 	  awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-20s\033[0m %s\n", $$1, $$2}'
@@ -28,7 +28,7 @@ help: ## Show this help message
 
 # ---- Install / uninstall ----
 .PHONY: install
-install: ## Install skill to Zcode (~/.zcode/skills/mavis-team-mode)
+install: ## Install skill to Zcode (~/.zcode/skills/teamforge)
 	REPO_URL=$(REPO_URL) GIT_REF=$(GIT_REF) bash scripts/install.sh
 
 .PHONY: uninstall
@@ -144,7 +144,7 @@ clean-all: clean prototype-stop uninstall clean-dist ## Clean everything (incl. 
 # ---- Info ----
 .PHONY: info
 info: ## Show skill metadata
-	@echo "Skill: mavis-team-mode"
+	@echo "Skill: teamforge"
 	@echo "Version: $$(grep '^version:' SKILL.md | head -1 | awk '{print $$2}')"
 	@echo "License: MIT"
 	@echo "Files:   $$(find . -type f -not -path './.git/*' -not -path './dist/*' -not -path '*/__pycache__/*' -not -name '*.pyc' | wc -l | tr -d ' ')"

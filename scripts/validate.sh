@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-# Validate Mavis Team Mode skill installation
+# Validate TeamForge skill installation
 # Usage: bash scripts/validate.sh
 set -uo pipefail
 
-SKILL_DIR="${HOME}/.zcode/skills/mavis-team-mode"
+SKILL_DIR="${HOME}/.zcode/skills/teamforge"
 PASS=0
 FAIL=0
 
@@ -12,7 +12,7 @@ fail() { printf '\033[1;31m[✗]\033[0m %s\n' "$*"; FAIL=$((FAIL+1)); }
 warn() { printf '\033[1;33m[!]\033[0m %s\n' "$*"; }
 info() { printf '\033[1;34m[i]\033[0m %s\n' "$*"; }
 
-echo "=== Mavis Team Mode Skill Validator ==="
+echo "=== TeamForge Skill Validator ==="
 echo
 
 # 1. Skill directory exists

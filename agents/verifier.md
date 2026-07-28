@@ -2,7 +2,7 @@
 name: team-verifier
 description: "Verifier sub-agent in a TeamForge workflow. Independently checks the Leader's integrated output against the original acceptance criteria. Does NOT trust the Leader's self-assessment — runs its own checks."
 tools: [Read, Bash, Glob, Grep, WebSearch, WebFetch]
-version: 1.5.0
+version: 2.1.0
 license: MIT
 ---
 

@@ -26,13 +26,13 @@ archive to download for your OS.
 
 | I am a... | Download | Install command |
 |-----------|----------|-----------------|
-| **macOS user** | `teamforge-sync-{ver}-bash.tar.gz` | `bash scripts/install.sh` |
-| **Linux user** | `teamforge-sync-{ver}-bash.tar.gz` | `bash scripts/install.sh` |
-| **Windows + Git Bash user** | `teamforge-sync-{ver}-bash.tar.gz` | `bash scripts/install.sh` (default copy mode) |
-| **Windows + PowerShell user** (no Git Bash) | `teamforge-sync-{ver}-windows.zip` | `powershell -ExecutionPolicy Bypass -File scripts\install.ps1` |
-| **WSL2 user** | `teamforge-sync-{ver}-bash.tar.gz` | `bash scripts/install.sh` (WSL = Linux) |
-| **Just want to browse / read** (no install) | `teamforge-sync-{ver}-core.zip` | No install needed |
-| **Contributor / CI runner** | `teamforge-sync-{ver}-source.tar.gz` | `git clone` (or use the source tarball) |
+| **macOS user** | `teamforge-{ver}-bash.tar.gz` | `bash scripts/install.sh` |
+| **Linux user** | `teamforge-{ver}-bash.tar.gz` | `bash scripts/install.sh` |
+| **Windows + Git Bash user** | `teamforge-{ver}-bash.tar.gz` | `bash scripts/install.sh` (default copy mode) |
+| **Windows + PowerShell user** (no Git Bash) | `teamforge-{ver}-windows.zip` | `powershell -ExecutionPolicy Bypass -File scripts\install.ps1` |
+| **WSL2 user** | `teamforge-{ver}-bash.tar.gz` | `bash scripts/install.sh` (WSL = Linux) |
+| **Just want to browse / read** (no install) | `teamforge-{ver}-core.zip` | No install needed |
+| **Contributor / CI runner** | `teamforge-{ver}-source.tar.gz` | `git clone` (or use the source tarball) |
 
 If you're unsure: **download the `bash` archive and use Git Bash** (Windows
 users — install from [git-scm.com](https://git-scm.com/download/win)) or
@@ -69,11 +69,11 @@ make package-dry-run
 
 After running, `dist/` contains:
 ```
-teamforge-sync-1.4.0-core.zip        (50 files, ~120KB)
-teamforge-sync-1.4.0-bash.tar.gz     (44 files, ~127KB)
-teamforge-sync-1.4.0-windows.zip     (54 files, ~130KB)
-teamforge-sync-1.4.0-source.tar.gz   (51 files, ~150KB)
-teamforge-sync-1.4.0-source.zip      (63 files, ~155KB)
+teamforge-1.4.0-core.zip        (50 files, ~120KB)
+teamforge-1.4.0-bash.tar.gz     (44 files, ~127KB)
+teamforge-1.4.0-windows.zip     (54 files, ~130KB)
+teamforge-1.4.0-source.tar.gz   (51 files, ~150KB)
+teamforge-1.4.0-source.zip      (63 files, ~155KB)
 SHA256SUMS                                  (checksums)
 ```
 
@@ -84,14 +84,14 @@ the bash installer on any platform with bash + git:
 
 ```bash
 # macOS / Linux / Git Bash / WSL
-git clone https://github.com/Qqapple1/TeamForge-sync.git ~/teamforge-sync
-bash ~/teamforge-sync/scripts/install.sh
+git clone https://github.com/Qqapple1/TeamForge.git ~/teamforge
+bash ~/teamforge/scripts/install.sh
 ```
 
 Or for Windows PowerShell:
 ```powershell
-git clone https://github.com/Qqapple1/TeamForge-sync.git $env:USERPROFILE\teamforge-sync
-powershell -ExecutionPolicy Bypass -File $env:USERPROFILE\teamforge-sync\scripts\install.ps1
+git clone https://github.com/Qqapple1/TeamForge.git $env:USERPROFILE\teamforge
+powershell -ExecutionPolicy Bypass -File $env:USERPROFILE\teamforge\scripts\install.ps1
 ```
 
 ## What runs everywhere vs. platform-only

@@ -2,7 +2,7 @@
 name: team-worker-researcher
 description: "Sub-agent for research tasks inside a TeamForge workflow. Two modes: (1) pure read-only research via Zcode's Explore agent, returns findings inline; (2) research + write report via general-purpose, produces a file. The Leader must pick the right mode based on whether the deliverable is inline (Explore) or a file (general-purpose). See body for the boundary."
 tools: [Read, Bash, Glob, Grep, WebSearch, WebFetch]
-version: 1.4.0
+version: 2.1.0
 license: MIT
 ---
 

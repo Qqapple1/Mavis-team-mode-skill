@@ -10,29 +10,29 @@
 
 ```bash
 # macOS / Linux / Git Bash / WSL
-curl -fsSL https://raw.githubusercontent.com/Qqapple1/TeamForge-sync/main/scripts/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/Qqapple1/TeamForge/main/scripts/install.sh | bash
 
 # 或先下载再跑（更安全，能看到脚本干了什么）
-curl -fsSL https://raw.githubusercontent.com/Qqapple1/TeamForge-sync/main/scripts/install.sh -o install.sh
+curl -fsSL https://raw.githubusercontent.com/Qqapple1/TeamForge/main/scripts/install.sh -o install.sh
 bash install.sh
 ```
 
 脚本会做：
 1. 检测平台（Linux / macOS / Windows Git Bash / WSL）
-2. clone 仓库到 `~/teamforge-sync/`
+2. clone 仓库到 `~/teamforge/`
 3. 软链（或 copy，看平台）到 `~/.zcode/skills/teamforge/`
 4. 跑 24 项格式自检
 5. 提示你重启 Zcode
 
 **如果没 `curl` 用 `wget`**：
 ```bash
-wget -qO- https://raw.githubusercontent.com/Qqapple1/TeamForge-sync/main/scripts/install.sh | bash
+wget -qO- https://raw.githubusercontent.com/Qqapple1/TeamForge/main/scripts/install.sh | bash
 ```
 
 **如果在中国大陆**，`raw.githubusercontent.com` 可能被 GFW 干扰。备选：
 ```bash
-git clone https://github.com/Qqapple1/TeamForge-sync.git ~/teamforge-sync
-bash ~/teamforge-sync/scripts/install.sh
+git clone https://github.com/Qqapple1/TeamForge.git ~/teamforge
+bash ~/teamforge/scripts/install.sh
 ```
 
 ### Windows Git Bash 注意事项
@@ -55,8 +55,8 @@ bash scripts/install.sh --uninstall   # 卸载
 
 | 变量 | 作用 | 默认 |
 |------|------|------|
-| `TEAMFORGE_REPO` | 改 Git 源 | `https://github.com/Qqapple1/TeamForge-sync.git` |
-| `TEAMFORGE_DIR` | 改安装路径 | `$HOME/teamforge-sync` |
+| `TEAMFORGE_REPO` | 改 Git 源 | `https://github.com/Qqapple1/TeamForge.git` |
+| `TEAMFORGE_DIR` | 改安装路径 | `$HOME/teamforge` |
 | `TEAMFORGE_REF` | pin 到 branch/tag/SHA | main |
 | `TEAMFORGE_NO_COLOR` | 禁用颜色 | — |
 | `TEAMFORGE_FORCE_COPY` | 强制 copy | auto on Windows Git Bash |
@@ -69,8 +69,8 @@ bash scripts/install.sh --uninstall   # 卸载
 
 ```powershell
 # 在 PowerShell 跑
-git clone https://github.com/Qqapple1/TeamForge-sync.git $env:USERPROFILE\teamforge-sync
-cd $env:USERPROFILE\teamforge-sync
+git clone https://github.com/Qqapple1/TeamForge.git $env:USERPROFILE\teamforge
+cd $env:USERPROFILE\teamforge
 powershell -ExecutionPolicy Bypass -File scripts\install.ps1
 ```
 
@@ -86,11 +86,11 @@ PowerShell 版功能等价（clone + copy + 验证 + 卸载）：
 
 ```bash
 # 1. Clone 仓库到本地
-git clone https://github.com/Qqapple1/TeamForge-sync.git ~/teamforge-sync
+git clone https://github.com/Qqapple1/TeamForge.git ~/teamforge
 
 # 2. 软链到 Zcode skills 目录
 mkdir -p ~/.zcode/skills
-ln -s ~/teamforge-sync ~/.zcode/skills/teamforge
+ln -s ~/teamforge ~/.zcode/skills/teamforge
 
 # 3. 验证
 ls -la ~/.zcode/skills/teamforge/
@@ -101,10 +101,10 @@ ls -la ~/.zcode/skills/teamforge/
 
 **Windows PowerShell 手动版**：
 ```powershell
-git clone https://github.com/Qqapple1/TeamForge-sync.git $env:USERPROFILE\teamforge-sync
+git clone https://github.com/Qqapple1/TeamForge.git $env:USERPROFILE\teamforge
 $dest = "$env:USERPROFILE\.zcode\skills\teamforge"
 New-Item -ItemType Directory -Path "$env:USERPROFILE\.zcode\skills" -Force | Out-Null
-Copy-Item -Recurse -Path $env:USERPROFILE\teamforge-sync -Destination $dest
+Copy-Item -Recurse -Path $env:USERPROFILE\teamforge -Destination $dest
 ```
 
 ---
@@ -113,12 +113,12 @@ Copy-Item -Recurse -Path $env:USERPROFILE\teamforge-sync -Destination $dest
 
 ```bash
 # 1. Clone 或下载 zip
-git clone https://github.com/Qqapple1/TeamForge-sync.git /tmp/teamforge-sync
-# 或：wget https://github.com/Qqapple1/TeamForge-sync/archive/main.zip && unzip main.zip
+git clone https://github.com/Qqapple1/TeamForge.git /tmp/teamforge
+# 或：wget https://github.com/Qqapple1/TeamForge/archive/main.zip && unzip main.zip
 
 # 2. 复制到 Zcode skills 目录
 mkdir -p ~/.zcode/skills
-cp -r /tmp/teamforge-sync ~/.zcode/skills/teamforge
+cp -r /tmp/teamforge ~/.zcode/skills/teamforge
 
 # 3. 重启 Zcode
 ```
@@ -157,13 +157,13 @@ ls ~/.zcode/skills/teamforge/agents/verifier.md && echo "✓ agents/verifier.md 
 
 ```bash
 # 方式 1/3：自动
-cd ~/teamforge-sync
+cd ~/teamforge
 git pull
 # 如果你用软链，Zcode 下次启动会自动看到新版（无需重装）
 # 如果你用 copy（Windows），重新跑 install.sh
 
 # 方式 2（PowerShell）：
-cd $env:USERPROFILE\teamforge-sync
+cd $env:USERPROFILE\teamforge
 git pull
 powershell -ExecutionPolicy Bypass -File scripts\install.ps1
 
@@ -178,7 +178,7 @@ powershell -ExecutionPolicy Bypass -File scripts\install.ps1
 ```bash
 bash scripts/install.sh --uninstall
 # 删 ~/.zcode/skills/teamforge 软链
-# 保留 ~/teamforge-sync（你的代码仓库）
+# 保留 ~/teamforge（你的代码仓库）
 ```
 
 **Windows PowerShell**：
@@ -189,7 +189,7 @@ powershell -ExecutionPolicy Bypass -File scripts\install.ps1 -Uninstall
 **完全删除（包括仓库）**：
 ```bash
 bash scripts/install.sh --uninstall
-rm -rf ~/teamforge-sync
+rm -rf ~/teamforge
 ```
 
 ---

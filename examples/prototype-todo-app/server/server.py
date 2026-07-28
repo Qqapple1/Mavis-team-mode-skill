@@ -1,5 +1,5 @@
 """
-Mock Todo backend server for Mavis Team Mode prototype.
+Mock Todo backend server for TeamForge prototype.
 
 This is a real, runnable Python script. It implements a minimal Todo API
 with tag filtering, so the team can verify the SKILL.md workflow end-to-end.
@@ -56,7 +56,7 @@ ALLOWED_ORIGINS = {
 
 
 class TodoHandler(BaseHTTPRequestHandler):
-    server_version = "TodoMavis/1.0"
+    server_version = "TodoTeamForge/1.0"
 
     # Per-connection socket timeout. BaseHTTPServer's `server.timeout`
     # is the select-poll interval, NOT a per-socket read timeout, so it

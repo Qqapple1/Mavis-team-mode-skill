@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Estimate token savings from Mavis Team Mode skill.
+Estimate token savings from TeamForge skill.
 
 This script measures the byte/character count of:
 1. The skill itself (SKILL.md + agents/ + examples/) — what Zcode loads
@@ -181,7 +181,7 @@ def main():
 
     # Human-friendly output
     print("=" * 60)
-    print("  Mavis Team Mode — Token Cost Analysis")
+    print("  TeamForge — Token Cost Analysis")
     print("=" * 60)
     print()
 
