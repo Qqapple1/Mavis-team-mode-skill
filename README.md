@@ -3,7 +3,7 @@
 **多 Agent 团队协作技能 — 为 Zcode 3.4.2+ 设计**
 
 > TeamForge 不是"提高效率"的工具，是"提高质量下限"的工具。
-> 它用 **4-6 倍 Token** 换取 **结果的可预测性** 和 **质量的显著提升**。
+> 它用 **2-4 倍 Token** 换取 **结果的可预测性** 和 **质量的显著提升**。
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 [![Version](https://img.shields.io/badge/version-2.0.0-blue)](CHANGELOG.md)
@@ -63,7 +63,7 @@ Verifier 对抗式验证（Checker + Skeptic + Judge）
 | 单文件 < 50 行的简单修改 | 拆解 overhead 比直接写还慢 |
 | 改个 typo、调个样式 | 大炮打蚊子 |
 | 快速原型验证 | 速度优先，质量可以后补 |
-| Token 预算紧张 | 4-6x 消耗不划算 |
+| Token 预算紧张 | 2-4x 消耗不划算 |
 | 简单问答、调研 | 根本不需要团队 |
 
 ---
@@ -75,8 +75,11 @@ Verifier 对抗式验证（Checker + Skeptic + Judge）
 | 模式 | Token 消耗 | 墙钟时间 | 质量 | 可预测性 |
 |------|:----------:|:--------:|:----:|:--------:|
 | **单 Agent** | 1x | 基准 | 基准 | 低 |
-| **TeamForge (3 Worker)** | ~3-4x | 快 30-50% | 明显提升 | 高 |
-| **TeamForge + 对抗验证** | ~5-6x | 快 20-40% | 显著提升 | 很高 |
+| **简单任务（2 Worker）** | ~1.5-2x | 快 30-50% | 提升 | 高 |
+| **标准任务（3 Worker + 验证）** | ~2-3x | 快 30-50% | 明显提升 | 高 |
+| **复杂任务（3 Worker + 对抗验证）** | ~3-4x | 快 20-40% | 显著提升 | 很高 |
+
+> 注：每个 Worker 只接收子任务 prompt + CONTRACT，不携带完整对话历史，所以实际消耗远低于"每个 Worker 都是完整 Agent"的理论值。
 
 **多花的 Token 换来了什么？**
 
@@ -89,7 +92,7 @@ Verifier 对抗式验证（Checker + Skeptic + Judge）
 | 产物交接，Wave 间信息不丢失 | ❌ 上下文内隐式 |
 | 断点恢复，会话中断可继续 | ❌ 从头开始 |
 
-**本质**：TeamForge 用 **Token 换质量下限**。适合"宁可多花 Token 也不能出错"的场景。
+**本质**：TeamForge 用 **2-4 倍 Token 换质量下限**。适合"宁可多花 Token 也不能出错"的场景。
 
 ---
 
