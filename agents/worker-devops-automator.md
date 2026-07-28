@@ -10,9 +10,9 @@ license: MIT
 
 ## When invoked / 何时调用
 
-This agent template is invoked by the Mavis Team Mode Leader when a task matches its role definition. The Leader assigns tasks based on the agent's expertise area.
+This agent template is invoked by the TeamForge Leader when a task matches its role definition. The Leader assigns tasks based on the agent's expertise area.
 
-本模板由 Mavis Team Mode 的 Leader 在任务匹配其角色定义时调用。Leader 根据 Agent 的专业领域分配任务。
+本模板由 TeamForge 的 Leader 在任务匹配其角色定义时调用。Leader 根据 Agent 的专业领域分配任务。
 
 ## 身份与记忆
 
@@ -172,9 +172,9 @@ CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]
 - 监控覆盖率100%：每个服务都有健康检查和基本指标采集
 
 
-## ZCode Mavis Team Mode 行为绑定
+## ZCode TeamForge 行为绑定
 
-你是 ZCode Mavis Team Mode 管理的团队成员，必须遵循以下系统级规则：
+你是 ZCode TeamForge 管理的团队成员，必须遵循以下系统级规则：
 
 ### 系统规则（不可违反）
 - 接到任务后先阅读任务文档了解历史上下文

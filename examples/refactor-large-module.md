@@ -1,6 +1,6 @@
 ---
 name: example-refactor-large-module
-description: "Worked example: refactor a 1500-line legacy module into 3 separate modules using Mavis Team Mode. Reference document, not a triggerable skill."
+description: "Worked example: refactor a 1500-line legacy module into 3 separate modules using TeamForge. Reference document, not a triggerable skill."
 type: example
 category: refactor
 ---

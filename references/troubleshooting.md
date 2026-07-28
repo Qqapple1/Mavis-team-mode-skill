@@ -1,6 +1,6 @@
 ---
 name: reference-troubleshooting
-description: "Common issues when installing or running Mavis Team Mode skill in Zcode, with diagnostic steps and fixes. Reference document, not a triggerable skill."
+description: "Common issues when installing or running TeamForge skill in Zcode, with diagnostic steps and fixes. Reference document, not a triggerable skill."
 type: reference
 category: troubleshooting
 ---
@@ -9,13 +9,13 @@ category: troubleshooting
 
 ## Skill 没被 Zcode 识别
 
-**症状**：输入 "用 mavis team mode" 之类没反应，或自然语言没触发
+**症状**：输入 "用 teamforge" 之类没反应，或自然语言没触发
 
 **排查步骤**：
 
 1. **检查文件位置**
    ```bash
-   ls -la ~/.zcode/skills/mavis-team-mode/
+   ls -la ~/.zcode/skills/teamforge/
    # 应该看到：SKILL.md, agents/, references/, examples/
    ```
 
@@ -25,7 +25,7 @@ category: troubleshooting
 
 3. **检查 frontmatter 格式**
    ```bash
-   head -20 ~/.zcode/skills/mavis-team-mode/SKILL.md
+   head -20 ~/.zcode/skills/teamforge/SKILL.md
    # 第一行必须是 ---
    # name 和 description 必填
    ```
@@ -49,7 +49,7 @@ category: troubleshooting
 
 **解决**：
 - 检查 Zcode 设置 → Agents → 确认 Sub-Agents 启用
-- 确认任务描述里有"用 team 模式"或"mavis team"触发词
+- 确认任务描述里有"用 teamforge"或"teamforge"触发词
 - 在 Team Plan 里明确每个 Sub-task 的 `type: general-purpose`（写文件）或 `type: explore`（只读）
 
 ## Verifier 没找到问题
@@ -87,7 +87,7 @@ category: troubleshooting
 **排查**：
 ```bash
 ls -la ~/.zcode/skills/
-# 看到 mavis-team-mode -> /path/to/repo
+# 看到 teamforge -> /path/to/repo
 
 # 检查软链目标是否存在
 ls -la /path/to/repo/
@@ -98,7 +98,7 @@ ls -la /path/to/repo/
 
 **解决**：
 - 检查软链目标路径是否对（绝对路径，不是相对路径）
-- 如果是 broken symlink，删除再重建：`rm ~/.zcode/skills/mavis-team-mode && ln -s <正确路径> ~/.zcode/skills/`
+- 如果是 broken symlink，删除再重建：`rm ~/.zcode/skills/teamforge && ln -s <正确路径> ~/.zcode/skills/`
 - 软链权限问题：跑 `chmod +x <目标目录>/SKILL.md`（某些 Zcode 版本需要）
 
 ---
@@ -194,7 +194,7 @@ echo *.txt
 
 ## 3. 路径分隔符(`\` vs `/`)
 
-**症状**: worker prompt 里写了 `D:\Z code\frename\xxx.py`,但代码里是 `D:/Z code/frename/xxx.py`,不一致
+**症状**: worker prompt 里写了 `.\xxx.py`,但代码里是 `./xxx.py`,不一致
 
 **解决**:
 - Leader prompt 里统一用**正斜杠** `/`,大多数 Python/PowerShell 都接受

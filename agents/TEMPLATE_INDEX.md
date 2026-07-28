@@ -1,8 +1,7 @@
 # Template Index / 模板清单
 
-> Generated from AI-team-OS project, adapted for ZCode Mavis Team Mode.
-> Source: `D:\Z code\ai-team-os\plugin\agents\`
-> Output: `D:\Z code\mavis-enhance\output\agents\`
+> Generated from AI-team-OS project, adapted for ZCode TeamForge.
+> Source: AI-company 项目
 
 ---
 
@@ -72,8 +71,7 @@
 
 ## Meeting Templates (8)
 
-Source: `D:\Z code\ai-team-os\plugin\skills\meeting-facilitate\templates\`
-Output: `D:\Z code\mavis-enhance\output\references\meeting-templates\`
+Source: AI-company 项目
 
 | # | File | Template Name | Rounds | Description / 适用场景 |
 |---|------|---------------|--------|----------------------|
@@ -93,7 +91,7 @@ Output: `D:\Z code\mavis-enhance\output\references\meeting-templates\`
 ### Changes applied to agent templates:
 
 1. **Removed CC-specific fields**: `disallowedTools`, `isolation: worktree` from YAML frontmatter
-2. **Replaced "AI Team OS"** references with **"ZCode Mavis Team Mode"**
+2. **Replaced "AI Team OS"** references with **"ZCode TeamForge"**
 3. **Removed `mcp__ai-team-os__` tool references** (CC-specific MCP tools)
 4. **Replaced `~/.claude/`** paths with `~/.zcode/`
 5. **Added "When invoked"** section to each template
@@ -102,11 +100,11 @@ Output: `D:\Z code\mavis-enhance\output\references\meeting-templates\`
 ### Naming convention:
 
 - Original prefix removed: `engineering-`, `testing-`, `management-`, `debate-`, `support-`, `specialized-`
-- New prefix applied: `worker-` (all agent roles are workers in Mavis Team Mode)
+- New prefix applied: `worker-` (all agent roles are workers in TeamForge)
 - Example: `engineering-backend-architect.md` -> `worker-backend-architect.md`
 
 ### Meeting templates:
 
 - YAML frontmatter preserved with original template definitions
-- Added "Usage in Mavis Team Mode" section with invocation instructions
+- Added "Usage in TeamForge" section with invocation instructions
 - Original content preserved (Chinese/English mixed as-is)

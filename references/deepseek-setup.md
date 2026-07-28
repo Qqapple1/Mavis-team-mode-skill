@@ -52,12 +52,12 @@ category: setup
 
 如果 DeepSeek 答了 = 通了。
 
-## 4. 跑 Mavis Team Mode
+## 4. 跑 TeamForge
 
 跟 Zcode 说（描述匹配触发）：
 
 ```
-用 mavis team mode 加 deepseek 模型，帮我 [你的复杂任务]
+用 teamforge 加 deepseek 模型，帮我 [你的复杂任务]
 ```
 
 ## 5. 模型选择建议

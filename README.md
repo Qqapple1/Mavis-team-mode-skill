@@ -1,20 +1,20 @@
-# Mavis Team Mode Skill for Zcode
+# TeamForge Skill for Zcode
 
 **Unofficial / 非官方** — 与 MiniMax 无关联、无背书。基于公开信息尽力还原的工作流模式。
 
-基于 MiniMax **Mavis Team Mode**（Leader + Workers + Verifier）工作流理念，为 Zcode 3.4.2+ 提供的结构化协作 skill。
+基于 MiniMax **TeamForge**（Leader + Workers + Verifier）工作流理念，为 Zcode 3.4.2+ 提供的结构化协作 skill。
 
-> **Pick your platform → [Download v1.4.0](https://github.com/Qqapple1/Mavis-team-mode-skill/releases/tag/v1.4.0)**:
-> - macOS / Linux / Git Bash / WSL → `mavis-team-mode-skill-1.4.0-bash.tar.gz`
-> - Windows PowerShell → `mavis-team-mode-skill-1.4.0-windows.zip`
-> - Just want to read it → `mavis-team-mode-skill-1.4.0-core.zip`
-> - Contributor / CI → `mavis-team-mode-skill-1.4.0-source.tar.gz`
+> **Pick your platform → [Download v1.4.0](https://github.com/Qqapple1/TeamForge-sync/releases/tag/v1.4.0)**:
+> - macOS / Linux / Git Bash / WSL → `teamforge-sync-1.4.0-bash.tar.gz`
+> - Windows PowerShell → `teamforge-sync-1.4.0-windows.zip`
+> - Just want to read it → `teamforge-sync-1.4.0-core.zip`
+> - Contributor / CI → `teamforge-sync-1.4.0-source.tar.gz`
 > - [Which archive should I download? →](docs/PLATFORMS.md)
 
 > 基于 Zcode 3.4.2+ 的子智能体系统 + Agent Skills 标准实现，
-> 完整复刻 MiniMax 官方 Mavis 2026-05 公告的 TeamEngine 工作流。
+> 完整复刻 MiniMax 官方 TeamForge 2026-05 公告的 TeamEngine 工作流。
 
-[![CI](https://github.com/Qqapple1/Mavis-team-mode-skill/actions/workflows/validate-skill.yml/badge.svg)](https://github.com/Qqapple1/Mavis-team-mode-skill/actions)
+[![CI](https://github.com/Qqapple1/TeamForge-sync/actions/workflows/validate-skill.yml/badge.svg)](https://github.com/Qqapple1/TeamForge-sync/actions)
 [![Skill tests](https://img.shields.io/badge/validate-24%2F24%20passing-brightgreen)](VALIDATION.md)
 [![Prototype tests](https://img.shields.io/badge/prototype%20e2e-48%2F48%20passing-brightgreen)](examples/prototype-todo-app/)
 [![YAML](https://img.shields.io/badge/yaml-16%2F16%20passing-brightgreen)](scripts/validate_yaml.py)
@@ -47,11 +47,11 @@
 
 1. **手动 clone 替代一键脚本**（推荐）：
    ```bash
-   git clone https://github.com/Qqapple1/Mavis-team-mode-skill.git ~/mavis-team-mode-skill
-   bash ~/mavis-team-mode-skill/scripts/install.sh
+   git clone https://github.com/Qqapple1/TeamForge-sync.git ~/teamforge-sync
+   bash ~/teamforge-sync/scripts/install.sh
    ```
 2. **用代理**（如有）：`export https_proxy=http://127.0.0.1:7890`
-3. **用 GitHub 官方 release 包**：从 [Releases](https://github.com/Qqapple1/Mavis-team-mode-skill/releases) 下载对应平台的 zip/tar.gz，解压到 `~/.zcode/skills/mavis-team-mode/`
+3. **用 GitHub 官方 release 包**：从 [Releases](https://github.com/Qqapple1/TeamForge-sync/releases) 下载对应平台的 zip/tar.gz，解压到 `~/.zcode/skills/teamforge/`
 <!-- 第三方镜像（如 ghfast.top）存在被篡改的供应链风险，不推荐。-->
 
 ## 功能
@@ -88,9 +88,9 @@ python3 test_e2e_advanced.py
 kill %1
 
 # 4. 打开 Zcode，跟它说：
-#    "用 mavis team mode 帮我 ..."
-#    或“拆开来做”、“用 team 模式跑一下”
-# （Zcode 靠 description 匹配自动加载；不需要 /mavis-team-mode 命令）
+#    "用 teamforge 帮我 ..."
+#    或“拆开来做”、“用 teamforge跑一下”
+# （Zcode 靠 description 匹配自动加载；不需要 /teamforge 命令）
 ```
 
 ## 🚀 Quick Start for Windows（如果你是 Windows 用户）
@@ -109,8 +109,8 @@ wsl --install
 
 ```bash
 # Ubuntu terminal 里
-git clone https://github.com/Qqapple1/Mavis-team-mode-skill.git ~/mavis-team-mode-skill
-cd ~/mavis-team-mode-skill
+git clone https://github.com/Qqapple1/TeamForge-sync.git ~/teamforge-sync
+cd ~/teamforge-sync
 bash scripts/install.sh
 ```
 
@@ -119,8 +119,8 @@ bash scripts/install.sh
 无需装 WSL 或 Git Bash，PowerShell 原生运行。install.ps1 功能等价（clone + copy + 验证 + 卸载），297 行维护。
 
 ```powershell
-git clone https://github.com/Qqapple1/Mavis-team-mode-skill.git $env:USERPROFILE\mavis-team-mode-skill
-cd $env:USERPROFILE\mavis-team-mode-skill
+git clone https://github.com/Qqapple1/TeamForge-sync.git $env:USERPROFILE\teamforge-sync
+cd $env:USERPROFILE\teamforge-sync
 powershell -ExecutionPolicy Bypass -File scripts\install.ps1
 ```
 
@@ -129,8 +129,8 @@ powershell -ExecutionPolicy Bypass -File scripts\install.ps1
 如果你已经装了 Git for Windows，直接打开 Git Bash：
 
 ```bash
-git clone https://github.com/Qqapple1/Mavis-team-mode-skill.git ~/mavis-team-mode-skill
-cd ~/mavis-team-mode-skill
+git clone https://github.com/Qqapple1/TeamForge-sync.git ~/teamforge-sync
+cd ~/teamforge-sync
 bash scripts/install.sh
 ```
 
@@ -154,7 +154,7 @@ bash scripts/install.sh
 
 **环境变量**（高级用法）：
 - `MAVIS_TEAM_REPO` — 改 Git 源
-- `MAVIS_TEAM_DIR` — 改安装路径
+- `TEAMFORGE_DIR` — 改安装路径
 - `MAVIS_TEAM_REF` — pin 到特定 branch/tag/SHA
 - `MAVIS_TEAM_NO_COLOR` — 禁用颜色输出
 - `MAVIS_TEAM_FORCE_COPY` — 强制 copy 模式
@@ -162,7 +162,7 @@ bash scripts/install.sh
 ## 仓库结构
 
 ```
-mavis-team-mode/
+teamforge/
 ├── SKILL.md                         # 核心 skill 定义 (272 lines)
 ├── README.md
 ├── INSTALL.md                       # 安装指南（4 种方式）
@@ -220,7 +220,7 @@ mavis-team-mode/
 └── .shellcheckrc
 ```
 
-## 与 MiniMax Code 原生 Mavis Team 模式的差异
+## 与 传统单 Agent 模式的差异
 
 | 维度 | MiniMax Code 原生 | Zcode + 此 skill |
 |------|---------------------|---------------------|

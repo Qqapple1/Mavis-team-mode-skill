@@ -15,7 +15,7 @@
 **Please do NOT file a public issue for security vulnerabilities.**
 
 Use GitHub Security Advisories (private disclosure):
-https://github.com/Qqapple1/Mavis-team-mode-skill/security/advisories/new
+https://github.com/Qqapple1/TeamForge-sync/security/advisories/new
 
 Include:
 - Description of the vulnerability
@@ -75,9 +75,9 @@ The skill is a "best effort" recreation. Limitations:
 
 1. **Review the skill before installing**:
    ```bash
-   git clone https://github.com/Qqapple1/Mavis-team-mode-skill
-   less mavis-team-mode-skill/SKILL.md
-   less mavis-team-mode-skill/agents/leader.md
+   git clone https://github.com/Qqapple1/TeamForge-sync
+   less teamforge-sync/SKILL.md
+   less teamforge-sync/agents/leader.md
    ```
 
 2. **Pin to a specific version**:
@@ -102,4 +102,4 @@ The skill is a "best effort" recreation. Limitations:
 ## Reporting issues with the skill itself
 
 For non-security bugs, use the standard GitHub issue tracker:
-https://github.com/Qqapple1/Mavis-team-mode-skill/issues
+https://github.com/Qqapple1/TeamForge-sync/issues

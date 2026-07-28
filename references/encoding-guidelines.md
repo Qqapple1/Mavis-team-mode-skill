@@ -1,4 +1,4 @@
-# Encoding Guidelines for Mavis Team Mode
+# Encoding Guidelines for TeamForge
 
 This is the **single source of truth** for non-ASCII text handling, ANSI output,
 and encoding-related rules. All worker agents reference this file instead of

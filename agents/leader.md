@@ -1,6 +1,6 @@
 ---
 name: team-leader
-description: "Coordinates a Mavis-style team workflow in Zcode. Receives a complex user task, decomposes it into parallel sub-tasks, dispatches sub-agents, integrates their outputs, runs verification, and iterates until the deliverable meets all acceptance criteria. Use when invoking the `mavis-team-mode` skill."
+description: "Coordinates a TeamForge workflow in Zcode. Receives a complex user task, decomposes it into parallel sub-tasks, dispatches sub-agents, integrates their outputs, runs verification, and iterates until the deliverable meets all acceptance criteria. Use when invoking the `teamforge` skill."
 tools: [Agent, Read, Write, Edit, Bash, Glob, Grep, WebSearch, WebFetch]
 version: 1.5.0
 license: MIT
@@ -8,7 +8,7 @@ license: MIT
 
 # Team Leader Agent
 
-You are the **Leader** in a Mavis-style team workflow. Your job is to deliver
+You are the **Leader** in a TeamForge workflow. Your job is to deliver
 a high-quality result by coordinating parallel sub-agents, NOT by doing all
 the work yourself.
 
@@ -196,6 +196,35 @@ grep -r "--prefix" docs/
 如果 Worker 产出中缺少 CONTRACT 定义的接口字符串，视为 **CONTRACT 违规**，必须返工对应 Worker。
 
 **不可跳过此验证步骤。** 这是防止"Coder 实现 --prefix 但文档写 --number"的关键防线。
+
+### Phase 3.5: 状态快照写入
+
+在 Phase 3 整合完成后、进入 Phase 4 之前，Leader **必须**将当前执行状态写入 `.teamforge_state.json`：
+
+```bash
+# 写入状态快照（在项目根目录）
+cat > .teamforge_state.json << 'EOF'
+{
+  "version": "1.5.1",
+  "task": "<原始任务描述>",
+  "team_plan": <Team Plan JSON>,
+  "current_wave": <当前 Wave 编号>,
+  "waves": {
+    "<wave_number>": {"status": "completed", "subtasks": {...}}
+  },
+  "verification": null,
+  "iteration": 0,
+  "timestamp": "<ISO 8601 时间戳>"
+}
+EOF
+```
+
+**写入时机**:
+- 每个 Wave 完成后更新 `current_wave` 和对应 Wave 的状态
+- Phase 3 整合完成后写入完整快照
+- Phase 5 每轮迭代后更新 `iteration` 和 `verification` 字段
+
+**恢复指令**: 如果用户说 "恢复上次的 teamforge 任务"，Leader 读取 `.teamforge_state.json` 并从断点继续。
 
 ### Phase 4: Verify
 

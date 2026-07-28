@@ -1,10 +1,10 @@
-# ADR-001: Recreate Mavis Team Mode as a portable Skill
+# ADR-001: Recreate TeamForge as a portable Skill
 
 **Status**: Accepted
 **Date**: 2026-07-25
-**Author**: Community port (Mavis CLI agent)
+**Author**: Community port (TeamForge CLI agent)
 
-> **Note**: This ADR was written before I had access to the MiniMax Mavis
+> **Note**: This ADR was written before I had access to the TeamForge
 > source code. The "70-80% fidelity" claim is qualitative, based on
 > documented TeamEngine features (May 2026 announcement). Real fidelity
 > depends on the Zcode 3.x sub-agent API surface, which is partially
@@ -12,7 +12,7 @@
 
 ## Context
 
-The Mavis (MiniMax Agent) product launched in May 2026 with a "Team Mode"
+The TeamForge product launched in May 2026 with a "Team Mode"
 feature: a Leader agent decomposes complex tasks, dispatches Worker
 sub-agents in parallel, and an independent Verifier checks the output.
 
@@ -29,7 +29,7 @@ workflow explicitly.
 
 ## Decision
 
-We recreate the Mavis Team Mode workflow as a **portable Agent Skill**
+We recreate the TeamForge workflow as a **portable Agent Skill**
 that can be installed in any tool that supports the Agent Skills standard.
 This skill is built and tested against Zcode 3.4.2+ (per
 [zcode-ai.com](https://zcode-ai.com) download page, 2026-07-25).
@@ -69,9 +69,9 @@ Skill (SKILL.md)
 6. Independent Verifier checks each acceptance criterion
 7. If FAIL: iterate up to 3 rounds, then escalate to user
 
-### Trade-offs vs native Mavis Team Mode
+### Trade-offs vs native TeamForge
 
-| Dimension | Native Mavis | Skill recreation |
+| Dimension | Native TeamForge | Skill recreation |
 |-----------|--------------|------------------|
 | Leader planning | Automatic (TeamEngine) | Manual (Leader follows template) |
 | Worker parallelism | Background tasks | Foreground (Zcode 3.x limit) |
@@ -110,14 +110,14 @@ Verifier independence — without a separate model, bias is real.
 - Pro: true independence
 - Con: complex setup, requires Claude Code or similar installed
 
-### C. Wait for MiniMax to open-source Mavis Team Mode
+### C. Wait for MiniMax to open-source TeamForge
 - Pro: perfect fidelity
 - Con: indefinite wait; current product is closed
 
 ### D. Recreate as a portable Agent Skill (chosen)
 - Pro: portable across the Agent Skills ecosystem; model-agnostic;
   self-contained, open source, can be incrementally improved
-- Con: ~70-80% fidelity vs the closed-source Mavis TeamEngine
+- Con: ~70-80% fidelity vs the closed-source TeamForge TeamEngine
   (qualitative estimate; the biggest gap is Verifier independence)
 
 We chose approach **D** because it provides 70-80% of the benefit today,
@@ -126,7 +126,7 @@ incrementally improved.
 
 ## References
 
-- MiniMax Mavis Team Mode announcement: May 2026 (cited per public Mavis docs; original URL not captured)
+- TeamForge Team Mode announcement: May 2026 (cited per public TeamForge docs; original URL not captured)
 - Agent Skills specification: Anthropic's published standard for skills (no specific URL retained; see any Claude Code / Zcode docs for current spec)
 - Zcode 3.x sub-agent system: per [zcode-ai.com](https://zcode-ai.com) public documentation, 2026-07-25
 

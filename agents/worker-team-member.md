@@ -1,6 +1,6 @@
 ---
 name: team-worker-team-member
-description: Standard ZCode Mavis Team Mode team member agent
+description: Standard ZCode TeamForge team member agent
 tools: [Read, Write, Edit, Bash, Glob, Grep]
 version: 1.5.0
 license: MIT
@@ -10,13 +10,13 @@ skills:
 
 # Team Member — 通用团队成员
 
-你是 ZCode Mavis Team Mode 中的一名团队成员。你通过 标准工具 与团队协作。
+你是 ZCode TeamForge 中的一名团队成员。你通过 标准工具 与团队协作。
 
 ## When invoked / 何时调用
 
-This agent template is invoked by the Mavis Team Mode Leader when a task matches its role definition. The Leader assigns tasks based on the agent's expertise area.
+This agent template is invoked by the TeamForge Leader when a task matches its role definition. The Leader assigns tasks based on the agent's expertise area.
 
-本模板由 Mavis Team Mode 的 Leader 在任务匹配其角色定义时调用。Leader 根据 Agent 的专业领域分配任务。
+本模板由 TeamForge 的 Leader 在任务匹配其角色定义时调用。Leader 根据 Agent 的专业领域分配任务。
 
 ## 启动流程
 

@@ -1,11 +1,11 @@
 ---
-name: mavis-team-mode
-description: "Recreates the Mavis (MiniMax Agent) Team Mode workflow (Leader + Workers + Verifier) inside Zcode 3.4.2+. Use this skill when the user wants parallel agent execution, structured task decomposition, independent quality verification, or multi-step work that benefits from sub-agents running concurrently. Triggers on: 'team mode', 'mavis team', 'multi-agent', 'split into subtasks', 'verify the result', '用 team 模式', '团队模式', '多智能体协作', '并行处理'. Do NOT use for simple single-step tasks."
+name: teamforge
+description: "Recreates the TeamForge workflow (Leader + Workers + Verifier) inside Zcode 3.4.2+. Use this skill when the user wants parallel agent execution, structured task decomposition, independent quality verification, or multi-step work that benefits from sub-agents running concurrently. Triggers on: 'teamforge', 'team mode', 'multi-agent', 'split into subtasks', 'verify the result', '用 teamforge', '团队模式', '多智能体协作', '并行处理'. Do NOT use for simple single-step tasks."
 version: 1.5.0
 license: MIT
 metadata:
-  author: Community port (Mavis CLI agent)
-  origin: Recreated from MiniMax Mavis TeamEngine (May 2026 announcement)
+  author: Community port (TeamForge CLI agent)
+  origin: Recreated from TeamEngine (May 2026 announcement)
   compatibility: Zcode 3.4.2+ (per zcode-ai.com download page, as of 2026-07-26). Model-agnostic: works with whatever model your Zcode is configured for (Zcode 3.x supports multiple providers per its docs; not independently tested for each).
   category: workflow
   tested-on-ranges:
@@ -15,11 +15,11 @@ metadata:
     - "Real Zcode runtime: tested 5+ times by community users (builds: frename CLI, mnote CLI, cquote CLI, hitokoto CLI, infrastructure audit). P0-P3 fixes from real-world feedback shipped in v1.3.14-v1.4.0. See CHANGELOG for details."
 ---
 
-# Mavis Team Mode for Zcode
+# TeamForge for Zcode
 
 ## What this skill does
 
-Recreates the Mavis (MiniMax Agent) **Team Mode** workflow inside Zcode 3.4.2+
+Recreates the **TeamForge** workflow inside Zcode 3.4.2+
 using the Agent Skills standard + Zcode's built-in sub-agent system.
 
 **Architecture:**
@@ -50,9 +50,9 @@ using the Agent Skills standard + Zcode's built-in sub-agent system.
                   Final Report
 ```
 
-**Mavis Team Mode vs this skill:**
+**TeamForge vs 理想状态：**
 
-| 维度 | Mavis (MiniMax Code) | Zcode + this skill |
+| 维度 | 理想状态 | Zcode + TeamForge |
 |------|----------------------|---------------------|
 | Leader 任务拆解 | TeamEngine 自动 | ✅ Leader 用本 skill 手动/半自动拆 |
 | Worker 并行 | ✅ 后台多任务 | ⚠️ 前台并行（Zcode 限制） |
@@ -87,17 +87,19 @@ reference these worker roles by name when dispatching sub-tasks.
 
 ```bash
 # Linux / macOS / Git Bash / WSL
-ls ~/.zcode/skills/mavis-team-mode/agents/
+ls ~/.zcode/skills/teamforge/agents/
 ```
 ```powershell
 # Windows PowerShell
-dir $env:USERPROFILE\.zcode\skills\mavis-team-mode\agents\
+dir $env:USERPROFILE\.zcode\skills\teamforge\agents\
 ```
 ```text
-# should show (8 files):
+# should show (30+ files):
 #   leader.md  verifier.md
 #   worker-coder.md  worker-tester.md  worker-researcher.md
 #   worker-doc-writer.md  worker-reviewer.md  worker-fixer.md
+#   worker-ai-engineer.md  worker-backend-architect.md  ...
+#   TEMPLATE_INDEX.md
 ```
 
 If missing, see INSTALL.md.
@@ -107,11 +109,11 @@ If missing, see INSTALL.md.
 ### Step 1: 用户下达任务
 
 直接说，例如：
-> "用 team 模式帮我做一个 X"
+> "用 teamforge 帮我做一个 X"
 
 或自然语言触发：
 > "这个任务比较复杂，拆开来做"
-> "用 Mavis team mode 跑一下"
+> "用 teamforge 跑一下"
 
 ### Step 2: Leader（你正在聊的 Zcode）做任务拆解
 
@@ -272,6 +274,31 @@ Leader 收到所有子智能体的摘要后，**自己整合**成初版交付物
 - **不需要用户手动操作**，Leader 自动完成整个验证流程
 - 推荐用于自动化流水线或用户希望"一键完成"的场景
 
+### Step 5.5: 状态快照（断点恢复机制）
+
+在每个 Wave 完成后，Leader **必须**将当前执行状态序列化为 `.teamforge_state.json` 文件：
+
+```json
+{
+  "version": "1.5.1",
+  "task": "原始任务描述",
+  "team_plan": {...},
+  "current_wave": 2,
+  "waves": {
+    "1": {"status": "completed", "subtasks": {...}},
+    "2": {"status": "in_progress", "subtasks": {...}}
+  },
+  "verification": null,
+  "iteration": 0,
+  "timestamp": "2026-07-28T20:00:00"
+}
+```
+
+**恢复流程**: 如果会话中断，用户可以说 "恢复上次的 teamforge 任务"，Leader 读取 `.teamforge_state.json` 并从断点继续：
+1. 检查已完成 Wave 的产出文件是否仍然存在
+2. 从当前 Wave 继续派发未完成的子任务
+3. 如果产出文件丢失，重新派发该 Wave
+
 ### Step 6: 迭代修正
 
 如果 Verifier 标 FAIL：
@@ -393,7 +420,6 @@ To verify this skill is correctly installed, see `VALIDATION.md`.
 - This skill implements the *workflow* but Zcode's sub-agent system is the
   *engine*. If Zcode improves sub-agents in the future, this skill benefits
   automatically.
-- The Mavis Team Mode in MiniMax Code is a closed-source product; this is a
-  best-effort recreation using Zcode's public capabilities.
-- For maximum fidelity to Mavis Team Mode, you also need the sub-agent configs
+- TeamForge 是基于 Zcode 公开能力的开源工作流实现。
+- For maximum fidelity, you also need the sub-agent configs
   in `agents/` — install the whole directory, not just SKILL.md.

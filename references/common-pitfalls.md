@@ -1,12 +1,12 @@
 ---
 name: common-pitfalls
-description: "常见陷阱和经验教训，来自 Mavis Team Mode 的真实使用反馈 (v1.3.14-v1.4.0)。Leader 和 Worker 在执行团队工作流时必须阅读。"
+description: "常见陷阱和经验教训，来自 TeamForge 的真实使用反馈 (v1.3.14-v1.4.0)。Leader 和 Worker 在执行团队工作流时必须阅读。"
 version: 1.5.0
 ---
 
 # Common Pitfalls — 常见陷阱与经验教训
 
-本文档汇总了 Mavis Team Mode 在真实 Zcode 运行环境中积累的教训。
+本文档汇总了 TeamForge 在真实 Zcode 运行环境中积累的教训。
 来源：v1.3.14 至 v1.4.0 的 CHANGELOG，来自 5+ 次社区用户实测反馈。
 
 ---

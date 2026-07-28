@@ -1,4 +1,4 @@
-# Contributing to Mavis Team Mode Skill
+# Contributing to TeamForge Skill
 
 欢迎贡献！下面是怎么提 PR 的指南。
 

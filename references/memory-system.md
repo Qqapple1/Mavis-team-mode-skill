@@ -1,12 +1,12 @@
 ---
 name: reference-memory-system
-description: "Memory system reference for Mavis Team Mode. Explains how the Leader can leverage past task experiences and user preferences to improve future team workflows. Reference document, not a triggerable skill."
+description: "Memory system reference for TeamForge. Explains how the Leader can leverage past task experiences and user preferences to improve future team workflows. Reference document, not a triggerable skill."
 type: reference
 category: memory
 version: 1.0.0
 ---
 
-# Memory System for Mavis Team Mode
+# Memory System for TeamForge
 
 ## Concept
 
@@ -41,7 +41,7 @@ Task-specific knowledge accumulated from past team executions:
 - "Round 1 fix attempt with approach A failed for error type Y —
   approach B worked"
 
-## Usage in Mavis Team Mode
+## Usage in TeamForge
 
 ### During Phase 1 (Scope + Plan)
 
@@ -94,10 +94,10 @@ Memory is stored as simple Markdown files in the skill's memory directory.
 
 | File | Path | Purpose |
 |------|------|---------|
-| User preferences | `~/.zcode/skills/mavis-team-mode/memory/user-preferences.md` | Direction layer |
-| Task experiences | `~/.zcode/skills/mavis-team-mode/memory/task-experiences.md` | Experience layer |
+| User preferences | `~/.zcode/skills/teamforge/memory/user-preferences.md` | Direction layer |
+| Task experiences | `~/.zcode/skills/teamforge/memory/task-experiences.md` | Experience layer |
 
-> **Windows equivalent**: Use `$env:USERPROFILE\.zcode\skills\mavis-team-mode\memory\` instead of `~/.zcode/skills/mavis-team-mode/memory/`.
+> **Windows equivalent**: Use `$env:USERPROFILE\.zcode\skills\teamforge\memory\` instead of `~/.zcode/skills/teamforge/memory/`.
 
 ### user-preferences.md format
 
@@ -143,9 +143,9 @@ Memory is stored as simple Markdown files in the skill's memory directory.
 
 The Leader reads memory files at the start of Phase 1:
 
-1. Check if `~/.zcode/skills/mavis-team-mode/memory/user-preferences.md`
+1. Check if `~/.zcode/skills/teamforge/memory/user-preferences.md`
    exists. If yes, read it and inject relevant preferences into the plan.
-2. Check if `~/.zcode/skills/mavis-team-mode/memory/task-experiences.md`
+2. Check if `~/.zcode/skills/teamforge/memory/task-experiences.md`
    exists. If yes, search for entries related to the current task type
    (e.g., "CLI tool", "encoding", "refactor") and inject relevant lessons.
 
@@ -158,18 +158,18 @@ Users can manually edit memory files at any time:
 
 ```powershell
 # Edit user preferences (Windows)
-notepad "$env:USERPROFILE\.zcode\skills\mavis-team-mode\memory\user-preferences.md"
+notepad "$env:USERPROFILE\.zcode\skills\teamforge\memory\user-preferences.md"
 
 # Edit task experiences (Windows)
-notepad "$env:USERPROFILE\.zcode\skills\mavis-team-mode\memory\task-experiences.md"
+notepad "$env:USERPROFILE\.zcode\skills\teamforge\memory\task-experiences.md"
 ```
 
 ```bash
 # Edit user preferences (Linux/macOS)
-vim ~/.zcode/skills/mavis-team-mode/memory/user-preferences.md
+vim ~/.zcode/skills/teamforge/memory/user-preferences.md
 
 # Edit task experiences (Linux/macOS)
-vim ~/.zcode/skills/mavis-team-mode/memory/task-experiences.md
+vim ~/.zcode/skills/teamforge/memory/task-experiences.md
 ```
 
 ## Privacy note

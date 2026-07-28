@@ -35,8 +35,8 @@ sudo apt install -y python3 git bash
 
 ```bash
 # 在 WSL 里的 Linux 文件系统（不要用 /mnt/c/，权限会乱）
-git clone https://github.com/Qqapple1/Mavis-team-mode-skill.git ~/mavis-team-mode-skill
-cd ~/mavis-team-mode-skill
+git clone https://github.com/Qqapple1/TeamForge-sync.git ~/teamforge-sync
+cd ~/teamforge-sync
 bash scripts/install.sh
 ```
 
@@ -44,7 +44,7 @@ bash scripts/install.sh
 
 Zcode 的 Windows 客户端能读 WSL 的文件。在 Zcode 里打开：
 ```
-\\wsl$\Ubuntu\home\<your-username>\mavis-team-mode-skill
+\\wsl$\Ubuntu\home\<your-username>\teamforge-sync
 ```
 
 或在 WSL 终端里：
@@ -70,8 +70,8 @@ explorer.exe .
 # https://zcode-ai.com (3.4.2+)
 
 # 4. 在 PowerShell 跑:
-git clone https://github.com/Qqapple1/Mavis-team-mode-skill.git $env:USERPROFILE\mavis-team-mode-skill
-cd $env:USERPROFILE\mavis-team-mode-skill
+git clone https://github.com/Qqapple1/TeamForge-sync.git $env:USERPROFILE\teamforge-sync
+cd $env:USERPROFILE\teamforge-sync
 powershell -ExecutionPolicy Bypass -File scripts\install.ps1
 ```
 > **提示**：`install.ps1` 也能自动 clone（如果你单独下载 `install.ps1` 直接运行，它会自动 clone 到默认路径）。上面的手动 clone 方式让你能自定义安装路径。
@@ -99,8 +99,8 @@ PowerShell 版**功能等价**（clone + copy + 验证 + 卸载），只是永�
 3. 装 [Zcode Windows 版](https://zcode-ai.com) (3.4.2+)
 4. 打开 **Git Bash**（不是 PowerShell / CMD），跑：
 ```bash
-git clone https://github.com/Qqapple1/Mavis-team-mode-skill.git ~/mavis-team-mode-skill
-cd ~/mavis-team-mode-skill
+git clone https://github.com/Qqapple1/TeamForge-sync.git ~/teamforge-sync
+cd ~/teamforge-sync
 bash scripts/install.sh
 ```
 > **提示**：`install.sh` 也能自动 clone（如果你单独下载 `install.sh` 直接运行，它会自动 clone 到默认路径）。上面的手动 clone 方式让你能自定义安装路径。
@@ -192,6 +192,6 @@ Passed: 5, Failed: 0  (advanced)
 - prototype server 跑在 WSL + Zcode 在 Windows 的 file watcher 行为
 
 **欢迎 Windows 用户提 issue 反馈**：
-https://github.com/Qqapple1/Mavis-team-mode-skill/issues
+https://github.com/Qqapple1/TeamForge-sync/issues
 
 或者直接编辑本文件 (`docs/WINDOWS.md`) 提 PR。

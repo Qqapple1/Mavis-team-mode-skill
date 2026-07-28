@@ -1,6 +1,6 @@
 ---
 name: example-new-feature
-description: "Worked example: add a tag-filter feature to a Todo app end-to-end using Mavis Team Mode. Reference document, not a triggerable skill."
+description: "Worked example: add a tag-filter feature to a Todo app end-to-end using TeamForge. Reference document, not a triggerable skill."
 type: example
 category: feature
 ---

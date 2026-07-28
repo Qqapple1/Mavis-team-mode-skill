@@ -42,15 +42,15 @@ keywords: [retro, 复盘, 回顾, 总结, 经验教训, 改进]
 - 复盘变成"甩锅会"或"表扬大会"，失去改进价值
 
 
-## 在 Mavis Team Mode 中使用 / Usage in Mavis Team Mode
+## 在 TeamForge 中使用 / Usage in TeamForge
 
-要在此模式下发起会议，请在 Mavis Team Mode 中使用以下命令：
+要在此模式下发起会议，请在 TeamForge 中使用以下命令：
 
 ```
-/mavis-team-mode
+/teamforge
 # 然后输入: 发起 retrospective 类型的会议，议题为 [你的议题]
 ```
 
 Leader 会自动加载此模板并按照预定义的轮次结构组织讨论。
 
-To initiate a meeting of this type in Mavis Team Mode, use the command above. The Leader will automatically load this template and organize the discussion according to the predefined round structure.
+To initiate a meeting of this type in TeamForge, use the command above. The Leader will automatically load this template and organize the discussion according to the predefined round structure.

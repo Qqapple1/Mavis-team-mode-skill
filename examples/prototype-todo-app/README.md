@@ -1,6 +1,6 @@
 # Todo Tag-Filter Prototype
 
-**Purpose**: Prove that the Mavis Team Mode skill works end-to-end by building
+**Purpose**: Prove that the TeamForge skill works end-to-end by building
 a real, runnable feature with a verifiable outcome.
 
 ## What this prototype demonstrates
@@ -67,7 +67,7 @@ ALL EXTENDED TESTS PASSED  (23/23)
 Passed: 5, Failed: 0  (advanced)
 ```
 
-## What this proves about the Mavis Team Mode skill
+## What this proves about the TeamForge skill
 
 1. **Skill output is runnable** — the team plan produces real code, not vibes
 2. **Acceptance criteria are testable** — 48 e2e tests verify the API

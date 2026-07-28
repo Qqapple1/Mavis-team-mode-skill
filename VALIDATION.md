@@ -7,7 +7,7 @@
 ```bash
 # 必需文件全部存在
 for f in SKILL.md agents/leader.md agents/verifier.md agents/worker-coder.md; do
-  test -f ~/.zcode/skills/mavis-team-mode/$f && echo "✓ $f" || echo "✗ MISSING $f"
+  test -f ~/.zcode/skills/teamforge/$f && echo "✓ $f" || echo "✗ MISSING $f"
 done
 ```
 
@@ -63,14 +63,14 @@ powershell -ExecutionPolicy Bypass -File .\run_e2e.ps1
 启动 Zcode，输入框输入：
 
 ```
-用 mavis team mode 帮我 …
+用 teamforge 帮我 …
 ```
 
 或自然语言：
 
 ```
 拆开来做
-用 team 模式跑一下
+用 teamforge跑一下
 用多智能体协作处理
 ```
 
@@ -82,7 +82,7 @@ powershell -ExecutionPolicy Bypass -File .\run_e2e.ps1
 
 **如果没反应**：
 - 检查 Zcode 是否有这个 skill：`bash scripts/install.sh --doctor`
-- 试试更明确的触发词：“team mode”、“用 team 模式”、“拆成子任务”
+- 试试更明确的触发词：“team mode”、“用 teamforge”、“拆成子任务”
 - 完全退出 Zcode 重开
 - 看 Zcode 日志（设置 → Logs）
 - 重跑 `bash scripts/validate.sh`
@@ -92,7 +92,7 @@ powershell -ExecutionPolicy Bypass -File .\run_e2e.ps1
 在 Zcode 输入：
 
 ```
-用 mavis team mode 帮我给这个项目加一个 README（如果还没有）
+用 teamforge 帮我给这个项目加一个 README（如果还没有）
 ```
 
 **期望反应**：
@@ -108,13 +108,13 @@ powershell -ExecutionPolicy Bypass -File .\run_e2e.ps1
 
 ```bash
 bash scripts/install.sh --uninstall
-ls ~/.zcode/skills/mavis-team-mode 2>/dev/null && echo "✗ still there" || echo "✓ removed"
+ls ~/.zcode/skills/teamforge 2>/dev/null && echo "✗ still there" || echo "✓ removed"
 ```
 
 ## 8. CI 验证（推送 GitHub 后）
 
 ```bash
-git remote add origin https://github.com/Qqapple1/Mavis-team-mode-skill.git
+git remote add origin https://github.com/Qqapple1/TeamForge-sync.git
 git push -u origin main
 ```
 

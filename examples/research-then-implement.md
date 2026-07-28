@@ -1,6 +1,6 @@
 ---
 name: example-research-then-implement
-description: "Worked example: research WebSocket libraries then build a demo with mock server using Mavis Team Mode. Reference document, not a triggerable skill."
+description: "Worked example: research WebSocket libraries then build a demo with mock server using TeamForge. Reference document, not a triggerable skill."
 type: example
 category: research
 ---

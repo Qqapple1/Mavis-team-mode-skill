@@ -86,6 +86,16 @@ failed — avoid repeating them. Learn from what didn't work.
    - Why the fix exceeds the threshold
    - Recommendation: re-dispatch as worker-coder with revised CONTRACT
 
+   **Leader 覆盖**: Leader 可以在 prompt 中通过 `FIXER_LIMIT: N` 覆盖默认阈值：
+   - `FIXER_LIMIT: 100` → 阈值为 100 行
+   - `FIXER_LIMIT: 100%` → 阈值为文件总行数（用于配置文件等小文件）
+   - 未指定 → 使用默认公式 min(20% of total file lines, 50 lines)
+
+   适用场景：
+   - 配置文件 (package.json, pyproject.toml) → Leader 可设 `FIXER_LIMIT: 100%`
+   - 大型重构 → Leader 可设 `FIXER_LIMIT: 200`
+   - 默认代码修复 → 不指定，使用默认公式
+
 6. **Regression check.** After applying the fix, actively check for
    regressions:
    - Re-run the original failing test/repro (must now pass)

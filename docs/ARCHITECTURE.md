@@ -1,18 +1,18 @@
 # Architecture
 
-Visual representation of the Mavis Team Mode skill structure, both as static text and as Mermaid diagrams (renderable on GitHub, Zcode doc, etc).
+Visual representation of the TeamForge skill structure, both as static text and as Mermaid diagrams (renderable on GitHub, Zcode doc, etc).
 
 ## High-level flow
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │                          User in Zcode                          │
-│                  "用 Mavis team mode 帮我做 X"                 │
+│                  "用 TeamForge 帮我做 X"                 │
 └─────────────────────────────┬───────────────────────────────────┘
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│  Zcode loads mavis-team-mode SKILL.md (frontmatter triggers)    │
+│  Zcode loads teamforge SKILL.md (frontmatter triggers)    │
 │  - description: matches user intent                            │
 │  - SKILL.md body: instructions for Leader                      │
 └─────────────────────────────┬───────────────────────────────────┘
@@ -129,7 +129,7 @@ flowchart TB
 > or `wc -l` for current numbers — these can drift.
 
 ```
-mavis-team-mode-skill/
+teamforge-sync/
 │
 ├── SKILL.md                       (272 lines) — Zcode loads this on trigger
 │   ├── YAML frontmatter            triggers on description match

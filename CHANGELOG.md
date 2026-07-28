@@ -657,9 +657,9 @@ changes that didn't actually land). This release fixes them all.
 ## [1.3.10] - 2026-07-24
 
 ### Fixed
-- **LICENSE: wrong copyright holder** — was `Mavis (MiniMax M3)`
+- **LICENSE: wrong copyright holder** — was `TeamForge (MiniMax M3)`
   (misleading pre-v1.3.6 attribution); changed to
-  `Community port contributors (Mavis CLI agent)` to match
+  `Community port contributors (TeamForge CLI agent)` to match
   the actual rebrand in v1.3.6 (ADR-001 + SKILL.md metadata).
 - **`Zcode 3.0` → `Zcode 3.4.2+`** — v1.3.4 bumped the version
   in `compatibility` metadata but missed the prose. Fixed 4
@@ -744,16 +744,16 @@ changes that didn't actually land). This release fixes them all.
 
 ### Fixed
 - **CRITICAL: CI Windows job regression**: Previous version's CI passed
-  because `install.ps1` silently ignored `MAVIS_TEAM_DIR` env var (it
+  because `install.ps1` silently ignored `TEAMFORGE_DIR` env var (it
   was hard-coded to the param default). v1.3.8 added env var support
   per parity with bash, which exposed a pre-existing bug: the CI
   `Verify install (PowerShell)` step ran `install.ps1 -Doctor` without
-  setting `MAVIS_TEAM_DIR`, so doctor looked for files at the default
+  setting `TEAMFORGE_DIR`, so doctor looked for files at the default
   location while install had put them at `-test` location. Same issue
-  affected the `Test uninstall` step. CI now sets `MAVIS_TEAM_DIR` in
+  affected the `Test uninstall` step. CI now sets `TEAMFORGE_DIR` in
   doctor + uninstall steps to match the install step. (Catches what
   would have been a silent bug for Windows users with custom
-  `MAVIS_TEAM_DIR` overrides.)
+  `TEAMFORGE_DIR` overrides.)
 - **CRITICAL: bash archive missing `package.sh`**: The `BASH_FILES`
   list in `package.sh` was missing `scripts/package.sh` itself, so
   the bash release archive shipped without it. Now bash archive
@@ -785,7 +785,7 @@ changes that didn't actually land). This release fixes them all.
   try/catch to catch console-cancel — but user-thrown errors are
   handled cleanly.)
 - **`scripts/install.ps1` env var parity**: Now supports
-  `MAVIS_TEAM_REPO`, `MAVIS_TEAM_DIR`, `MAVIS_TEAM_NO_COLOR` (the
+  `MAVIS_TEAM_REPO`, `TEAMFORGE_DIR`, `MAVIS_TEAM_NO_COLOR` (the
   same vars bash installer accepts). Previously PowerShell users had
   no way to override defaults except `-InstallDir` / `-RepoUrl`.
   `MAVIS_TEAM_FORCE_COPY` is intentionally bash-only (PowerShell
@@ -823,21 +823,21 @@ changes that didn't actually land). This release fixes them all.
 - `make test-all`: 48/48 e2e (20 + 23 + 5)
 - `make package`: 5/5 archives, all self-test pass, SHA256 verified
 - Archive end-to-end: extracted `bash.tar.gz` runs `install.sh --version`
-  → "Mavis Team Mode installer v1.3.8"
-- Local Windows-style flow simulation: install (set MAVIS_TEAM_DIR)
-  → doctor (set MAVIS_TEAM_DIR) → no issues found
+  → "TeamForge installer v1.3.8"
+- Local Windows-style flow simulation: install (set TEAMFORGE_DIR)
+  → doctor (set TEAMFORGE_DIR) → no issues found
 
 ## [1.3.7] - 2026-07-23
 
 ### Added
 - **Platform-specific release archives** via `scripts/package.sh`:
-  - `mavis-team-mode-skill-{ver}-core.zip` (38 files, cross-platform core,
+  - `teamforge-sync-{ver}-core.zip` (38 files, cross-platform core,
     no installer — for browsing/embedding)
-  - `mavis-team-mode-skill-{ver}-bash.tar.gz` (40 files, adds
+  - `teamforge-sync-{ver}-bash.tar.gz` (40 files, adds
     `install.sh` + `validate.sh` for Linux/macOS/Git Bash/WSL)
-  - `mavis-team-mode-skill-{ver}-windows.zip` (41 files, adds
+  - `teamforge-sync-{ver}-windows.zip` (41 files, adds
     PowerShell `install.ps1` + `validate.ps1` + `run_e2e.ps1`)
-  - `mavis-team-mode-skill-{ver}-source.tar.gz` + `.zip` (47 files,
+  - `teamforge-sync-{ver}-source.tar.gz` + `.zip` (47 files,
     everything including CI workflows — for contributors)
   - `SHA256SUMS` for verification
   - Run `bash scripts/package.sh` to build all 4 archives locally
@@ -890,10 +890,10 @@ changes that didn't actually land). This release fixes them all.
 ### Fixed
 - Version sync: README badge, SKILL.md frontmatter, install.ps1, index.html
   bumped to 1.3.6 (previous v1.3.6 commit only updated install.sh)
-- `scripts/validate.sh` final line: removed fake `/mavis-team-mode` slash
+- `scripts/validate.sh` final line: removed fake `/teamforge` slash
   command suggestion, replaced with description-match guidance
-- `docs/ADR-001-team-mode-recreation.md`: "Author: Mavis (MiniMax M3)" →
-  "Community port (Mavis CLI agent)"
+- `docs/ADR-001-team-mode-recreation.md`: "Author: TeamForge (MiniMax M3)" →
+  "Community port (TeamForge CLI agent)"
 - `docs/PERFORMANCE.md` speedup table: all 4 columns now labeled `(est.)`
 - `docs/WINDOWS.md`: removed contradictory "PowerShell not supported" claim
   (this repo DOES ship `install.ps1` and `validate.ps1`)
@@ -905,7 +905,7 @@ changes that didn't actually land). This release fixes them all.
 - `SKILL.md` metadata `tested-on-ranges`: corrected "20+21=41" → "20+23+5=48"
   and "9/9 jobs" → "11/11 jobs"
 - `index.html`: removed fake Zcode slash commands (`/plugin marketplace
-  add`, `/plugin install mavis-team-mode@Qqapple1`), removed unverified
+  add`, `/plugin install teamforge@Qqapple1`), removed unverified
   speedup claim from hero, corrected test count (41 → 48)
 - `docs/ARCHITECTURE.md`: corrected file/line counts (SKILL.md 212→201,
   test_e2e_extended 21→23, added test_e2e_advanced 5, scripts 3→5,
@@ -992,7 +992,7 @@ changes that didn't actually land). This release fixes them all.
   what's actually verified (e2e 23/23 + skill format 22/22 + CI 9/9 jobs)
 - SKILL.md `metadata.author` no longer falsely claims to be M3
 - README/VALIDATION/INSTALL/agents/leader.md/references no longer
-  reference the fake `/mavis-team-mode` slash command. Zcode skills
+  reference the fake `/teamforge` slash command. Zcode skills
   use description-matching, not slash commands. (Caught during deep review.)
 - examples/refactor-large-module.md: Subtask 3 and 4 now have full
   prompts (no more `[same structure as Subtask 2]` placeholders)
@@ -1020,7 +1020,7 @@ changes that didn't actually land). This release fixes them all.
   YAML validation, install --doctor, idempotency check
 - install.sh: `--version`, `--doctor`, `--no-verify` options
 - install.sh: NO_COLOR support + non-TTY detection
-- install.sh: `MAVIS_TEAM_DIR`, `MAVIS_TEAM_REF` env vars for pinning
+- install.sh: `TEAMFORGE_DIR`, `MAVIS_TEAM_REF` env vars for pinning
 - install.sh: `safe_rm` helper for sandboxed FS
 
 ### Changed
@@ -1077,27 +1077,27 @@ changes that didn't actually land). This release fixes them all.
 - 3 reference documents
 - `README.md`, `LICENSE`, `.gitignore`
 
-[1.3.7]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.6...v1.3.7
-[1.3.6]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.5...v1.3.6
-[1.3.5]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.4...v1.3.5
-[1.3.4]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.3...v1.3.4
-[1.3.3]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.2...v1.3.3
-[1.3.2]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.1...v1.3.2
-[1.3.1]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.0...v1.3.1
-[1.3.0]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.2.0...v1.3.0
-[1.2.0]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.1.0...v1.2.0
-[1.3.19]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.18...v1.3.19
-[1.3.18]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.17...v1.3.18
-[1.3.17]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.16...v1.3.17
-[1.3.16]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.15...v1.3.16
-[1.3.15]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.14...v1.3.15
-[1.3.14]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.13...v1.3.14
-[1.3.13]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.12...v1.3.13
-[1.3.12]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.11...v1.3.12
-[1.3.11]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.10...v1.3.11
-[1.3.10]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.9...v1.3.10
-[1.3.9]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.8...v1.3.9
-[1.1.0]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.0.0...v1.1.0
-[1.0.0]: https://github.com/Qqapple1/Mavis-team-mode-skill/releases/tag/v1.0.0
-[1.3.8]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.7...v1.3.8
-[1.4.0]: https://github.com/Qqapple1/Mavis-team-mode-skill/compare/v1.3.19...v1.4.0
+[1.3.7]: https://github.com/Qqapple1/TeamForge-sync/compare/v1.3.6...v1.3.7
+[1.3.6]: https://github.com/Qqapple1/TeamForge-sync/compare/v1.3.5...v1.3.6
+[1.3.5]: https://github.com/Qqapple1/TeamForge-sync/compare/v1.3.4...v1.3.5
+[1.3.4]: https://github.com/Qqapple1/TeamForge-sync/compare/v1.3.3...v1.3.4
+[1.3.3]: https://github.com/Qqapple1/TeamForge-sync/compare/v1.3.2...v1.3.3
+[1.3.2]: https://github.com/Qqapple1/TeamForge-sync/compare/v1.3.1...v1.3.2
+[1.3.1]: https://github.com/Qqapple1/TeamForge-sync/compare/v1.3.0...v1.3.1
+[1.3.0]: https://github.com/Qqapple1/TeamForge-sync/compare/v1.2.0...v1.3.0
+[1.2.0]: https://github.com/Qqapple1/TeamForge-sync/compare/v1.1.0...v1.2.0
+[1.3.19]: https://github.com/Qqapple1/TeamForge-sync/compare/v1.3.18...v1.3.19
+[1.3.18]: https://github.com/Qqapple1/TeamForge-sync/compare/v1.3.17...v1.3.18
+[1.3.17]: https://github.com/Qqapple1/TeamForge-sync/compare/v1.3.16...v1.3.17
+[1.3.16]: https://github.com/Qqapple1/TeamForge-sync/compare/v1.3.15...v1.3.16
+[1.3.15]: https://github.com/Qqapple1/TeamForge-sync/compare/v1.3.14...v1.3.15
+[1.3.14]: https://github.com/Qqapple1/TeamForge-sync/compare/v1.3.13...v1.3.14
+[1.3.13]: https://github.com/Qqapple1/TeamForge-sync/compare/v1.3.12...v1.3.13
+[1.3.12]: https://github.com/Qqapple1/TeamForge-sync/compare/v1.3.11...v1.3.12
+[1.3.11]: https://github.com/Qqapple1/TeamForge-sync/compare/v1.3.10...v1.3.11
+[1.3.10]: https://github.com/Qqapple1/TeamForge-sync/compare/v1.3.9...v1.3.10
+[1.3.9]: https://github.com/Qqapple1/TeamForge-sync/compare/v1.3.8...v1.3.9
+[1.1.0]: https://github.com/Qqapple1/TeamForge-sync/compare/v1.0.0...v1.1.0
+[1.0.0]: https://github.com/Qqapple1/TeamForge-sync/releases/tag/v1.0.0
+[1.3.8]: https://github.com/Qqapple1/TeamForge-sync/compare/v1.3.7...v1.3.8
+[1.4.0]: https://github.com/Qqapple1/TeamForge-sync/compare/v1.3.19...v1.4.0

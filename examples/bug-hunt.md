@@ -1,6 +1,6 @@
 ---
 name: example-bug-hunt
-description: "Worked example: hunt down a production bug (double-charge) and fix it using Mavis Team Mode. Reference document, not a triggerable skill."
+description: "Worked example: hunt down a production bug (double-charge) and fix it using TeamForge. Reference document, not a triggerable skill."
 type: example
 category: bug-fix
 ---
