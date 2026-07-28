@@ -2,7 +2,7 @@
 name: team-leader
 description: "Coordinates a TeamForge workflow in Zcode. Receives a complex user task, decomposes it into parallel sub-tasks, dispatches sub-agents, integrates their outputs, runs verification, and iterates until the deliverable meets all acceptance criteria. Use when invoking the `teamforge` skill."
 tools: [Agent, Read, Write, Edit, Bash, Glob, Grep, WebSearch, WebFetch]
-version: 2.2.0
+version: 2.3.0
 license: MIT
 ---
 
@@ -261,32 +261,19 @@ grep -r "--prefix" docs/
 
 ### Phase 3.5: 状态快照写入
 
-在 Phase 3 整合完成后、进入 Phase 4 之前，Leader **必须**将当前执行状态写入 `.teamforge_state.json`：
+在 Phase 3 整合完成后、进入 Phase 4 之前，Leader **必须**将状态变更追加到 `.teamforge_state.log`（日志追加模式，避免并发损坏）：
 
 ```bash
-# 写入状态快照（在项目根目录）
-cat > .teamforge_state.json << 'EOF'
-{
-  "version": "1.5.1",
-  "task": "<原始任务描述>",
-  "team_plan": <Team Plan JSON>,
-  "current_wave": <当前 Wave 编号>,
-  "waves": {
-    "<wave_number>": {"status": "completed", "subtasks": {...}}
-  },
-  "verification": null,
-  "iteration": 0,
-  "timestamp": "<ISO 8601 时间戳>"
-}
-EOF
+# 每次状态变更追加一行（在项目根目录）
+echo '{"ts":"<ISO 8601 时间戳>","wave":<当前 Wave>,"task":"<子任务ID>","status":"done","files":["<产出文件>"]}' >> .teamforge_state.log
 ```
 
 **写入时机**:
-- 每个 Wave 完成后更新 `current_wave` 和对应 Wave 的状态
-- Phase 3 整合完成后写入完整快照
-- Phase 5 每轮迭代后更新 `iteration` 和 `verification` 字段
+- 每个 Wave 完成后追加该 Wave 所有子任务的状态
+- Phase 3 整合完成后追加整合状态
+- Phase 5 每轮迭代后追加迭代结果
 
-**恢复指令**: 如果用户说 "恢复上次的 teamforge 任务"，Leader 读取 `.teamforge_state.json` 并从断点继续。
+**恢复指令**: 如果用户说 "恢复上次的 teamforge 任务"，Leader 读取 `.teamforge_state.log` 并重放状态，从最后一个未完成的 Wave 继续。
 
 ### Phase 4: Verify
 
@@ -350,6 +337,17 @@ If verification fails:
   scope.
 - After 3 failed iterations: present the partial result + remaining issues
   to the user, let them decide
+
+**Fixer 阈值提示**：Leader 在派发 Fixer 时，prompt 中**必须**包含以下约束：
+```
+CONSTRAINTS:
+  - 修复行数需小于阈值（默认: min(文件行数的20%, 50行)）
+  - 如果修复可能超过此阈值，立即报告 ESCALATED，不要尝试强行修复
+  - Leader 收到 ESCALATED 后，可以：
+    (a) 调高 FIXER_LIMIT 重试
+    (b) 改派 Worker-Coder 做大范围修改
+    (c) 缩小功能范围
+```
 
 #### 降级策略 (Degradation Strategy)
 

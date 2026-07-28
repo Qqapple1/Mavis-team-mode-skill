@@ -1,7 +1,7 @@
 ---
 name: teamforge
 description: "Recreates the TeamForge workflow (Leader + Workers + Verifier) inside Zcode 3.4.2+. Use this skill when the user wants parallel agent execution, structured task decomposition, independent quality verification, or multi-step work that benefits from sub-agents running concurrently. Triggers on: 'teamforge', 'team mode', 'multi-agent', 'split into subtasks', 'verify the result', '用 teamforge', '团队模式', '多智能体协作', '并行处理'. Do NOT use for simple single-step tasks."
-version: 2.2.0
+version: 2.3.0
 license: MIT
 metadata:
   author: Community port (TeamForge CLI agent)
@@ -144,7 +144,20 @@ If missing, see INSTALL.md.
 - 检查每个文件非空（`wc -l` 命令）
 
 **Level 2 — 接口验证（推荐）**：
-- 对 Python 代码：检查函数名是否存在（`grep -n "def function_name"` ）
+- 对 Python 代码：使用 AST 解析验证函数是否存在且签名正确
+  ```python
+  # Leader 可以执行此脚本验证 Python 函数
+  python -c "
+  import ast, sys
+  code = open(sys.argv[1]).read()
+  tree = ast.parse(code)
+  funcs = {n.name: [a.arg for a in n.args.args] for n in ast.walk(tree) if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))}
+  for name in sys.argv[2:]:
+      status = '✅' if name in funcs else '❌'
+      print(f'{status} {name}: {funcs.get(name, \"NOT FOUND\")}')
+  " <file.py> <func1> <func2> ...
+  ```
+  这比 grep 健壮：即使函数是 `async def`、有装饰器、或在注释中出现同名，AST 也能准确识别。
 - 对 CLI 工具：运行 `--help` 并检查输出中是否包含 CONTRACT 定义的参数名
 - 对 JSON 输出：运行工具并用 `python -c "import json; ..."` 验证输出格式
 
@@ -332,42 +345,28 @@ Leader 收到所有子智能体的摘要后，**自己整合**成初版交付物
 
 ### Step 5.5: 状态快照（断点恢复机制）
 
-在每个 Wave 完成后，Leader **必须**将当前执行状态序列化为 `.teamforge_state.json` 文件：
+在每个 Wave 完成后，Leader **必须**将状态变更追加到 `.teamforge_state.log` 文件：
 
-```json
-{
-  "version": "2.1.0",
-  "task": "原始任务描述（一句话摘要）",
-  "team_plan_path": "./team_plan.md",
-  "current_wave": 2,
-  "waves": {
-    "1": {"status": "completed", "subtasks": {"subtask_1": {"status": "completed", "output_files": ["src/main.py"]}}},
-    "2": {"status": "in_progress", "subtasks": {"subtask_3": {"status": "pending"}}}
-  },
-  "verification": null,
-  "iteration": 0,
-  "timestamp": "2026-07-28T20:00:00"
-}
-```
-
-**快照设计原则**：快照只记录子任务 ID、状态、文件路径等轻量信息。大段 Prompt 和 Team Plan 详情存为独立文件，快照中只记录引用路径，确保快照文件始终轻量（< 5KB）。
-
-**原子写入规则**：Leader 写入 `.teamforge_state.json` 时**必须**使用原子写入，防止并发损坏：
-1. 先写入临时文件 `.teamforge_state.tmp`
-2. 写入完成后，将 `.teamforge_state.tmp` 重命名为 `.teamforge_state.json`
-3. 这确保了即使写入过程中断，原文件也不会损坏
-
+**日志追加模式**（替代 JSON 文件写入，避免并发损坏）：
 ```bash
-# 写入临时文件
-echo '{...}' > .teamforge_state.tmp
-# 原子替换
-mv .teamforge_state.tmp .teamforge_state.json
+# 每次状态变更追加一行（不会覆盖之前的数据）
+echo '{"ts":"2026-07-29T10:00:00","wave":1,"task":"subtask_1","status":"done","files":["src/main.py"]}' >> .teamforge_state.log
+echo '{"ts":"2026-07-29T10:05:00","wave":1,"task":"subtask_2","status":"done","files":["tests/test.py"]}' >> .teamforge_state.log
+echo '{"ts":"2026-07-29T10:10:00","wave":2,"task":"subtask_3","status":"started"}' >> .teamforge_state.log
 ```
 
-**恢复流程**: 如果会话中断，用户可以说 "恢复上次的 teamforge 任务"，Leader 读取 `.teamforge_state.json` 并从断点继续：
-1. 检查已完成 Wave 的产出文件是否仍然存在
-2. 从当前 Wave 继续派发未完成的子任务
-3. 如果产出文件丢失，重新派发该 Wave
+**恢复流程**：如果会话中断，用户说 "恢复上次的 teamforge 任务"，Leader 读取 `.teamforge_state.log` 并重放状态：
+1. 解析日志，重建每个子任务的最新状态
+2. 检查已完成子任务的产出文件是否仍然存在
+3. 从最后一个未完成的 Wave 继续派发
+
+**日志格式**：每行一个 JSON 对象，字段：
+- `ts`: ISO 时间戳
+- `wave`: Wave 编号
+- `task`: 子任务 ID
+- `status`: `started` | `done` | `failed` | `blocked`
+- `files`: 产出文件列表（可选）
+- `error`: 错误信息（可选）
 
 ### Step 6: 迭代修正
 

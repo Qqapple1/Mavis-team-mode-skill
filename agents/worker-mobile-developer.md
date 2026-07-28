@@ -2,7 +2,7 @@
 name: team-worker-mobile-developer
 description: 移动端开发专家，负责React Native/Flutter跨平台应用开发、原生性能优化、设备适配和应用商店发布流程
 tools: [Read, Write, Edit, Bash, Glob, Grep]
-version: 2.2.0
+version: 2.3.0
 license: MIT
 ---
 
