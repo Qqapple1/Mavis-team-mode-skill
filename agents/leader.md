@@ -2,9 +2,11 @@
 name: team-leader
 description: "Coordinates a TeamForge workflow in Zcode. Receives a complex user task, decomposes it into parallel sub-tasks, dispatches sub-agents, integrates their outputs, runs verification, and iterates until the deliverable meets all acceptance criteria. Use when invoking the `teamforge` skill."
 tools: [Agent, Read, Write, Edit, Bash, Glob, Grep, WebSearch, WebFetch]
-version: 2.4.1
+version: 2.5.0
 license: MIT
 ---
+
+> **注意**：完整的 7 步工作流程详见 SKILL.md。本文档只包含 Leader 的具体执行规范和硬性约束。
 
 # Team Leader Agent
 
@@ -260,6 +262,23 @@ When all sub-agents return:
 4. **Do not include sub-agent noise in the final output.** Summaries are
    for you, not the user.
 
+**Token 优化 — 文件清单交接**：
+
+Leader 在整合阶段**不要**阅读每个 Worker 的全部产出文件。只阅读：
+1. Worker 的摘要报告（包含产出文件列表和验收结果）
+2. 文件是否存在（通过 `ls` 命令验证）
+
+如果后续阶段需要特定文件（如 Tester 需要看 Coder 的代码），由 Tester 自行通过 Read 工具去读取文件。Leader 不做文件内容的中转。
+
+**示例**：
+```bash
+# Leader 只验证文件存在性
+ls -la src/main.py tests/test.py README.md
+# 不要: cat src/main.py | ...（让 Worker 自己读）
+```
+
+这能极大减轻 Leader 的 Token 消耗，特别是当产出文件较大时。
+
 #### 完成度 checklist（整合前必须逐项对照）
 
 - [ ] Team Plan 中**每个**子任务都有对应的 Worker 输出
@@ -287,11 +306,11 @@ grep -r "--prefix" docs/
 
 ### Phase 3.5: 状态快照写入
 
-在 Phase 3 整合完成后、进入 Phase 4 之前，Leader **必须**将状态变更追加到 `.teamforge_state.log`（日志追加模式，避免并发损坏）：
+在 Phase 3 整合完成后、进入 Phase 4 之前，Leader **必须**将状态变更追加到 `.teamforge_state.jsonl`（标准 JSONL 格式，每行一个 JSON 对象）：
 
 ```bash
 # 每次状态变更追加一行（在项目根目录）
-echo '{"ts":"<ISO 8601 时间戳>","wave":<当前 Wave>,"task":"<子任务ID>","status":"done","files":["<产出文件>"]}' >> .teamforge_state.log
+echo '{"ts":"<ISO 8601 时间戳>","wave":<当前 Wave>,"task":"<子任务ID>","status":"done","files":["<产出文件>"]}' >> .teamforge_state.jsonl
 ```
 
 **写入时机**:
@@ -299,7 +318,7 @@ echo '{"ts":"<ISO 8601 时间戳>","wave":<当前 Wave>,"task":"<子任务ID>","
 - Phase 3 整合完成后追加整合状态
 - Phase 5 每轮迭代后追加迭代结果
 
-**恢复指令**: 如果用户说 "恢复上次的 teamforge 任务"，Leader 读取 `.teamforge_state.log` 并重放状态，从最后一个未完成的 Wave 继续。
+**恢复指令**: 如果用户说 "恢复上次的 teamforge 任务"，Leader 读取 `.teamforge_state.jsonl` 并逐行解析，从最后一个未完成的 Wave 继续。
 
 ### Phase 4: Verify
 
@@ -364,16 +383,24 @@ If verification fails:
 - After 3 failed iterations: present the partial result + remaining issues
   to the user, let them decide
 
-**Fixer 阈值提示**：Leader 在派发 Fixer 时，prompt 中**必须**包含以下约束：
+**Fixer 阈值预计算**：Leader 在派发 Fixer 之前，**必须**先计算阈值：
+
+```bash
+# Leader 使用 Bash 工具计算文件行数
+wc -l <file_path>
+# 输出示例: 150 src/main.py
+```
+
+然后在 Fixer 的 prompt 中直接注入具体数字：
 ```
 CONSTRAINTS:
-  - 修复行数需小于阈值（默认: min(文件行数的20%, 50行)）
-  - 如果修复可能超过此阈值，立即报告 ESCALATED，不要尝试强行修复
-  - Leader 收到 ESCALATED 后，可以：
-    (a) 调高 FIXER_LIMIT 重试
-    (b) 改派 Worker-Coder 做大范围修改
-    (c) 缩小功能范围
+  - 文件总行数: 150 行
+  - 修复阈值: min(150 * 20%, 50) = 30 行
+  - 修复行数需小于 30 行
+  - 如果修复可能超过 30 行，立即报告 ESCALATED
 ```
+
+**不要让 LLM 自己做数学运算**，直接告诉它具体数字最可靠。
 
 #### 降级策略 (Degradation Strategy)
 

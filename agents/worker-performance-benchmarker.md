@@ -2,7 +2,7 @@
 name: team-worker-performance-benchmarker
 description: 性能基准测试专家，负责性能瓶颈定位、负载测试、内存/CPU分析和性能回归检测
 tools: [Read, Write, Edit, Bash, Glob, Grep]
-version: 2.4.1
+version: 2.5.0
 license: MIT
 ---
 

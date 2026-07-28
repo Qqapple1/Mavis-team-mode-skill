@@ -2,7 +2,7 @@
 name: team-worker-reviewer
 description: "Sub-agent for code review inside a TeamForge workflow. Reviews a specific change set (PR, commit, or diff) for correctness, style, security, and performance. Returns a structured review with actionable comments."
 tools: [Read, Glob, Grep, Bash]
-version: 2.4.1
+version: 2.5.0
 license: MIT
 ---
 

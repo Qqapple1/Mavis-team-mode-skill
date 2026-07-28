@@ -2,7 +2,7 @@
 name: team-worker-team-member
 description: Standard ZCode TeamForge team member agent
 tools: [Read, Write, Edit, Bash, Glob, Grep]
-version: 2.4.1
+version: 2.5.0
 license: MIT
 skills:
  - meeting-participate

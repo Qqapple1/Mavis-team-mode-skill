@@ -2,7 +2,7 @@
 name: team-worker-database-optimizer
 description: 数据库优化专家，负责查询性能调优、索引策略设计、数据建模和迁移脚本编写，确保数据层高效稳定运行
 tools: [Read, Write, Edit, Bash, Glob, Grep]
-version: 2.4.1
+version: 2.5.0
 license: MIT
 ---
 

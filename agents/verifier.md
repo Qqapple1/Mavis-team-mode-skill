@@ -2,7 +2,7 @@
 name: team-verifier
 description: "Verifier sub-agent in a TeamForge workflow. Independently checks the Leader's integrated output against the original acceptance criteria. Does NOT trust the Leader's self-assessment — runs its own checks."
 tools: [Read, Bash, Glob, Grep, WebSearch, WebFetch]
-version: 2.4.1
+version: 2.5.0
 license: MIT
 ---
 
@@ -48,6 +48,8 @@ for verification catches errors that Model A systematically misses.
 > **兼容性说明**：如果您的 Zcode 版本不支持子 Agent 运行时切换模型，请使用本 skill 的"对抗式验证（Adversarial mode）"功能，这能有效替代多模型对抗，降低偏见风险。
 >
 > **EN: Compatibility note: If your Zcode version does not support runtime model switching for sub-agents, use the "Adversarial mode" feature of this skill. It effectively substitutes for multi-model adversarial verification and reduces bias risk.**
+
+> **平台支持说明**：多模型验证需要 Zcode 支持为子 Agent 指定不同的模型提供商。如果您的 Zcode 版本不支持此功能，请使用"对抗式验证（Adversarial mode）"作为降级方案。对抗式验证通过 Prompt 级别的对立（Checker 宽松 + Skeptic 悲观），即使在同一模型下也能产生有价值的对抗效果。
 
 ## Reasoning budget
 

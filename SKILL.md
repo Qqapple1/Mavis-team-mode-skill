@@ -1,7 +1,7 @@
 ---
 name: teamforge
 description: "Recreates the TeamForge workflow (Leader + Workers + Verifier) inside Zcode 3.4.2+. Use this skill when the user wants parallel agent execution, structured task decomposition, independent quality verification, or multi-step work that benefits from sub-agents running concurrently. Triggers on: 'teamforge', 'team mode', 'multi-agent', 'split into subtasks', 'verify the result', '用 teamforge', '团队模式', '多智能体协作', '并行处理'. Do NOT use for simple single-step tasks."
-version: 2.4.1
+version: 2.5.0
 license: MIT
 metadata:
   author: Community port (TeamForge CLI agent)
@@ -77,6 +77,15 @@ using the Agent Skills standard + Zcode's built-in sub-agent system.
 - 子任务强依赖（必须串行）
 - 任务太小不值得拆（拆完比直接干还慢）
 - 你只想要"试试看"（直接干就行）
+
+## 并行执行说明
+
+TeamForge 的 Worker 并行是"前台并行"（Zcode 平台限制），这意味着：
+- 同一 Wave 内的 Worker 会同时启动
+- Leader 需要等待所有 Worker 返回后才能继续
+- 在等待期间，用户界面可能会暂时冻结
+
+**建议**：对于复杂任务，开启一个独立的 Zcode 对话来运行 TeamForge，避免在主对话中等待时卡死。
 
 ## Required companion files
 
@@ -351,22 +360,45 @@ Leader 收到所有子智能体的摘要后，**自己整合**成初版交付物
 
 ### Step 5.5: 状态快照（断点恢复机制）
 
-在每个 Wave 完成后，Leader **必须**将状态变更追加到 `.teamforge_state.log` 文件：
+在每个 Wave 完成后，Leader **必须**将状态变更追加到 `.teamforge_state.jsonl` 文件：
 
-**日志追加模式**（替代 JSON 文件写入，避免并发损坏）：
+**JSONL 格式**（标准 JSON Lines）：
+- 文件扩展名: `.teamforge_state.jsonl`
+- 每行一个独立的 JSON 对象
+- 行与行之间用换行符分隔
+- 不需要外层的数组括号 `[...]`
+- 任何 JSON 解析器都能逐行读取
+
 ```bash
-# 每次状态变更追加一行（不会覆盖之前的数据）
-echo '{"ts":"2026-07-29T10:00:00","wave":1,"task":"subtask_1","status":"done","files":["src/main.py"]}' >> .teamforge_state.log
-echo '{"ts":"2026-07-29T10:05:00","wave":1,"task":"subtask_2","status":"done","files":["tests/test.py"]}' >> .teamforge_state.log
-echo '{"ts":"2026-07-29T10:10:00","wave":2,"task":"subtask_3","status":"started"}' >> .teamforge_state.log
+# 写入示例（每行一个完整 JSON）
+echo '{"ts":"2026-07-29T10:00:00","wave":1,"task":"subtask_1","status":"done","files":["src/main.py"]}' >> .teamforge_state.jsonl
+echo '{"ts":"2026-07-29T10:05:00","wave":1,"task":"subtask_2","status":"done","files":["tests/test.py"]}' >> .teamforge_state.jsonl
 ```
 
-**恢复流程**：如果会话中断，用户说 "恢复上次的 teamforge 任务"，Leader 读取 `.teamforge_state.log` 并重放状态：
-1. 解析日志，重建每个子任务的最新状态
+**恢复流程**：逐行读取 `.teamforge_state.jsonl`，每行解析为独立 JSON 对象，重建最新状态：
+1. 解析 JSONL，重建每个子任务的最新状态
 2. 检查已完成子任务的产出文件是否仍然存在
 3. 从最后一个未完成的 Wave 继续派发
 
-**日志格式**：每行一个 JSON 对象，字段：
+**文件一致性校验**：恢复时 Leader **必须**检查每个已完成子任务的产出文件：
+
+```bash
+# 检查文件是否存在且非空
+for file in <产出文件列表>; do
+    if [ ! -s "$file" ]; then
+        echo "❌ MISSING: $file"
+    else
+        echo "✅ EXISTS: $file ($(wc -l < "$file") lines)"
+    fi
+done
+```
+
+**校验结果处理**：
+- 所有文件存在且非空 → 从当前 Wave 继续
+- 部分文件缺失 → 标记对应 Worker 为 MISSING，触发重派
+- 所有文件缺失 → 从 Wave 1 重新开始
+
+**JSONL 字段**：每行一个 JSON 对象，字段：
 - `ts`: ISO 时间戳
 - `wave`: Wave 编号
 - `task`: 子任务 ID

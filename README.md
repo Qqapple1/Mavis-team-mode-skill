@@ -40,7 +40,7 @@ Verifier 对抗式验证（Checker + Skeptic + Judge）
 | **对抗式验证** | Checker 按标准检查 + Skeptic 主动找茬 + Judge 最终裁决 |
 | **产物交接协议** | Wave 间通过文件显式传递，不依赖 Leader 记忆 |
 | **沙箱快照回溯** | Fixer 修复前先备份，失败可回退 |
-| **状态快照** | 每个 Wave 完成后写入 `.teamforge_state.json`，支持断点恢复 |
+| **状态快照** | 每个 Wave 完成后写入 `.teamforge_state.jsonl`，支持断点恢复 |
 
 ---
 
@@ -158,7 +158,7 @@ teamforge/
 |------|------|----------|
 | Worker 前台并行，非后台 | Zcode sub-agent 机制限制 | 等平台升级 |
 | Verifier 同模型偏见 | 无法切换模型 | 对抗式验证模式 |
-| 无真正的状态机 | 需要持久化存储 | `.teamforge_state.json` 快照 |
+| 无真正的状态机 | 需要持久化存储 | `.teamforge_state.jsonl` 快照 |
 | Agent 间无法直接通信 | 需要平台支持 | Leader 中转 + 文件交接 |
 | Worker 工具权限无法差异化 | Zcode 不支持 per-agent 工具限制 | prompt 约束 |
 
