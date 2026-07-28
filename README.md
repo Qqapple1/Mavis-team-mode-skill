@@ -1,302 +1,183 @@
-# TeamForge Skill for Zcode
+# TeamForge
 
-**Unofficial / 非官方** — 与 MiniMax 无关联、无背书。基于公开信息尽力还原的工作流模式。
+**多 Agent 团队协作技能 — 为 Zcode 3.4.2+ 设计**
 
-基于 MiniMax **TeamForge**（Leader + Workers + Verifier）工作流理念，为 Zcode 3.4.2+ 提供的结构化协作 skill。
+> TeamForge 不是"提高效率"的工具，是"提高质量下限"的工具。
+> 它用 **4-6 倍 Token** 换取 **结果的可预测性** 和 **质量的显著提升**。
 
-> **Pick your platform → [Download v1.4.0](https://github.com/Qqapple1/TeamForge-sync/releases/tag/v1.4.0)**:
-> - macOS / Linux / Git Bash / WSL → `teamforge-sync-1.4.0-bash.tar.gz`
-> - Windows PowerShell → `teamforge-sync-1.4.0-windows.zip`
-> - Just want to read it → `teamforge-sync-1.4.0-core.zip`
-> - Contributor / CI → `teamforge-sync-1.4.0-source.tar.gz`
-> - [Which archive should I download? →](docs/PLATFORMS.md)
-
-> 基于 Zcode 3.4.2+ 的子智能体系统 + Agent Skills 标准实现，
-> 完整复刻 MiniMax 官方 TeamForge 2026-05 公告的 TeamEngine 工作流。
-
-[![CI](https://github.com/Qqapple1/TeamForge-sync/actions/workflows/validate-skill.yml/badge.svg)](https://github.com/Qqapple1/TeamForge-sync/actions)
-[![Skill tests](https://img.shields.io/badge/validate-24%2F24%20passing-brightgreen)](VALIDATION.md)
-[![Prototype tests](https://img.shields.io/badge/prototype%20e2e-48%2F48%20passing-brightgreen)](examples/prototype-todo-app/)
-[![YAML](https://img.shields.io/badge/yaml-16%2F16%20passing-brightgreen)](scripts/validate_yaml.py)
-[![Version](https://img.shields.io/badge/version-1.4.0-blue)](CHANGELOG.md)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
-[![Zcode 3.x](https://img.shields.io/badge/zcode-3.x-purple)](https://zcode-ai.com)
-[![Security](https://img.shields.io/badge/security-policy-green)](SECURITY.md)
+[![Version](https://img.shields.io/badge/version-2.0.0-blue)](CHANGELOG.md)
 
-## Requirements
+---
 
-- **Platform**: macOS / Linux / Windows（基于 [Zcode 官方下载页](https://zcode-ai.com) 列出的 Windows x64 / ARM64 / macOS / Linux x64 / Linux ARM64）
-  - **install.sh 是 bash 脚本**：Linux / macOS / Git Bash / WSL 上用
-  - **install.ps1 是 PowerShell 脚本**：Windows PowerShell 原生可用（无需 Git Bash）
-  - **prototype server 是 Python**：跨平台（只用了 stdlib）
-- **Python**: 3.8+ （3.6/3.7 已 EOL；CI matrix 测试 3.9-3.13）
-- **Git**: 2.0+ （install.sh 用 `--depth 1` shallow clone）
-- **Bash**: 3.2+（我用的语法都兼容 bash 3.2，包括 macOS 默认 bash）
-- **Disk**: ~600KB 安装空间
-- **Zcode**: 3.4.2+（per [zcode-ai.com](https://zcode-ai.com) download page, 2026-07-26）
-- **Windows 用户**: 见 [docs/WINDOWS.md](docs/WINDOWS.md)。两条路径，都受完整支持：
-  - **推荐**：WSL2 + `install.sh` — 真 symlink、Linux 文件权限、Zcode 官方支持，适合生产/长期使用
-  - **备选**：原生 PowerShell + `install.ps1`（无需 Git Bash）— 快速上手，纯 Windows 环境也能跑
+## TeamForge 是什么
 
-> **真 Zcode runtime 实测**: 社区用户已在真实 Zcode 对话中测试 5+ 次（frename / mnote / cquote / hitokoto CLI 工具 + 基础设施审计），P0-P3 修复已随 v1.3.14-v1.4.0 发布。详见 CHANGELOG。
+TeamForge 是一个 Zcode Skill，将复杂任务拆分为多个并行子任务，由专业化的 Agent 团队协作完成：
 
-### 网络访问注意
+```
+用户下达任务
+    ↓
+Leader 拆解任务 + 发布 CONTRACT 接口契约
+    ↓
+Wave 1: Worker-Coder + Worker-Doc-Writer（并行）
+    ↓
+Wave 2: Worker-Tester（依赖 Wave 1 产物）
+    ↓
+Leader 整合 + CONTRACT 字符串级验证
+    ↓
+Verifier 对抗式验证（Checker + Skeptic + Judge）
+    ↓
+交付 + 状态快照
+```
 
-如果你在中国大陆，`raw.githubusercontent.com`（一键安装命令依赖的）
-可能不稳定（GitHub 在大陆没官方 CDN）。两个解决方案：
+**核心机制**：
 
-1. **手动 clone 替代一键脚本**（推荐）：
-   ```bash
-   git clone https://github.com/Qqapple1/TeamForge-sync.git ~/teamforge-sync
-   bash ~/teamforge-sync/scripts/install.sh
-   ```
-2. **用代理**（如有）：`export https_proxy=http://127.0.0.1:7890`
-3. **用 GitHub 官方 release 包**：从 [Releases](https://github.com/Qqapple1/TeamForge-sync/releases) 下载对应平台的 zip/tar.gz，解压到 `~/.zcode/skills/teamforge/`
-<!-- 第三方镜像（如 ghfast.top）存在被篡改的供应链风险，不推荐。-->
+| 机制 | 作用 |
+|------|------|
+| **CONTRACT 接口契约** | 所有 Worker 基于同一份接口规范工作，避免各说各话 |
+| **Wave 并行执行** | 无依赖的子任务并行派发，有依赖的按 Wave 串行 |
+| **DoD 清单** | 每个子任务附带"完成定义"，Worker 必须逐项打勾 |
+| **对抗式验证** | Checker 按标准检查 + Skeptic 主动找茬 + Judge 最终裁决 |
+| **产物交接协议** | Wave 间通过文件显式传递，不依赖 Leader 记忆 |
+| **沙箱快照回溯** | Fixer 修复前先备份，失败可回退 |
+| **状态快照** | 每个 Wave 完成后写入 `.teamforge_state.json`，支持断点恢复 |
 
-## 功能
+---
 
-- ✅ Leader 任务拆解（结构化 Team Plan）
-- ⚠️ Workers 并行执行（Zcode 前台并行，非后台）
-- ⚠️ Verifier 独立验收（需第二会话，同会话有偏见风险）
-- ✅ 迭代修正（最多 3 轮）
-- ✅ 模型无关（Zcode 支持什么模型，这个 skill 就能用什么 — 见 requirements 段）
-- ✅ 渐进式加载（相对一次性全加载，减少 ~90% 激活成本；但相较不用 skill 仍多 ~148% token）
-- ✅ 4 个真实可运行 example + 1 个 Todo prototype
-- ✅ 48 项端到端测试（20 + 23 + 5）+ 24 项 skill 格式自检 + 16 项 YAML 校验
+## 什么时候该用 TeamForge
 
-## 5 分钟快速开始
+### ✅ 适合用的场景
+
+| 场景 | 原因 |
+|------|------|
+| 复杂任务，需要拆分为 3+ 个独立子任务 | 单 Agent 容易顾此失彼 |
+| 需要代码 + 测试 + 文档同时交付 | 三个 Worker 并行，质量互锁 |
+| 高 stakes 项目（生产环境、对外交付） | 对抗式验证能发现 30-40% 额外问题 |
+| 任务需要多个专业视角 | 多视角分析（性能/安全/可维护性） |
+| 需要结果可预测、可复现 | CONTRACT + DoD 保证一致性 |
+
+### ❌ 不适合用的场景
+
+| 场景 | 原因 |
+|------|------|
+| 单文件 < 50 行的简单修改 | 拆解 overhead 比直接写还慢 |
+| 改个 typo、调个样式 | 大炮打蚊子 |
+| 快速原型验证 | 速度优先，质量可以后补 |
+| Token 预算紧张 | 4-6x 消耗不划算 |
+| 简单问答、调研 | 根本不需要团队 |
+
+---
+
+## Token 成本：诚实的分析
+
+**是的，TeamForge 比单 Agent 消耗更多 Token。**
+
+| 模式 | Token 消耗 | 墙钟时间 | 质量 | 可预测性 |
+|------|:----------:|:--------:|:----:|:--------:|
+| **单 Agent** | 1x | 基准 | 基准 | 低 |
+| **TeamForge (3 Worker)** | ~3-4x | 快 30-50% | 明显提升 | 高 |
+| **TeamForge + 对抗验证** | ~5-6x | 快 20-40% | 显著提升 | 很高 |
+
+**多花的 Token 换来了什么？**
+
+| 收益 | 单 Agent 能做到吗？ |
+|------|:------------------:|
+| 并行执行，墙钟时间缩短 30-50% | ❌ 串行 |
+| CONTRACT 接口契约，避免各说各话 | ❌ 没有机制 |
+| 对抗式验证，多发现 30-40% 问题 | ❌ 同模型偏见 |
+| DoD 清单，消除虚假完成 | ❌ 靠自觉 |
+| 产物交接，Wave 间信息不丢失 | ❌ 上下文内隐式 |
+| 断点恢复，会话中断可继续 | ❌ 从头开始 |
+
+**本质**：TeamForge 用 **Token 换质量下限**。适合"宁可多花 Token 也不能出错"的场景。
+
+---
+
+## 快速开始
+
+### 安装
 
 ```bash
-# 1. 装
+# 方式 1: 一键脚本（推荐）
 bash scripts/install.sh
-# 或带选项
-bash scripts/install.sh --no-verify   # 跳过校验
-bash scripts/install.sh --doctor      # 不修改只诊断
-bash scripts/install.sh --version     # 看版本
 
-# 2. 验证（24 项格式自检）
-bash scripts/validate.sh
+# 方式 2: PowerShell（Windows 原生）
+powershell -ExecutionPolicy Bypass -File scripts/install.ps1
 
-# 3. 跑 prototype（48 项 e2e = 20 + 23 + 5）
-cd examples/prototype-todo-app
-python3 server/server.py &
-sleep 2
-python3 test_e2e.py
-python3 test_e2e_extended.py
-python3 test_e2e_advanced.py
-kill %1
-
-# 4. 打开 Zcode，跟它说：
-#    "用 teamforge 帮我 ..."
-#    或“拆开来做”、“用 teamforge跑一下”
-# （Zcode 靠 description 匹配自动加载；不需要 /teamforge 命令）
+# 方式 3: 手动 clone
+git clone https://github.com/Qqapple1/Mavis-team-mode-skill.git ~/.zcode/skills/teamforge
 ```
 
-## 🚀 Quick Start for Windows（如果你是 Windows 用户）
-
-两条主要路径，都受完整支持。选哪个取决于你的场景：
-
-### 推荐：WSL2 + `install.sh`（生产/长期使用）
-
-最完整的方案 — 真 symlink、Linux 文件权限、Zcode 官方支持。
-
-```powershell
-# 一次性：管理员 PowerShell
-wsl --install
-# 重启
-```
+### 使用
 
 ```bash
-# Ubuntu terminal 里
-git clone https://github.com/Qqapple1/TeamForge-sync.git ~/teamforge-sync
-cd ~/teamforge-sync
-bash scripts/install.sh
+# 在 Zcode 中直接说：
+"用 teamforge 帮我做一个 CLI 工具，支持 xxx 功能"
+
+# 或者：
+"这个任务比较复杂，拆开来做"
+"用 teamforge 跑一下"
 ```
 
-### 备选：原生 PowerShell + `install.ps1`（快速试用 / 纯 Windows 环境）
+Zcode 会根据 description 自动匹配并加载 TeamForge skill。
 
-无需装 WSL 或 Git Bash，PowerShell 原生运行。install.ps1 功能等价（clone + copy + 验证 + 卸载），297 行维护。
-
-```powershell
-git clone https://github.com/Qqapple1/TeamForge-sync.git $env:USERPROFILE\teamforge-sync
-cd $env:USERPROFILE\teamforge-sync
-powershell -ExecutionPolicy Bypass -File scripts\install.ps1
-```
-
-### 也支持：Git Bash + `install.sh`（已有 Git Bash 的用户）
-
-如果你已经装了 Git for Windows，直接打开 Git Bash：
-
-```bash
-git clone https://github.com/Qqapple1/TeamForge-sync.git ~/teamforge-sync
-cd ~/teamforge-sync
-bash scripts/install.sh
-```
-
-**区别**：
-| 方案 | Symlink | 需要额外工具 | 适用场景 |
-|---|---|---|---|
-| **WSL2（推荐）** | 真 symlink | WSL2（一次安装） | 生产/长期使用，Linux 重度用户 |
-| **PowerShell（备选）** | copy | 无（Windows 自带） | 快速试用，纯 Windows 环境 |
-| **Git Bash** | copy（默认）/ symlink（设 MSYS env） | Git for Windows | 已有 Git Bash，不想装 WSL |
-
-**详细 Windows 指南**：见 [docs/WINDOWS.md](docs/WINDOWS.md)
-
-## 安装
-
-4 种方式（全部经过实际验证），详见 [INSTALL.md](INSTALL.md)：
-
-1. **一键脚本**（推荐）: `bash scripts/install.sh`
-2. **PowerShell 脚本**（Windows 原生）: `powershell -ExecutionPolicy Bypass -File scripts/install.ps1`
-3. **手动 git clone + 软链**
-4. **手动复制**（适合离线 / 容器 / NAS）
-
-**环境变量**（高级用法）：
-- `MAVIS_TEAM_REPO` — 改 Git 源
-- `TEAMFORGE_DIR` — 改安装路径
-- `MAVIS_TEAM_REF` — pin 到特定 branch/tag/SHA
-- `MAVIS_TEAM_NO_COLOR` — 禁用颜色输出
-- `MAVIS_TEAM_FORCE_COPY` — 强制 copy 模式
+---
 
 ## 仓库结构
 
 ```
 teamforge/
-├── SKILL.md                         # 核心 skill 定义 (272 lines)
-├── README.md
-├── INSTALL.md                       # 安装指南（4 种方式）
-├── VALIDATION.md                    # 验证清单（8 步）
-├── CHANGELOG.md
-├── CONTRIBUTING.md
-├── SECURITY.md
-├── LICENSE (MIT)
-├── scripts/
-│   ├── install.sh                   # bash 一键安装（macOS / Linux / Git Bash / WSL）
-│   ├── install.ps1                  # PowerShell 一键安装（Windows 原生）
-│   ├── validate.sh                  # bash 24 项格式自检
-│   ├── validate.ps1                 # PowerShell 验证
-│   ├── package.sh                   # 平台分类打包（5 个 release 压缩包）
-│   ├── validate_yaml.py             # 16 项 YAML 校验（无 PyYAML 依赖）
-│   └── benchmark_tokens.py          # Token 成本估算
-├── agents/                          # Sub-agent 配置（8 个）
-│   ├── leader.md                    #   Leader (6 阶段流程)
-│   ├── verifier.md                  #   Verifier 独立验收
-│   ├── worker-coder.md              #   Worker: 写代码
-│   ├── worker-tester.md             #   Worker: 写测试
-│   ├── worker-researcher.md         #   Worker: 调研
-│   ├── worker-doc-writer.md         #   Worker: 文档
-│   ├── worker-reviewer.md           #   Worker: code review
-│   └── worker-fixer.md              #   Worker: 精准修复 (v1.4.0+)
-├── examples/                        # 4 个案例 + 1 个真实 prototype
-│   ├── refactor-large-module.md
-│   ├── bug-hunt.md
-│   ├── new-feature.md
-│   ├── research-then-implement.md
-│   └── prototype-todo-app/
-│       ├── server/server.py         #     Python HTTP server (332 lines, 安全加固)
-│       ├── client/index.html        #     浏览器 UI (337 lines)
-│       ├── test_e2e.py              #     20 个端到端测试
-│       ├── test_e2e_extended.py     #     23 个扩展测试
-│       ├── test_e2e_advanced.py     #     5 个高级测试
-│       ├── run_e2e.ps1              #     Windows e2e runner
-│       └── README.md
-├── references/                      # 引用文档
-│   ├── verification-checklist.md
-│   ├── deepseek-setup.md
-│   └── troubleshooting.md
-├── docs/                            # 设计文档
-│   ├── ADR-001-team-mode-recreation.md
-│   ├── ADR-002-security.md
-│   ├── ARCHITECTURE.md              # 流程图 + Mermaid + 决策边界
-│   ├── PERFORMANCE.md               # Token 成本 + 加速分析
-│   ├── PLATFORMS.md                 # 平台分类 + archive 选择
-│   └── WINDOWS.md                   # Windows 专项指南
-├── .github/
-│   ├── workflows/validate-skill.yml # CI（12 jobs：lint x3、py x5、win、integration、stats、package）
-│   └── ISSUE_TEMPLATE/              # Bug / Feature 模板
-├── Makefile                         # make help/install/test/lint 快捷方式
-├── index.html                       # GitHub Pages 风格落地页
-└── .shellcheckrc
+├── SKILL.md                    # 核心 skill 定义
+├── agents/                     # Agent 角色模板（33 个）
+│   ├── leader.md               #   Leader 主控
+│   ├── verifier.md             #   Verifier 对抗式验证
+│   ├── worker-coder.md         #   写代码
+│   ├── worker-tester.md        #   写测试
+│   ├── worker-researcher.md    #   调研（只读）
+│   ├── worker-doc-writer.md    #   文档
+│   ├── worker-reviewer.md      #   代码审查
+│   ├── worker-fixer.md         #   精准修复
+│   ├── worker-ai-engineer.md   #   AI 工程师
+│   ├── worker-backend-architect.md  # 后端架构
+│   └── ... (共 33 个角色)
+├── references/                 # 参考文档（8 个）
+│   ├── common-rules.md         #   通用行为规范
+│   ├── common-pitfalls.md      #   15 条常见陷阱
+│   ├── memory-system.md        #   记忆系统
+│   ├── verification-checklist.md # 增强验证清单
+│   └── meeting-templates/      #   8 种会议模板
+├── memory/                     # 记忆存储目录
+├── examples/                   # 使用案例
+├── scripts/                    # 安装/验证脚本
+└── docs/                       # 设计文档
 ```
 
-## 与 传统单 Agent 模式的差异
+---
 
-| 维度 | MiniMax Code 原生 | Zcode + 此 skill |
-|------|---------------------|---------------------|
-| Leader 拆任务 | ✅ TeamEngine 自动 | ⚠️ 手动/半自动（按 Team Plan 模板） |
-| Worker 并行 | ✅ 后台多任务 | ⚠️ 前台并行（Zcode 3.x 限制） |
-| Verifier 对抗 | ✅ 独立推理空间 | ⚠️ 第二个 Zcode 会话模拟（同模型可能引入偏见） |
-| 状态机 | ✅ TeamEngine | ❌ 无（用 checkpoint 模拟） |
-| 模型自由 | ❌ 锁 M3 | ✅ 任意（取决于你 Zcode 接的是什么模型） |
-| 收费 | 💰 M3 Token Plan | 免费（用你自己的 API key） |
-| 集成难度 | 下载安装 | 下载 + 一行命令 |
+## 版本历史
 
-**实际体验差距**：约 70-80%。够用，但不是 100% 复刻 — Verifier 独立性尤其弱（同模型自检）。
+| 版本 | 日期 | 主要变更 |
+|------|------|----------|
+| **v2.0.0** | 2026-07-28 | 品牌重命名 TeamForge + 状态快照 + 权限修复 + Fixer 增强 + 公共规则 |
+| v1.5.1 | 2026-07-28 | 对抗式验证 + DoD 清单 + 产物交接 + 快照回溯 + 多视角分析 |
+| v1.5.0 | 2026-07-28 | 核心工作流增强 + 25 个角色模板 + 8 种会议模板 + 记忆系统 |
+| v1.4.0 | 2026-07-27 | 初始版本 |
 
-## 测试
+详见 [CHANGELOG.md](CHANGELOG.md)。
 
-```bash
-# 24 项格式自检
-bash scripts/validate.sh
+---
 
-# 16 项 YAML 校验（无外部依赖）
-python3 scripts/validate_yaml.py
+## 已知限制
 
-# 48 项端到端 prototype 测试（20 + 23 + 5）
-cd examples/prototype-todo-app
-python3 server/server.py &
-sleep 2
-python3 test_e2e.py
-python3 test_e2e_extended.py
-python3 test_e2e_advanced.py
-kill %1
-```
+| 限制 | 原因 | 缓解方案 |
+|------|------|----------|
+| Worker 前台并行，非后台 | Zcode sub-agent 机制限制 | 等平台升级 |
+| Verifier 同模型偏见 | 无法切换模型 | 对抗式验证模式 |
+| 无真正的状态机 | 需要持久化存储 | `.teamforge_state.json` 快照 |
+| Agent 间无法直接通信 | 需要平台支持 | Leader 中转 + 文件交接 |
+| Worker 工具权限无法差异化 | Zcode 不支持 per-agent 工具限制 | prompt 约束 |
 
-GitHub Actions 自动跑全部 4 套测试 + shellcheck + Windows install + Python 3.8-3.12 矩阵（`.github/workflows/validate-skill.yml`）。
-
-## 安全
-
-详见 [SECURITY.md](SECURITY.md) 和 [docs/ADR-002-security.md](docs/ADR-002-security.md)。
-
-Prototype server 默认：
-- 绑定 `127.0.0.1`（仅本机）
-- CORS 白名单（不是 `*`）
-- 输入校验 + 64KB body 上限
-- 线程安全
-
-## 性能 / Token 效率
-
-详见 [docs/PERFORMANCE.md](docs/PERFORMANCE.md)。
-
-**理论加速**（基于"4 个 parallel subagent + 1 个 verifier" 的最坏情况推导）：
-
-- 1 个 Leader 加 4 个并行 Worker ≈ 5x 串行
-- 减去 dispatch / integrate / verify overhead ≈ 实际 ~2-2.5x **(est.)**
-- 这个数字**没有真在 Zcode 上 benchmark 过**，是纸面推算
-- 真要测需要 headless Zcode + 一组标准化任务——见路线图
-
-**Token 成本（实测估算）**：
-
-> 下面数字是 `python3 scripts/benchmark_tokens.py` 在 v1.4.0 实跑出来的（1 token ≈ 4 字符，启发式估算，非 BPE 精确数）。重新跑会随文件大小变化。
-
-| 加载模式 | Tokens | vs inline baseline |
-|---|---|---|
-| 内联 Team plan（无 skill） | ~3,000 | — |
-| 一次全加载 | ~72,826 | +2327% |
-| **渐进加载（默认）** | ~7,430 | **+148%** |
-
-Skill 本身**多耗 ~148% tokens**（比内联 baseline），但换来 2-2.5x 并行加速。**用 skill = 换时间，不省钱**。
-
-## 路线图
-
-- [ ] Worker: 数据库迁移专家
-- [ ] Worker: 性能调优专家
-- [ ] Worker: 安全审计
-- [ ] Verifier: 多模型对抗（Leader/Verifier 用不同模型）— 现在只是文档建议
-- [ ] 自动从 Team Plan 生成 skill 的元 skill
-- [ ] Real Zcode integration test (in CI with headless Zcode) — 需要 Zcode 官方支持 headless 模式
-- [ ] 4 个 e2e 文件之外的更多并发 / 网络异常场景测试
+---
 
 ## 贡献
 

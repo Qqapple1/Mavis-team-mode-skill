@@ -5,6 +5,60 @@ All notable changes to this skill are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [2.0.0] - 2026-07-28
+
+品牌重命名 + 5 项关键改进。
+
+### 品牌重命名
+- "Mavis Team Mode" → "TeamForge"（独立品牌，不依赖外部引用）
+- 全局替换 347 处引用（65 个文件）
+- 更新 README.md 为客观定位：质量工具而非效率工具
+
+### 新增功能
+- **状态快照断点恢复**: 每个 Wave 完成后写入 `.teamforge_state.json`，支持会话中断后恢复
+- **公共行为规范**: 新建 `references/common-rules.md`，提取通用规则减少模板冗余
+- **Fixer 动态阈值**: Leader 可通过 `FIXER_LIMIT` 参数覆盖默认阈值
+
+### 修复
+- **worker-researcher 权限**: 移除 Write/Edit 工具，明确只读角色
+- **硬编码路径清理**: 移除所有绝对 Windows 路径
+
+## [1.5.1] - 2026-07-28
+
+从 15+ 个开源项目中借鉴 5 项创新特性。
+
+### 新增功能
+- **对抗式验证 (Adversarial Verification)**: Checker + Skeptic + Judge 三角色验证
+- **DoD 清单 (Definition of Done)**: 每个子任务附带完成定义
+- **产物交接协议**: Wave 间通过文件显式传递，支持回退
+- **沙箱快照回溯**: Fixer 修复前先备份，失败可回退
+- **多视角分析**: 研究类任务从不同角度切入
+
+## [1.5.0] - 2026-07-28
+
+核心工作流增强 + 从 AI-company 提取精华。
+
+### 新增功能
+- 25 个专业角色模板（工程/测试/管理/支持/辩论）
+- 8 种会议模板（头脑风暴/决策/评审/回顾/站会/辩论等）
+- 双层记忆系统参考文件
+- 15 条常见陷阱参考文件
+- 增强验证清单（55 项）
+
+### 核心工作流修复（12 个问题）
+- Leader 硬性约束：禁止自己写代码
+- CONTRACT 从"建议"改为"必须" + 字符串级验证
+- 自动化 Verifier（Method D）
+- Worker 5 分钟超时机制
+- Wave 分批执行 + 依赖图可视化
+- 拆解质量自检 checklist
+- 任务完成度 checklist
+- 重试注入历史上下文
+- Fixer 动态阈值（替代硬编码 30 行）
+- Verifier 3 级推理预算
+- 降级策略（最小可用版本）
+- Phase 进度报告
+
 ## [1.4.0] - 2026-07-26
 
 Milestone release after 15 rounds of real-world Zcode testing.
