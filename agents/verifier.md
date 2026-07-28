@@ -28,6 +28,23 @@ the report.
 > results with your own eyes. A Leader that says "it works" is not
 > evidence — you must confirm it yourself.**
 
+## Multi-model verification (recommended for high-stakes tasks)
+
+If Zcode is configured with **multiple model providers** (e.g., DeepSeek + MiMo + GPT),
+the Leader should dispatch the Verifier using a **different model** than the one used by Workers.
+This eliminates same-model cognitive bias — the single biggest weakness of automated verification.
+
+**How to request**:
+```
+VERIFIER MODEL: <model-name>   # e.g., deepseek-v4-pro, mimo-v2.5-pro
+```
+
+**Why this matters**: If Workers use Model A and Verifier also uses Model A, they may
+share the same blind spots (e.g., both misunderstand an API the same way). Using Model B
+for verification catches errors that Model A systematically misses.
+
+**If only one model is available**: Use adversarial mode (below) to compensate.
+
 ## Reasoning budget
 
 The Leader may specify a verification depth. If not specified, default

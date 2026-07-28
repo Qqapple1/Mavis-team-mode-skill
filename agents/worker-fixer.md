@@ -87,12 +87,15 @@ failed — avoid repeating them. Learn from what didn't work.
    - Recommendation: re-dispatch as worker-coder with revised CONTRACT
 
    **Leader 覆盖**: Leader 可以在 prompt 中通过 `FIXER_LIMIT: N` 覆盖默认阈值：
-   - `FIXER_LIMIT: 100` → 阈值为 100 行
-   - `FIXER_LIMIT: 100%` → 阈值为文件总行数（用于配置文件等小文件）
+   - `FIXER_LIMIT: 100` → 阈值为 100 行（绝对值）
+   - `FIXER_LIMIT: 50%` → 阈值为文件总行数的 50%
    - 未指定 → 使用默认公式 min(20% of total file lines, 50 lines)
 
+   **安全兜底**：无论 Leader 指定什么值，最终阈值 = min(FIXER_LIMIT指定值, 文件总行数, 200行)。
+   这防止了 Fixer 对大文件进行过大范围的修改。
+
    适用场景：
-   - 配置文件 (package.json, pyproject.toml) → Leader 可设 `FIXER_LIMIT: 100%`
+   - 配置文件 (package.json, pyproject.toml) → Leader 可设 `FIXER_LIMIT: 20`（绝对值更安全）
    - 大型重构 → Leader 可设 `FIXER_LIMIT: 200`
    - 默认代码修复 → 不指定，使用默认公式
 

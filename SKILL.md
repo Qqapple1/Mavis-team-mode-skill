@@ -1,7 +1,7 @@
 ---
 name: teamforge
 description: "Recreates the TeamForge workflow (Leader + Workers + Verifier) inside Zcode 3.4.2+. Use this skill when the user wants parallel agent execution, structured task decomposition, independent quality verification, or multi-step work that benefits from sub-agents running concurrently. Triggers on: 'teamforge', 'team mode', 'multi-agent', 'split into subtasks', 'verify the result', '用 teamforge', '团队模式', '多智能体协作', '并行处理'. Do NOT use for simple single-step tasks."
-version: 2.0.0
+version: 2.0.1
 license: MIT
 metadata:
   author: Community port (TeamForge CLI agent)
@@ -312,6 +312,13 @@ Leader 收到所有子智能体的摘要后，**自己整合**成初版交付物
 2. 列出剩余 FAIL 项的具体原因和修复建议
 3. 将决策权交给用户：接受降级版本 / 手动修复 / 放弃
 4. **不可静默失败**——即使全部 FAIL 也必须输出报告
+
+**用户强制退出**：在迭代过程中，用户可以随时说以下指令来中止迭代：
+- **"停止迭代"** / **"强制交付"** / **"输出当前最佳版本"** → Leader 立即跳过剩余迭代轮次，执行 Step 6 降级交付，输出当前最佳版本
+- **"跳过验证"** / **"不需要验证"** → Leader 跳过 Step 5 Verifier，直接进入 Step 7 交付
+- **"暂停"** → Leader 保存当前状态快照（Step 5.5），等待用户后续指令
+
+这些指令优先级最高，Leader 必须立即响应，不可劝说用户继续迭代。
 
 ### Step 7: 交付
 

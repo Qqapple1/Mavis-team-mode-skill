@@ -36,6 +36,26 @@ the work yourself.
 
 违反此约束会导致：上下文污染（你的思考过程混入产出）、质量下降（一心二用）、无法并行（你只能串行做）。
 
+### 派发安全检查清单 (Dispatch Security Checklist)
+
+在派发每个 Worker 时，Leader **必须**在 prompt 中明确限制工具使用范围：
+
+| 角色 | 允许的工具 | 禁止的工具 | 原因 |
+|------|-----------|-----------|------|
+| Worker-Coder | Read, Write, Edit, Bash, Glob, Grep | — | 需要全部权限 |
+| Worker-Tester | Read, Write, Edit, Bash, Glob, Grep | — | 需要写测试+运行 |
+| Worker-Doc-Writer | Read, Write, Glob, Grep | Edit, Bash | 只写文档，不改代码 |
+| Worker-Reviewer | Read, Glob, Grep, Bash | Write, Edit | 只读审查 |
+| Worker-Researcher | Read, Bash, Glob, Grep, WebSearch, WebFetch | Write, Edit | 只读调研 |
+| Worker-Fixer | Read, Write, Edit, Bash, Glob, Grep | — | 需要修复代码 |
+
+**在 prompt 中必须包含**：
+```
+CONSTRAINTS:
+  - 只允许使用以下工具: [列出工具]
+  - 不要修改 [列出禁止修改的文件/目录]
+```
+
 ## When invoked
 
 When the user invokes this skill (description-matched trigger or natural language like "team mode" / "拆成子任务"), do
@@ -161,6 +181,46 @@ After user confirms, dispatch sub-agents. Use Zcode's sub-agent tool:
 - 不同 Wave 之间**必须串行**（前一个 Wave 全部完成后才派发下一个）
 - 如果某个 Worker 超过 5 分钟未返回，视为失败，不阻塞其他 Worker
 - 每个 Wave 完成后输出进度报告（见 Progress Reporting）
+
+#### 角色选择决策树 (Role Selection Decision Tree)
+
+当有 33 个角色可选时，Leader 按以下逻辑快速决策：
+
+```
+任务类型是什么？
+├── 写新代码 → worker-coder
+├── 写测试 → worker-tester
+├── 写文档/README → worker-doc-writer
+├── 修 Bug → worker-fixer
+├── 代码审查 → worker-reviewer
+├── 调研/分析 → worker-researcher
+├── 架构设计？
+│   ├── 后端 API 设计 → worker-backend-architect
+│   ├── 前端 UI 设计 → worker-frontend-developer
+│   ├── 整体系统分层 → worker-software-architect
+│   └── 数据库设计 → worker-database-optimizer
+├── 运维/部署？
+│   ├── CI/CD 流水线 → worker-devops-automator
+│   ├── 监控/告警 → worker-sre
+│   └── 安全审计 → worker-security-engineer
+├── 专项任务？
+│   ├── MCP Server 开发 → worker-mcp-builder
+│   ├── 移动端开发 → worker-mobile-developer
+│   ├── AI/ML 工程 → worker-ai-engineer
+│   └── 快速原型 → worker-rapid-prototyper
+├── 管理/协调？
+│   ├── 技术决策 → worker-tech-lead
+│   ├── 项目管理 → worker-project-manager
+│   └── 工作流设计 → worker-workflow-architect
+├── 写作/沟通？
+│   ├── 技术写作 → worker-technical-writer
+│   ├── 会议主持 → worker-meeting-facilitator
+│   └── 辩论/讨论 → worker-debate-advocate / worker-debate-critic
+└── 通用任务 → worker-team-member
+```
+
+**如果不确定选哪个**：选更通用的角色（worker-coder > worker-backend-architect），
+或者在 Team Plan 中注明"角色待定"让用户确认。
 
 ### Phase 3: Integrate
 
@@ -300,6 +360,18 @@ If verification fails:
    - 选项 B: 用户手动修复剩余问题
    - 选项 C: 放弃，重新规划
 4. **不可静默失败**: 即使全部 FAIL 也必须输出报告和降级版本
+
+#### 用户强制退出指令 (Force Exit Commands)
+
+在迭代过程中，用户可以随时发出以下指令，**优先级最高，Leader 必须立即响应**：
+
+| 用户指令 | Leader 行为 |
+|----------|-------------|
+| **"停止迭代"** / **"强制交付"** / **"输出当前最佳版本"** | 立即跳过剩余迭代轮次，执行 Phase 6 降级交付 |
+| **"跳过验证"** / **"不需要验证"** | 跳过 Phase 4 Verifier，直接进入 Phase 6 交付 |
+| **"暂停"** | 保存当前状态快照（Step 5.5），等待用户后续指令 |
+
+**重要**：收到强制退出指令后，Leader 不可劝说用户继续迭代，不可询问"确定吗？"，必须立即执行。
 
 #### 历史上下文注入 (Historical Context Injection)
 
