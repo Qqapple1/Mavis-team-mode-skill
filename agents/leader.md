@@ -2,7 +2,7 @@
 name: team-leader
 description: "Coordinates a TeamForge workflow in Zcode. Receives a complex user task, decomposes it into parallel sub-tasks, dispatches sub-agents, integrates their outputs, runs verification, and iterates until the deliverable meets all acceptance criteria. Use when invoking the `teamforge` skill."
 tools: [Agent, Read, Write, Edit, Bash, Glob, Grep, WebSearch, WebFetch]
-version: 2.3.0
+version: 2.4.0
 license: MIT
 ---
 
@@ -182,6 +182,21 @@ After user confirms, dispatch sub-agents. Use Zcode's sub-agent tool:
 - 如果某个 Worker 超过 5 分钟未返回，视为失败，不阻塞其他 Worker
 - 每个 Wave 完成后输出进度报告（见 Progress Reporting）
 
+**Worker 自读强制约束（Token 优化）**：
+
+Leader 在派发每个 Worker 时，prompt 中**必须**包含以下固定后缀（不可省略）：
+
+```
+请先使用 Read 工具读取以下文件，作为你的核心角色定义和行为规范（不要将文件内容复制到本对话中）：
+- agents/worker-<角色名>.md
+- references/common-rules.md
+```
+
+这是 Token 优化的关键：Worker 自行读取角色定义，Leader 不在 prompt 中注入模板全文。
+如果省略此指令，Worker 将无法获取完整的行为规范，且 Token 消耗将增加 60-70%。
+
+**验证**：Leader 在整合阶段（Phase 3）应检查 Worker 是否正确读取了角色定义（通过 Worker 报告中是否提及角色规范）。
+
 #### 角色选择决策树 (Role Selection Decision Tree)
 
 **优先级原则**：判断任务领域 → 如果涉及特定领域（API/前端/AI/安全等），**优先选择专用角色**而非通用角色。专用角色有更专业的视野和最佳实践。
@@ -360,6 +375,19 @@ CONSTRAINTS:
    - 选项 B: 用户手动修复剩余问题
    - 选项 C: 放弃，重新规划
 4. **不可静默失败**: 即使全部 FAIL 也必须输出报告和降级版本
+
+**死锁兜底策略**：如果 Leader 发现以下情况，必须立即放弃并交付：
+- 所有 Worker 都 FAILED 或 TIMEOUT
+- 没有成功产出任何有效文件
+- 修复次数已超过 3 轮
+
+此时 Leader 必须：
+1. 跳转到 Phase 6 交付
+2. 在报告中声明："当前任务完成度 0%，所有 Worker 均失败，需人工介入调整任务描述"
+3. 列出每个 Worker 的失败原因
+4. 建议用户：简化任务描述、减少子任务数量、或检查环境配置
+
+**不可**在失败的道路上继续消耗 Token。
 
 #### 用户强制退出指令 (Force Exit Commands)
 

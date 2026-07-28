@@ -1,7 +1,7 @@
 ---
 name: teamforge
 description: "Recreates the TeamForge workflow (Leader + Workers + Verifier) inside Zcode 3.4.2+. Use this skill when the user wants parallel agent execution, structured task decomposition, independent quality verification, or multi-step work that benefits from sub-agents running concurrently. Triggers on: 'teamforge', 'team mode', 'multi-agent', 'split into subtasks', 'verify the result', '用 teamforge', '团队模式', '多智能体协作', '并行处理'. Do NOT use for simple single-step tasks."
-version: 2.3.0
+version: 2.4.0
 license: MIT
 metadata:
   author: Community port (TeamForge CLI agent)
@@ -144,20 +144,13 @@ If missing, see INSTALL.md.
 - 检查每个文件非空（`wc -l` 命令）
 
 **Level 2 — 接口验证（推荐）**：
-- 对 Python 代码：使用 AST 解析验证函数是否存在且签名正确
-  ```python
-  # Leader 可以执行此脚本验证 Python 函数
-  python -c "
-  import ast, sys
-  code = open(sys.argv[1]).read()
-  tree = ast.parse(code)
-  funcs = {n.name: [a.arg for a in n.args.args] for n in ast.walk(tree) if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))}
-  for name in sys.argv[2:]:
-      status = '✅' if name in funcs else '❌'
-      print(f'{status} {name}: {funcs.get(name, \"NOT FOUND\")}')
-  " <file.py> <func1> <func2> ...
+- 对 Python 代码：使用 AST 验证脚本检查函数是否存在且签名正确
+  ```bash
+  python scripts/validate_contract_ast.py <file.py> <func1> <func2> ...
   ```
+  示例：`python scripts/validate_contract_ast.py src/main.py scan_file scan_directory detect_language`
   这比 grep 健壮：即使函数是 `async def`、有装饰器、或在注释中出现同名，AST 也能准确识别。
+  如果脚本报错"语法错误"，说明 Worker 产出的代码有语法问题，需要返工。
 - 对 CLI 工具：运行 `--help` 并检查输出中是否包含 CONTRACT 定义的参数名
 - 对 JSON 输出：运行工具并用 `python -c "import json; ..."` 验证输出格式
 

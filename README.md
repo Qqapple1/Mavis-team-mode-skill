@@ -83,6 +83,10 @@ Verifier 对抗式验证（Checker + Skeptic + Judge）
 bash scripts/install.sh
 
 # 方式 2: PowerShell（Windows 原生）
+> **⚠️ Windows 用户注意**：TeamForge 的部分功能依赖 Unix 命令（如 `grep`、`wc`、`mv`）。
+> 如果您使用原生 PowerShell（非 WSL），请确保已安装 [Git for Windows](https://git-scm.com/download/win) 并将其添加到 PATH。
+> 推荐使用 WSL2 + `install.sh` 方案以获得最佳兼容性。
+
 powershell -ExecutionPolicy Bypass -File scripts/install.ps1
 
 # 方式 3: 手动 clone

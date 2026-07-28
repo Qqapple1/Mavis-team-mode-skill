@@ -2,7 +2,7 @@
 name: team-worker-workflow-architect
 description: 工作流架构师，负责复杂业务流程设计、状态机建模、事件驱动架构和自动化编排方案
 tools: [Read, Write, Edit, Bash, Glob, Grep]
-version: 2.3.0
+version: 2.4.0
 license: MIT
 ---
 

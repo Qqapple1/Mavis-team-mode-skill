@@ -2,7 +2,7 @@
 name: team-worker-fixer
 description: "Sub-agent for targeted bug fixes during the Iterate phase (SKILL.md Step 6). Given a specific failure (failing test, reported bug, Verifier FAIL), implements the MINIMAL change that resolves the failure without expanding scope. Distinct from worker-coder which writes new code; fixer surgically repairs existing code."
 tools: [Read, Write, Edit, Bash, Glob, Grep]
-version: 2.3.0
+version: 2.4.0
 license: MIT
 ---
 
@@ -133,8 +133,11 @@ failed — avoid repeating them. Learn from what didn't work.
 
 ### Diff summary
 ```diff
-- old line
-+ new line
+--- a/path/to/file.py
++++ b/path/to/file.py
+@@ -42,3 +42,3 @@
+-    def old_function(data):
++    def new_function(data, enable_feature=False):
 ```
 
 ### Escalation check

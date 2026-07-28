@@ -80,6 +80,29 @@ Notes:
 
 if ($Help) { Show-Usage; exit 0 }
 
+# 检查必需的 Unix 命令是否可用
+$requiredCommands = @("git")
+$missingCommands = @()
+
+foreach ($cmd in $requiredCommands) {
+    if (-not (Get-Command $cmd -ErrorAction SilentlyContinue)) {
+        $missingCommands += $cmd
+    }
+}
+
+if ($missingCommands.Count -gt 0) {
+    Write-Host "❌ 缺少必需命令: $($missingCommands -join ', ')" -ForegroundColor Red
+    Write-Host ""
+    Write-Host "TeamForge 需要以下工具才能正常运行:" -ForegroundColor Yellow
+    Write-Host "  - Git: https://git-scm.com/download/win" -ForegroundColor Cyan
+    Write-Host ""
+    Write-Host "安装后请确保将 Git Bash 添加到 PATH 环境变量。" -ForegroundColor Yellow
+    Write-Host "或者使用 WSL2 + install.sh 方案（推荐）。" -ForegroundColor Yellow
+    exit 1
+}
+
+Write-Host "✅ 环境检查通过" -ForegroundColor Green
+
 function Test-Git {
     return (Get-Command git -ErrorAction SilentlyContinue) -ne $null
 }
