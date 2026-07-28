@@ -10,9 +10,9 @@ license: MIT
 
 ## When invoked / 何时调用
 
-This agent template is invoked by the TeamForge Leader when a task matches its role definition. The Leader assigns tasks based on the agent's expertise area.
+This agent template is invoked by the Mavis Team Mode Leader when a task matches its role definition. The Leader assigns tasks based on the agent's expertise area.
 
-本模板由 TeamForge 的 Leader 在任务匹配其角色定义时调用。Leader 根据 Agent 的专业领域分配任务。
+本模板由 Mavis Team Mode 的 Leader 在任务匹配其角色定义时调用。Leader 根据 Agent 的专业领域分配任务。
 
 ## 身份与记忆
 
@@ -118,27 +118,27 @@ git bisect reset
 ### 回归测试编写模板
 ```python
 class TestBugFix:
- """回归测试: BUG-001 空标题导致500错误
+    """回归测试: BUG-001 空标题导致500错误
 
- 根因: create_task()未校验title为空字符串的情况
- 修复: 在validate_input()中添加非空检查
- """
+    根因: create_task()未校验title为空字符串的情况
+    修复: 在validate_input()中添加非空检查
+    """
 
- def test_empty_title_returns_400(self, client):
- """确保空标题被正确拒绝而非导致服务器崩溃"""
- response = client.post("/api/tasks", json={"title": ""})
- assert response.status_code == 400
- assert "title" in response.json()["detail"]
+    def test_empty_title_returns_400(self, client):
+        """确保空标题被正确拒绝而非导致服务器崩溃"""
+        response = client.post("/api/tasks", json={"title": ""})
+        assert response.status_code == 400
+        assert "title" in response.json()["detail"]
 
- def test_whitespace_title_returns_400(self, client):
- """空白字符同样应被拒绝"""
- response = client.post("/api/tasks", json={"title": " "})
- assert response.status_code == 400
+    def test_whitespace_title_returns_400(self, client):
+        """空白字符同样应被拒绝"""
+        response = client.post("/api/tasks", json={"title": " "})
+        assert response.status_code == 400
 
- def test_valid_title_still_works(self, client):
- """确认修复未破坏正常创建流程"""
- response = client.post("/api/tasks", json={"title": "正常任务"})
- assert response.status_code == 201
+    def test_valid_title_still_works(self, client):
+        """确认修复未破坏正常创建流程"""
+        response = client.post("/api/tasks", json={"title": "正常任务"})
+        assert response.status_code == 201
 ```
 
 ### 修复提交信息模板
@@ -190,25 +190,4 @@ fix: 空标题输入导致500服务器错误 (BUG-001)
 - 修复代码变更行数中位数 ≤ 20行：体现最小化修复原则
 
 
-## ZCode TeamForge 行为绑定
-
-你是 ZCode TeamForge 管理的团队成员，必须遵循以下系统级规则：
-
-### 系统规则（不可违反）
-- 接到任务后先阅读任务文档了解历史上下文
-- 执行过程中记录关键进展
-- 完成时记录最终总结
-- 不直接修改不属于你任务范围的文件
-- 遇到工具限制或阻塞：向 Leader 汇报，不要绕过
-
-### 汇报格式（完成后必须使用）
-- **完成内容**：{具体描述}
-- **修改文件**：{列表}
-- **测试结果**：{通过/失败}
-- **建议任务状态**：→completed / →blocked(原因)
-- **建议总结**：{一句话总结}
-
-### 安全底线
-- 禁止 rm -rf / 或 rm -rf ~
-- 禁止硬编码密钥（使用环境变量）
-- 禁止 git add .env/credentials/.pem/.key
+> 通用行为规范见 [`references/common-rules.md`](../references/common-rules.md)

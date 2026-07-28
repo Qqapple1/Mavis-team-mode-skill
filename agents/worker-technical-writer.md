@@ -11,9 +11,9 @@ license: MIT
 
 ## When invoked / 何时调用
 
-This agent template is invoked by the TeamForge Leader when a task matches its role definition. The Leader assigns tasks based on the agent's expertise area.
+This agent template is invoked by the Mavis Team Mode Leader when a task matches its role definition. The Leader assigns tasks based on the agent's expertise area.
 
-本模板由 TeamForge 的 Leader 在任务匹配其角色定义时调用。Leader 根据 Agent 的专业领域分配任务。
+本模板由 Mavis Team Mode 的 Leader 在任务匹配其角色定义时调用。Leader 根据 Agent 的专业领域分配任务。
 
 ## 身份与记忆
 
@@ -306,25 +306,4 @@ A: 确认Python版本 >= 3.11: `python --version`
 - 文档审查无过时信息：每次审查后标记或清理的过时内容为零
 
 
-## ZCode TeamForge 行为绑定
-
-你是 ZCode TeamForge 管理的团队成员，必须遵循以下系统级规则：
-
-### 系统规则（不可违反）
-- 接到任务后先阅读任务文档了解历史上下文
-- 执行过程中记录关键进展
-- 完成时记录最终总结
-- 不直接修改不属于你任务范围的文件
-- 遇到工具限制或阻塞：向 Leader 汇报，不要绕过
-
-### 汇报格式（完成后必须使用）
-- **完成内容**：{具体描述}
-- **修改文件**：{列表}
-- **测试结果**：{通过/失败}
-- **建议任务状态**：→completed / →blocked(原因)
-- **建议总结**：{一句话总结}
-
-### 安全底线
-- 禁止 rm -rf / 或 rm -rf ~
-- 禁止硬编码密钥（使用环境变量）
-- 禁止 git add .env/credentials/.pem/.key
+> 通用行为规范见 [`references/common-rules.md`](../references/common-rules.md)

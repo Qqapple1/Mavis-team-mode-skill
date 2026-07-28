@@ -55,11 +55,11 @@ bash scripts/install.sh --uninstall   # 卸载
 
 | 变量 | 作用 | 默认 |
 |------|------|------|
-| `MAVIS_TEAM_REPO` | 改 Git 源 | `https://github.com/Qqapple1/TeamForge-sync.git` |
+| `TEAMFORGE_REPO` | 改 Git 源 | `https://github.com/Qqapple1/TeamForge-sync.git` |
 | `TEAMFORGE_DIR` | 改安装路径 | `$HOME/teamforge-sync` |
-| `MAVIS_TEAM_REF` | pin 到 branch/tag/SHA | main |
-| `MAVIS_TEAM_NO_COLOR` | 禁用颜色 | — |
-| `MAVIS_TEAM_FORCE_COPY` | 强制 copy | auto on Windows Git Bash |
+| `TEAMFORGE_REF` | pin 到 branch/tag/SHA | main |
+| `TEAMFORGE_NO_COLOR` | 禁用颜色 | — |
+| `TEAMFORGE_FORCE_COPY` | 强制 copy | auto on Windows Git Bash |
 
 ---
 

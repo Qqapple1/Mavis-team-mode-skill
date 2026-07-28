@@ -57,6 +57,8 @@ Verifier 对抗式验证（Checker + Skeptic + Judge）
 
 > **为什么不是 4-6x？** 每个 Worker 只接收子任务 prompt + CONTRACT，不携带完整对话历史，实际消耗远低于"每个 Worker 都是完整 Agent"的理论值。
 
+> *加速比数据源于并行 Worker 的理论模型推导，实际墙钟时间受 Zcode 宿主环境并发限制及任务图依赖关系影响。
+
 **多花的 Token 换来了什么？**
 
 | 收益 | 单 Agent 能做到吗？ |
@@ -84,7 +86,7 @@ bash scripts/install.sh
 powershell -ExecutionPolicy Bypass -File scripts/install.ps1
 
 # 方式 3: 手动 clone
-git clone https://github.com/Qqapple1/Mavis-team-mode-skill.git ~/.zcode/skills/teamforge
+git clone https://github.com/Qqapple1/TeamForge-sync.git ~/.zcode/skills/teamforge
 ```
 
 ### 使用
@@ -137,7 +139,7 @@ teamforge/
 
 | 版本 | 日期 | 主要变更 |
 |------|------|----------|
-| **v2.0.0** | 2026-07-28 | 品牌重命名 TeamForge + 状态快照 + 权限修复 + Fixer 增强 + 公共规则 |
+| **v2.0.0** | 2026-07-28 | 状态快照 + 权限修复 + Fixer 增强 + 公共规则 + 对抗式验证 |
 | v1.5.1 | 2026-07-28 | 对抗式验证 + DoD 清单 + 产物交接 + 快照回溯 + 多视角分析 |
 | v1.5.0 | 2026-07-28 | 核心工作流增强 + 25 个角色模板 + 8 种会议模板 + 记忆系统 |
 | v1.4.0 | 2026-07-27 | 初始版本 |

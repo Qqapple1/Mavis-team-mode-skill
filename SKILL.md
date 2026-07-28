@@ -1,11 +1,11 @@
 ---
 name: teamforge
 description: "Recreates the TeamForge workflow (Leader + Workers + Verifier) inside Zcode 3.4.2+. Use this skill when the user wants parallel agent execution, structured task decomposition, independent quality verification, or multi-step work that benefits from sub-agents running concurrently. Triggers on: 'teamforge', 'team mode', 'multi-agent', 'split into subtasks', 'verify the result', '用 teamforge', '团队模式', '多智能体协作', '并行处理'. Do NOT use for simple single-step tasks."
-version: 2.0.1
+version: 2.1.0
 license: MIT
 metadata:
   author: Community port (TeamForge CLI agent)
-  origin: Recreated from TeamEngine (May 2026 announcement)
+  origin: TeamForge — multi-agent team collaboration skill for Zcode
   compatibility: Zcode 3.4.2+ (per zcode-ai.com download page, as of 2026-07-26). Model-agnostic: works with whatever model your Zcode is configured for (Zcode 3.x supports multiple providers per its docs; not independently tested for each).
   category: workflow
   tested-on-ranges:
@@ -54,12 +54,12 @@ using the Agent Skills standard + Zcode's built-in sub-agent system.
 
 | 维度 | 理想状态 | Zcode + TeamForge |
 |------|----------------------|---------------------|
-| Leader 任务拆解 | TeamEngine 自动 | ✅ Leader 用本 skill 手动/半自动拆 |
+| Leader 任务拆解 | 自动拆解 | ✅ Leader 用本 skill 手动/半自动拆 |
 | Worker 并行 | ✅ 后台多任务 | ⚠️ 前台并行（Zcode 限制） |
 | Verifier 对抗迭代 | ✅ 独立推理空间 | ⚠️ 用第二个 Zcode 会话模拟 |
-| 状态机管理 | ✅ TeamEngine 状态机 | ❌ 无（用 checkpoint 模拟） |
+| 状态机管理 | ✅ 内置状态机 | ❌ 无（用 checkpoint 模拟） |
 | 上下文隔离 | ✅ Worker 独立上下文 | ✅ Zcode subagent 原生支持 |
-| 适用模型 | 绑定 M3 | 任意（取决于你 Zcode 接的 provider） |
+| 适用模型 | 绑定单一模型 | 任意（取决于你 Zcode 接的 provider） |
 
 ## When to use this skill
 
@@ -280,19 +280,21 @@ Leader 收到所有子智能体的摘要后，**自己整合**成初版交付物
 
 ```json
 {
-  "version": "1.5.1",
-  "task": "原始任务描述",
-  "team_plan": {...},
+  "version": "2.1.0",
+  "task": "原始任务描述（一句话摘要）",
+  "team_plan_path": "./team_plan.md",
   "current_wave": 2,
   "waves": {
-    "1": {"status": "completed", "subtasks": {...}},
-    "2": {"status": "in_progress", "subtasks": {...}}
+    "1": {"status": "completed", "subtasks": {"subtask_1": {"status": "completed", "output_files": ["src/main.py"]}}},
+    "2": {"status": "in_progress", "subtasks": {"subtask_3": {"status": "pending"}}}
   },
   "verification": null,
   "iteration": 0,
   "timestamp": "2026-07-28T20:00:00"
 }
 ```
+
+**快照设计原则**：快照只记录子任务 ID、状态、文件路径等轻量信息。大段 Prompt 和 Team Plan 详情存为独立文件，快照中只记录引用路径，确保快照文件始终轻量（< 5KB）。
 
 **恢复流程**: 如果会话中断，用户可以说 "恢复上次的 teamforge 任务"，Leader 读取 `.teamforge_state.json` 并从断点继续：
 1. 检查已完成 Wave 的产出文件是否仍然存在

@@ -16,15 +16,15 @@ The TeamForge product launched in May 2026 with a "Team Mode"
 feature: a Leader agent decomposes complex tasks, dispatches Worker
 sub-agents in parallel, and an independent Verifier checks the output.
 
-This is a powerful workflow pattern, but it's locked inside MiniMax Code:
-- Only works with the M3 model
-- Requires a paid M3 Token Plan / Coding Plan
+This is a powerful workflow pattern, but it's locked inside the original platform:
+- Only works with a specific model
+- Requires a paid subscription plan
 - Closed-source, no way to inspect or extend
-- Tied to the MiniMax Code desktop app
+- Tied to a single desktop application
 
 Users who want this pattern but use other tools (Zcode, etc.) have no
 equivalent that I know of as of 2026-07. The pattern is also useful in
-pure skill form even for MiniMax Code users who want to understand the
+pure skill form even for users of the original platform who want to understand the
 workflow explicitly.
 
 ## Decision
@@ -77,8 +77,8 @@ Skill (SKILL.md)
 | Worker parallelism | Background tasks | Foreground (Zcode 3.x limit) |
 | Verifier isolation | Independent reasoning space | Second Zcode session (same model = possible bias) |
 | State machine | TeamEngine | None (use checkpoints manually) |
-| Model freedom | Locked to M3 | Whatever your Zcode is configured for |
-| Cost | M3 Token Plan | User's existing API key |
+| Model freedom | Locked to specific model | Whatever your Zcode is configured for |
+| Cost | Paid subscription | User's existing API key |
 
 We accept **~70-80% of native capability** (qualitative estimate) in
 exchange for portability and model freedom. The biggest gap is
@@ -89,7 +89,7 @@ Verifier independence — without a separate model, bias is real.
 ### Positive
 
 - Works in any Agent Skills–compatible tool
-- User can swap models (e.g., DeepSeek for cost, M3 for quality)
+- User can swap models (e.g., DeepSeek for cost, other models for quality)
 - Open source: community can inspect, modify, and improve
 - Self-contained: no external dependencies beyond standard tooling
 
@@ -110,7 +110,7 @@ Verifier independence — without a separate model, bias is real.
 - Pro: true independence
 - Con: complex setup, requires Claude Code or similar installed
 
-### C. Wait for MiniMax to open-source TeamForge
+### C. Wait for the original vendor to open-source TeamForge
 - Pro: perfect fidelity
 - Con: indefinite wait; current product is closed
 

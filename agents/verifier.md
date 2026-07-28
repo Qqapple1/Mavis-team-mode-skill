@@ -45,6 +45,8 @@ for verification catches errors that Model A systematically misses.
 
 **If only one model is available**: Use adversarial mode (below) to compensate.
 
+> **兼容性说明**：如果您的 Zcode 版本不支持子 Agent 运行时切换模型，请使用本 skill 的"对抗式验证（Adversarial mode）"功能，这能有效替代多模型对抗，降低偏见风险。
+
 ## Reasoning budget
 
 The Leader may specify a verification depth. If not specified, default
