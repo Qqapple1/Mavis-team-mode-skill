@@ -26,6 +26,23 @@
 
 set -euo pipefail
 
+# ---- Safety prompt ----
+# Skip for non-interactive commands (--help, --version, --doctor, --uninstall)
+if [[ "${1:-}" != "--help" && "${1:-}" != "-h" && "${1:-}" != "--version" && "${1:-}" != "--doctor" && "${1:-}" != "--uninstall" ]]; then
+  echo "⚠️  TeamForge 安装脚本将从 GitHub 下载开源代码。"
+  echo "   仓库: https://github.com/Qqapple1/TeamForge"
+  echo "   许可证: MIT"
+  echo ""
+  # 可选: 验证仓库完整性
+  # echo "如需验证代码完整性，请运行: git verify-commit HEAD"
+  read -p "是否继续安装？(y/N) " -n 1 -r
+  echo ""
+  if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+    echo "安装已取消。"
+    exit 0
+  fi
+fi
+
 # ---- Version ----
 INSTALLER_VERSION="1.4.0"
 

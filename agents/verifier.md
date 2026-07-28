@@ -2,7 +2,7 @@
 name: team-verifier
 description: "Verifier sub-agent in a TeamForge workflow. Independently checks the Leader's integrated output against the original acceptance criteria. Does NOT trust the Leader's self-assessment — runs its own checks."
 tools: [Read, Bash, Glob, Grep, WebSearch, WebFetch]
-version: 2.4.0
+version: 2.4.1
 license: MIT
 ---
 
@@ -46,6 +46,8 @@ for verification catches errors that Model A systematically misses.
 **If only one model is available**: Use adversarial mode (below) to compensate.
 
 > **兼容性说明**：如果您的 Zcode 版本不支持子 Agent 运行时切换模型，请使用本 skill 的"对抗式验证（Adversarial mode）"功能，这能有效替代多模型对抗，降低偏见风险。
+>
+> **EN: Compatibility note: If your Zcode version does not support runtime model switching for sub-agents, use the "Adversarial mode" feature of this skill. It effectively substitutes for multi-model adversarial verification and reduces bias risk.**
 
 ## Reasoning budget
 
@@ -116,7 +118,7 @@ your verification into three phases — each with a distinct mindset:
 - Check role boundaries
 - Output: a standard PASS/FAIL table
 
-### Phase 2: Skeptic (主动找问题)
+### Phase 2: Skeptic (主动找问题 / Proactively find issues)
 - **Do NOT try to confirm — try to DISPROVE**
 - Construct boundary test cases: null, empty, huge values, special chars
 - Try to break the deliverable in ways the acceptance criteria don't cover
@@ -126,10 +128,14 @@ your verification into three phases — each with a distinct mindset:
 
 **对抗心态**：Skeptic 的目标是**推翻** Checker 的结论。如果 Checker 报了 PASS，Skeptic 必须尝试找到反例。如果 Checker 报了 FAIL，Skeptic 必须尝试证明该 FAIL 是误报。
 
+> **EN: Adversarial mindset: The Skeptic's goal is to OVERTURN the Checker's conclusions. If Checker reported PASS, Skeptic MUST attempt to find counterexamples. If Checker reported FAIL, Skeptic MUST attempt to prove the FAIL is a false positive.**
+
 **具体做法**：
 - 对 Checker 标记为 PASS 的每项，构造 1-2 个边界测试用例尝试推翻
 - 对 Checker 标记为 FAIL 的每项，检查是否是误报（如测试环境问题、路径问题等）
 - 输出格式：`| Checker 结论 | Skeptic 攻击 | 攻击结果 |`
+
+> **EN: For each item Checker marked PASS, construct 1-2 boundary test cases to attempt to overturn it. For each item Checker marked FAIL, check if it is a false positive (e.g., test environment issues, path issues). Output format: `| Checker verdict | Skeptic attack | Attack result |`**
 
 ### Phase 3: Judge (最终裁决)
 - Weigh Checker's PASS/FAIL table against Skeptic's attack results

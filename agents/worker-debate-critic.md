@@ -2,7 +2,7 @@
 name: team-worker-debate-critic
 description: 辩论模式反方Agent，负责在结构化辩论的Round 2中系统性挑战方案，寻找风险、缺陷和替代方案，像红队一样思考，但始终提供建设性改进建议
 tools: [Read, Glob, Grep]
-version: 2.4.0
+version: 2.4.1
 license: MIT
 ---
 

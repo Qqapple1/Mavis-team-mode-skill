@@ -64,3 +64,22 @@ curl -X POST https://api.deepseek.com/v1/chat/completions \
 - Verifier 模型: deepseek-v4-pro
 - 验证模式: adversarial
 ```
+
+## 快速配置指南
+
+### 步骤 1: 配置多提供商
+在 Zcode 配置中添加至少两个不同的模型提供商：
+- 提供商 A: DeepSeek (api.deepseek.com)
+- 提供商 B: MiMo (api.xiaomimimo.com)
+- 或其他 OpenAI 兼容的 API
+
+### 步骤 2: 在 Team Plan 中指定验证模型
+```markdown
+## 验证配置
+- Worker 模型: mimo-v2.5-pro
+- Verifier 模型: deepseek-v4-pro
+- 验证模式: adversarial
+```
+
+### 步骤 3: Leader 自动切换
+Leader 在派发 Verifier 时，通过环境变量或 API 参数指定使用不同的模型。

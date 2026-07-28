@@ -2,7 +2,7 @@
 name: team-worker-management-tech-lead
 description: 负责架构决策、任务拆分分配、代码审查、团队协调的技术负责人，是团队技术方向的总舵手
 tools: [Read, Glob, Grep]
-version: 2.4.0
+version: 2.4.1
 license: MIT
 ---
 

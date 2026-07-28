@@ -1,7 +1,7 @@
 ---
 name: teamforge
 description: "Recreates the TeamForge workflow (Leader + Workers + Verifier) inside Zcode 3.4.2+. Use this skill when the user wants parallel agent execution, structured task decomposition, independent quality verification, or multi-step work that benefits from sub-agents running concurrently. Triggers on: 'teamforge', 'team mode', 'multi-agent', 'split into subtasks', 'verify the result', '用 teamforge', '团队模式', '多智能体协作', '并行处理'. Do NOT use for simple single-step tasks."
-version: 2.4.0
+version: 2.4.1
 license: MIT
 metadata:
   author: Community port (TeamForge CLI agent)
@@ -142,6 +142,19 @@ If missing, see INSTALL.md.
 **Level 1 — 结构验证（必须）**：
 - 检查 CONTRACT 中定义的所有文件是否已创建（`ls` 命令）
 - 检查每个文件非空（`wc -l` 命令）
+
+**验证细节**：
+- 文本文件：检查是否包含至少 10 个非空白字符（避免空文件或只有空行的文件）
+  ```bash
+  # 检查文件是否有实际内容
+  content=$(tr -d '[:space:]' < <file> | wc -c)
+  if [ "$content" -lt 10 ]; then echo "⚠️ 文件内容过少"; fi
+  ```
+- 二进制文件：使用 `file` 命令校验文件类型
+  ```bash
+  file <file>  # 应显示 "ASCII text" 或类似，而非 "data" 或 "binary"
+  ```
+- JSON 文件：使用 `python -c "import json; json.load(open('<file>'))"` 验证格式
 
 **Level 2 — 接口验证（推荐）**：
 - 对 Python 代码：使用 AST 验证脚本检查函数是否存在且签名正确
