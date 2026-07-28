@@ -208,6 +208,26 @@ Leader 在主对话里调用 Zcode 的 sub-agent 机制。两种用法：
 
 > **Worker 超时**: 如果 sub-agent 超过 **5 分钟**未返回结果，Leader 应视为该 Worker 失败。处理方式：记录为 FAILED，不阻塞其他 Worker；在 Step 4 整合时决定是否重试。Zcode 的 sub-agent 没有内置超时机制，Leader 需要自行通过时间戳判断。
 
+### Step 3.5: Wave 间产物交接协议
+
+当存在多个 Wave 时，Wave 间的产物交接**必须**通过文件显式传递，不能依赖 Leader 的记忆或摘要转述：
+
+**规则**:
+1. 前一个 Wave 的每个 Worker **必须**将关键产物写入磁盘（代码文件、报告文件等）
+2. Leader 在派发下一个 Wave 前，**必须**确认前一个 Wave 的所有产物文件已存在且非空
+3. 下一个 Wave 的 Worker prompt 中**必须**引用前一个 Wave 的产物文件路径
+4. 如果 Wave 2 的 Worker 发现 Wave 1 的产物有误，**必须**标记 `NEEDS-ROLLBACK`，由 Leader 决定是否重做
+
+**示例**:
+```
+Wave 1: Coder 写 src/auth.py → 文件必须存在
+Wave 2: Tester 写 tests/test_auth.py → prompt 中引用 "参考 src/auth.py 的实现"
+```
+
+**回退机制**: 如果 Wave N 的 Worker 发现 Wave N-1 的产物有致命问题：
+- Worker 在报告中标记 `NEEDS-ROLLBACK: <原因>`
+- Leader 评估后决定：(a) 派 Fixer 修复, (b) 重做 Wave N-1 的相关子任务, (c) 缩小范围跳过
+
 ### Step 4: 收集子任务结果
 
 Leader 收到所有子智能体的摘要后，**自己整合**成初版交付物。

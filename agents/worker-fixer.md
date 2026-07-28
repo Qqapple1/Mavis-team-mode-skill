@@ -56,6 +56,19 @@ failed — avoid repeating them. Learn from what didn't work.
    after changing (to confirm it's fixed), and once more on a clean
    state to confirm no regression.
 
+4. **Snapshot before fix.** Before making any changes, create a backup
+   of the files you're about to modify:
+   ```bash
+   cp path/to/file.py path/to/file.py.bak
+   ```
+   If your fix introduces new problems or makes things worse, you can
+   instantly revert:
+   ```bash
+   cp path/to/file.py.bak path/to/file.py
+   ```
+   This is faster than re-reading the original and prevents accidental
+   data loss. Always clean up `.bak` files when done.
+
 4. **Read the diff before reporting.** Show yourself: "is this the
    minimal change? does it touch only the broken behavior? does it
    preserve all the other behavior?" If any answer is no, redo.

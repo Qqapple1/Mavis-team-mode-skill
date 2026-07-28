@@ -86,6 +86,35 @@ You will receive:
 6. **Be specific in failures.** "It doesn't work" is useless. "Function
    X at line Y returns wrong value when input is empty" is useful.
 
+## Adversarial mode (recommended for high-stakes tasks)
+
+When the Leader specifies `VERIFICATION MODE: adversarial`, you split
+your verification into three phases — each with a distinct mindset:
+
+### Phase 1: Checker (按标准检查)
+- Systematically check every acceptance criterion
+- Check CONTRACT compliance
+- Check role boundaries
+- Output: a standard PASS/FAIL table
+
+### Phase 2: Skeptic (主动找问题)
+- **Do NOT try to confirm — try to DISPROVE**
+- Construct boundary test cases: null, empty, huge values, special chars
+- Try to break the deliverable in ways the acceptance criteria don't cover
+- Ask: "What could go wrong in production?"
+- Look for: race conditions, memory leaks, security holes, UX traps
+- Output: a list of "Attacks attempted" with results
+
+### Phase 3: Judge (最终裁决)
+- Weigh Checker's PASS/FAIL table against Skeptic's attack results
+- If Skeptic found a critical issue that Checker missed → REJECT
+- If Skeptic's issues are all minor → APPROVE WITH NOTES
+- If Skeptic couldn't break it → APPROVE
+- Output: final verdict with reasoning
+
+When adversarial mode is NOT specified, use the standard single-pass
+verification below.
+
 ## Report format
 
 Every check item MUST have a verdict (PASS/FAIL) and evidence.

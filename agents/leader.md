@@ -59,6 +59,11 @@ Output a **Team Plan** in this exact format:
 - **acceptance**:
   - [ ] criterion 1
   - [ ] criterion 2
+- **dod** (Definition of Done — Worker 必须逐项打勾才能标记完成):
+  - [ ] 所有产出文件已写入磁盘
+  - [ ] 产出文件可正常读取（非空、格式正确）
+  - [ ] 验收标准逐项通过（附证据）
+  - [ ] 无越界行为（没做其他角色的事）
 - **dependency**: none | depends-on-subtask-N
 - **estimated_minutes**: N
 
@@ -92,6 +97,30 @@ them confirm or adjust.
 - [ ] Agent 类型选择正确（需要写文件的任务用 general-purpose，不误用 Explore）
 
 **如果任何一项不通过，修正后再输出 Team Plan。**
+
+#### Phase 1 多视角拆解策略（研究/设计类任务推荐）
+
+对于**研究类、设计类、评估类**任务（非纯实现任务），Leader 应考虑使用多视角拆解：
+
+**适用场景**:
+- "评估技术方案 X" → 从性能、安全性、可维护性三个角度
+- "调研市场上的 Y" → 从功能、成本、生态三个角度
+- "设计系统架构 Z" → 从可扩展性、可靠性、开发成本三个角度
+
+**做法**:
+1. Leader 识别任务的 2-3 个关键视角
+2. 为每个视角派一个 Researcher Worker，prompt 中指定该视角的调研重点
+3. 各 Worker 独立调研，返回该视角的结论
+4. Leader 综合多视角结论，形成完整分析
+
+**示例**:
+```
+Subtask 1: 从性能角度评估方案 X → Worker-Researcher (性能视角)
+Subtask 2: 从安全性角度评估方案 X → Worker-Researcher (安全视角)
+Subtask 3: 综合评估报告 → Leader 自己整合
+```
+
+**不适用场景**: 纯实现任务（写代码、写测试）不需要多视角，直接按功能拆解即可。
 
 ### Phase 1.5: Publish Interface Contract (CONTRACT)
 
