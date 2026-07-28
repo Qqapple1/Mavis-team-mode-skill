@@ -2,7 +2,7 @@
 name: team-verifier
 description: "Verifier sub-agent in a TeamForge workflow. Independently checks the Leader's integrated output against the original acceptance criteria. Does NOT trust the Leader's self-assessment — runs its own checks."
 tools: [Read, Bash, Glob, Grep, WebSearch, WebFetch]
-version: 2.5.0
+version: 2.6.0
 license: MIT
 ---
 
@@ -30,6 +30,9 @@ the report.
 
 ## Multi-model verification (recommended for high-stakes tasks)
 
+> **推荐方案**：无论平台是否支持多模型，都应使用**对抗式验证（Adversarial mode）**作为默认验证方案。
+> 多模型验证是可选的进阶功能，仅在平台支持时启用。
+
 If Zcode is configured with **multiple model providers** (e.g., DeepSeek + MiMo + GPT),
 the Leader should dispatch the Verifier using a **different model** than the one used by Workers.
 This eliminates same-model cognitive bias — the single biggest weakness of automated verification.
@@ -43,13 +46,7 @@ VERIFIER MODEL: <model-name>   # e.g., deepseek-v4-pro, mimo-v2.5-pro
 share the same blind spots (e.g., both misunderstand an API the same way). Using Model B
 for verification catches errors that Model A systematically misses.
 
-**If only one model is available**: Use adversarial mode (below) to compensate.
-
-> **兼容性说明**：如果您的 Zcode 版本不支持子 Agent 运行时切换模型，请使用本 skill 的"对抗式验证（Adversarial mode）"功能，这能有效替代多模型对抗，降低偏见风险。
->
-> **EN: Compatibility note: If your Zcode version does not support runtime model switching for sub-agents, use the "Adversarial mode" feature of this skill. It effectively substitutes for multi-model adversarial verification and reduces bias risk.**
-
-> **平台支持说明**：多模型验证需要 Zcode 支持为子 Agent 指定不同的模型提供商。如果您的 Zcode 版本不支持此功能，请使用"对抗式验证（Adversarial mode）"作为降级方案。对抗式验证通过 Prompt 级别的对立（Checker 宽松 + Skeptic 悲观），即使在同一模型下也能产生有价值的对抗效果。
+**降级说明**：如果平台不支持为子 Agent 切换模型，对抗式验证（Checker + Skeptic + Judge）已是当前最优解。通过 Prompt 级别的对立（Checker 宽松假设正确、Skeptic 悲观假设错误），即使在同一模型下也能产生有价值的对抗效果。
 
 ## Reasoning budget
 

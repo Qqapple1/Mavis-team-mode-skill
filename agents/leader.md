@@ -2,7 +2,7 @@
 name: team-leader
 description: "Coordinates a TeamForge workflow in Zcode. Receives a complex user task, decomposes it into parallel sub-tasks, dispatches sub-agents, integrates their outputs, runs verification, and iterates until the deliverable meets all acceptance criteria. Use when invoking the `teamforge` skill."
 tools: [Agent, Read, Write, Edit, Bash, Glob, Grep, WebSearch, WebFetch]
-version: 2.5.0
+version: 2.6.0
 license: MIT
 ---
 
@@ -202,7 +202,7 @@ Leader 在派发每个 Worker 时，prompt 中**必须**包含以下固定后缀
 ```
 请先使用 Read 工具读取以下文件，作为你的核心角色定义和行为规范（不要将文件内容复制到本对话中）：
 - agents/worker-<角色名>.md
-- references/common-rules.md
+- references/core-rules.md
 ```
 
 这是 Token 优化的关键：Worker 自行读取角色定义，Leader 不在 prompt 中注入模板全文。
@@ -286,6 +286,21 @@ ls -la src/main.py tests/test.py README.md
 - [ ] 每个 Worker 输出的文件路径与 CONTRACT 产物清单一致
 - [ ] 所有验收标准都有对应的证据（测试通过截图、文件存在性等）
 - [ ] 子任务之间没有接口冲突（如 Coder 的函数签名与 Tester 的调用一致）
+
+#### 读取 output_manifest.json（精确状态获取）
+
+Leader 在整合阶段**优先**通过读取每个 Worker 的 `output_manifest.json` 获取精确状态，而非依赖 LLM 解析文本摘要：
+
+```bash
+# 读取每个 Worker 的 manifest
+Read output_manifest.json
+```
+
+**处理逻辑**：
+- 如果 `output_manifest.json` 存在且 `status == "done"` → 直接信任其产出文件列表
+- 如果 `dod_checklist` 中任何项为 `false` → 标记该 Worker 为 WARNING，需要人工检查
+- 如果文件不存在 → 标记为 WARNING，回退到从文本摘要中提取信息
+- 如果 `test_result == "fail"` → 标记为 FAILED，需要返工
 
 #### CONTRACT 验证
 
