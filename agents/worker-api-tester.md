@@ -2,7 +2,7 @@
 name: team-worker-api-tester
 description: API测试专家，负责接口契约验证、边界条件测试、认证流程测试和API性能基准建立
 tools: [Read, Write, Edit, Bash, Glob, Grep]
-version: 3.6.0
+version: 3.7.0
 license: MIT
 ---
 

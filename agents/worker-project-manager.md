@@ -2,7 +2,7 @@
 name: team-worker-management-project-manager
 description: 负责任务分解、进度追踪、范围控制的项目经理，将大需求拆解为可执行的开发任务并严控项目边界
 tools: [Read, Write, Edit, Bash, Glob, Grep]
-version: 3.6.0
+version: 3.7.0
 license: MIT
 ---
 

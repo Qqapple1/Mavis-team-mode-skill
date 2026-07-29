@@ -1,7 +1,7 @@
 ---
 name: teamforge
 description: "Recreates the TeamForge workflow (Leader + Workers + Verifier) inside Zcode 3.4.2+. Use this skill when the user wants parallel agent execution, structured task decomposition, independent quality verification, or multi-step work that benefits from sub-agents running concurrently. Triggers on: 'teamforge', 'team mode', 'multi-agent', 'split into subtasks', 'verify the result', '用 teamforge', '团队模式', '多智能体协作', '并行处理'. Do NOT use for simple single-step tasks."
-version: 3.6.0
+version: 3.7.0
 license: MIT
 metadata:
   author: Community port (TeamForge CLI agent)
@@ -103,7 +103,7 @@ Leader 在 Phase 1 时，**必须**检查 Zcode 是否配置了多模型：
 
 Leader 通过以下命令检查 Zcode 是否配置了多模型：
 ```bash
-python -c "import json; c=json.load(open('$HOME/.zcode/cli/config.json')); providers=[k for k in c.get('provider',{}) if c['provider'][k].get('enabled',True)]; print(f'providers: {len(providers)}'); print('multi-model: ' + str(len(providers)>1))"
+python scripts/teamforge_utils.py --check-multi-model
 ```
 
 如果返回 `multi-model: True`，Leader 应使用不同模型派发 Verifier。
@@ -133,14 +133,14 @@ TeamForge 的 Worker 并行是"前台并行"（Zcode 平台限制），这意味
 
 TeamForge 支持两种执行模式：
 
-**标准模式**（推荐）：使用 Unix 命令（ls, wc, grep, awk）+ Python 脚本
+**标准模式**（推荐）：使用 Unix 命令（ls, grep）+ Python 脚本
 - 适用：WSL2, Git Bash, macOS, Linux
 - 验证：`python scripts/teamforge_utils.py --count-lines <file>`
 
 **纯 Python 模式**（兜底）：所有操作使用 Python 脚本
 - 适用：Windows 原生 PowerShell（无 Unix 工具）
 - 自动检测：Leader 在 Phase 2 预检时执行 `ls` 命令，如果失败则切换到纯 Python 模式
-- 验证：全部使用 `python scripts/teamforge_utils.py` 和 `python scripts/validate_contract_ast.py`
+- 验证：全部使用 `python scripts/teamforge_utils.py`（推荐）或 `python scripts/validate_contract_ast.py`（向后兼容）
 
 > **Windows Python 路径**：如果 `python` 命令不可用，尝试使用 `py -3`（Windows Python 启动器）或直接指定 Python 完整路径（如 `C:\Users\user\AppData\Local\Programs\Python\Python312\python.exe`）。
 
@@ -224,7 +224,7 @@ If missing, see INSTALL.md.
 > ## 项目语言
 > - primary_language: python | javascript | typescript | go | rust | java
 > - 验证策略根据语言自动选择：
->   - Python → AST 解析（scripts/validate_contract_ast.py）
+>   - Python → AST 解析（scripts/teamforge_utils.py --validate-ast，向后兼容：scripts/validate_contract_ast.py）
 >   - JavaScript/TypeScript → Grep + Regex 模式匹配
 >   - 其他语言 → Grep + Regex 模式匹配（标注"可能存在误报"）
 > ```
@@ -242,9 +242,7 @@ If missing, see INSTALL.md.
 
 **Level 1 — 结构验证（必须）**：
 - 检查 CONTRACT 中定义的所有文件是否已创建（`ls` 命令）
-- 检查每个文件非空（`wc -l <file_path> | awk '{print $1}'` 命令）
-
-**注意**：`wc -l` 输出格式为 `150 src/main.py`（数字+文件名）。使用 `awk '{print $1}'` 提取第一个字段（纯数字），避免 LLM 解析错误。
+- 检查每个文件非空（`python scripts/teamforge_utils.py --count-lines <file_path>` 命令）
 
 **验证细节**：
 - 文本文件：检查是否包含至少 10 个非空白字符（避免空文件或只有空行的文件）
@@ -276,7 +274,7 @@ python -c "import glob; files=glob.glob('src/**/*.js', recursive=True) + glob.gl
 ```
 
 **验证策略**：
-- Python 项目 → 使用 `scripts/validate_contract_ast.py`（AST 解析）
+- Python 项目 → 使用 `scripts/teamforge_utils.py --validate-ast`（AST 解析，推荐）或 `scripts/validate_contract_ast.py`（向后兼容）
 - JavaScript/TypeScript 项目 → 使用 Grep + Regex 模式匹配（标注"可能存在误报"）
 - 其他语言 → 使用 Grep + Regex 模式匹配（标注"AST 验证跳过"）
 
@@ -288,8 +286,8 @@ python scripts/teamforge_utils.py --match-role "实现 FastAPI 后端 API"
 
 - 文件行数检查：`python scripts/teamforge_utils.py --count-lines <file>`
 - 文件存在性检查：`python scripts/teamforge_utils.py --check-exists <file1> <file2> ...`
-- Python 函数验证：`python scripts/validate_contract_ast.py <file.py> <func1> <func2> ...`
-  示例：`python scripts/validate_contract_ast.py src/main.py scan_file scan_directory detect_language`
+- Python 函数验证：`python scripts/teamforge_utils.py --validate-ast <file.py> <func1> <func2> ...`
+  示例：`python scripts/teamforge_utils.py --validate-ast src/main.py scan_file scan_directory detect_language`
   这比 grep 健壮：即使函数是 `async def`、有装饰器、或在注释中出现同名，AST 也能准确识别。
   如果脚本报错"语法错误"，说明 Worker 产出的代码有语法问题，需要返工。
 - 对 CLI 工具：运行 `--help` 并检查输出中是否包含 CONTRACT 定义的参数名
@@ -462,7 +460,7 @@ Wave 2: Tester 写 tests/test_auth.py → prompt 中引用 "参考 src/auth.py �
 在整合前，执行三层独立检查：
 
 **第一查：自查（Contract）**
-- Leader 执行 `python scripts/validate_contract_ast.py` 或 `python scripts/teamforge_utils.py --count-lines`
+- Leader 执行 `python scripts/teamforge_utils.py --validate-ast` 或 `python scripts/teamforge_utils.py --count-lines`
 - 不依赖 LLM，纯工具验证
 - 检查文件存在性、函数签名、行数
 
@@ -582,13 +580,7 @@ echo '{"ts":"2026-07-29T10:05:00","wave":1,"task":"subtask_2","status":"done","f
 
 ```bash
 # 检查文件是否存在且非空
-for file in <产出文件列表>; do
-    if [ ! -s "$file" ]; then
-        echo "❌ MISSING: $file"
-    else
-        echo "✅ EXISTS: $file ($(wc -l < "$file" | awk '{print $1}') lines)"
-    fi
-done
+python scripts/teamforge_utils.py --check-exists <产出文件列表>
 ```
 
 **校验结果处理**：
@@ -660,19 +652,10 @@ python scripts/teamforge_utils.py --write-state <session_uuid> <wave> <task> <st
 
 **检索方式**：新任务启动时，Leader 在 Phase 1 可以用 `grep` 搜索 `.memory_index.jsonl` 中的 keywords，获取历史经验。这能在 0 Token 消耗下获得上下文。
 
-**语义匹配增强**（可选）：除了 grep 关键词匹配，Leader 可以使用 Python 的 `difflib` 进行近似匹配：
+**语义匹配增强**（可选）：除了 grep 关键词匹配，Leader 可以使用 `teamforge_utils.py` 进行近似匹配：
 
-```python
-python -c "
-import difflib, json, sys
-keyword = sys.argv[1]
-with open('.memory_index.jsonl') as f:
-    for line in f:
-        entry = json.loads(line)
-        ratio = difflib.SequenceMatcher(None, keyword, entry.get('summary','')).ratio()
-        if ratio > 0.3:
-            print(f'[{ratio:.0%}] {entry[\"task\"]}: {entry[\"summary\"][:50]}')
-" "重构"
+```bash
+python scripts/teamforge_utils.py --search-memory "重构"
 ```
 
 如果找到匹配度 > 30% 的历史记录，Leader 应显式输出：

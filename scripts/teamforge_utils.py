@@ -6,11 +6,17 @@ TeamForge 跨平台工具函数库
   python scripts/teamforge_utils.py --check-exists <file1> <file2> ...
   python scripts/teamforge_utils.py --strip-ansi <text>
   python scripts/teamforge_utils.py --write-state <session_uuid> <wave> <task> <status> [--files "file1,file2"] [--error "错误信息"]
+  python scripts/teamforge_utils.py --check-multi-model
+  python scripts/teamforge_utils.py --search-memory <keyword>
+  python scripts/teamforge_utils.py --validate-ast <file.py> <func1> [func2] ...
+  python scripts/teamforge_utils.py --self-check
 """
 
 import sys
 import os
 import re
+import json
+import ast
 import glob as glob_mod
 
 def get_file_lines(filepath: str) -> int:
@@ -87,6 +93,40 @@ def _match_role_simple(task_description: str, index_path: str) -> list:
 
     results.sort(key=lambda x: x['score'], reverse=True)
     return results[:3]
+
+def validate_functions(file_path: str, expected_funcs: list) -> dict:
+    """验证 Python 文件中是否存在指定的函数（AST 解析）。"""
+    result = {"file": file_path, "found": [], "missing": [], "error": None}
+
+    if not os.path.exists(file_path):
+        result["error"] = f"文件不存在: {file_path}"
+        return result
+
+    try:
+        with open(file_path, "r", encoding="utf-8") as f:
+            code = f.read()
+        tree = ast.parse(code)
+    except SyntaxError as e:
+        result["error"] = f"语法错误 (行 {e.lineno}): {e.msg}"
+        return result
+    except Exception as e:
+        result["error"] = f"读取失败: {e}"
+        return result
+
+    # 收集所有函数定义（包括 async def）
+    defined_funcs = set()
+    for node in ast.walk(tree):
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            defined_funcs.add(node.name)
+
+    # 检查期望的函数
+    for func_name in expected_funcs:
+        if func_name in defined_funcs:
+            result["found"].append(func_name)
+        else:
+            result["missing"].append(func_name)
+
+    return result
 
 def main():
     if len(sys.argv) < 2:
@@ -168,6 +208,91 @@ def main():
         else:
             os.rename(tmp, final)
         print(f"✅ 状态已写入: {final}")
+
+    elif cmd == "--check-multi-model":
+        import json
+        config_path = os.path.join(os.path.expanduser('~'), '.zcode', 'cli', 'config.json')
+        if not os.path.exists(config_path):
+            print("multi-model: false")
+            print("reason: config file not found")
+            sys.exit(0)
+        try:
+            with open(config_path, 'r', encoding='utf-8') as f:
+                config = json.load(f)
+            providers = [k for k in config.get('provider', {}) if config['provider'][k].get('enabled', True)]
+            is_multi = len(providers) > 1
+            print(f"providers: {len(providers)}")
+            print(f"multi-model: {str(is_multi).lower()}")
+        except Exception as e:
+            print(f"multi-model: false")
+            print(f"reason: {e}")
+
+    elif cmd == "--search-memory":
+        if len(sys.argv) < 3:
+            print("用法: --search-memory <keyword>")
+            sys.exit(1)
+        keyword = sys.argv[2].lower()
+        memory_file = '.memory_index.jsonl'
+        if not os.path.exists(memory_file):
+            print("未找到记忆索引文件")
+            sys.exit(0)
+
+        import difflib
+        results = []
+        with open(memory_file, 'r', encoding='utf-8') as f:
+            for line in f:
+                try:
+                    entry = json.loads(line.strip())
+                    summary = entry.get('summary', '')
+                    ratio = difflib.SequenceMatcher(None, keyword, summary.lower()).ratio()
+                    if ratio > 0.2 or keyword in summary.lower():
+                        results.append((ratio, entry))
+                except:
+                    continue
+
+        results.sort(key=lambda x: x[0], reverse=True)
+        if not results:
+            print("未找到匹配的记忆")
+        else:
+            for ratio, entry in results[:5]:
+                print(f"[{ratio:.0%}] {entry.get('task', '?')}: {entry.get('summary', '')[:60]}")
+
+    elif cmd == "--validate-ast":
+        if len(sys.argv) < 4:
+            print("用法: --validate-ast <file.py> <func1> [func2] ...")
+            sys.exit(1)
+        file_path = sys.argv[2]
+        expected_funcs = sys.argv[3:]
+        result = validate_functions(file_path, expected_funcs)
+        if result.get("error"):
+            print(f"❌ 错误: {result['error']}")
+            sys.exit(1)
+        for func in result.get("found", []):
+            print(f"  ✅ {func}")
+        for func in result.get("missing", []):
+            print(f"  ❌ {func} (未找到)")
+        if result.get("missing"):
+            sys.exit(1)
+
+    elif cmd == "--self-check":
+        print("TeamForge Utils 自检...")
+        print(f"Python: {sys.version}")
+        print(f"平台: {sys.platform}")
+
+        # 检查所有子命令
+        commands = ["--count-lines", "--check-exists", "--strip-ansi", "--match-role",
+                    "--write-state", "--check-multi-model", "--search-memory", "--validate-ast"]
+
+        for subcmd in commands:
+            print(f"  ✅ {subcmd}: 可用")
+
+        # 检查关键文件
+        files = ["agents/ROLE_INDEX.yaml", "references/core-rules.md", "scripts/validate_contract_ast.py"]
+        for f in files:
+            exists = "✅" if os.path.exists(f) else "❌"
+            print(f"  {exists} {f}")
+
+        print("自检完成")
 
     else:
         print(f"未知命令: {cmd}")
