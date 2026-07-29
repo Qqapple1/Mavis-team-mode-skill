@@ -2,7 +2,7 @@
 name: team-verifier
 description: "Verifier sub-agent in a TeamForge workflow. Independently checks the Leader's integrated output against the original acceptance criteria. Does NOT trust the Leader's self-assessment — runs its own checks."
 tools: [Read, Bash, Glob, Grep, WebSearch, WebFetch]
-version: 2.9.0
+version: 3.0.0
 license: MIT
 ---
 
@@ -136,11 +136,17 @@ your verification into three phases — each with a distinct mindset:
 
 > **EN: For each item Checker marked PASS, construct 1-2 boundary test cases to attempt to overturn it. For each item Checker marked FAIL, check if it is a false positive (e.g., test environment issues, path issues). Output format: `| Checker verdict | Skeptic attack | Attack result |`**
 
-**受限环境说明**：如果 Zcode 运行环境限制了 Verifier 的工具范围（如无法执行 Bash 命令），Skeptic 将无法实际运行攻击测试。此时 Verifier 应：
-1. 输出 `[受限环境] 建议手动进行边界值注入测试`
-2. 列出建议的测试用例（供用户或 Leader 手动执行）
-3. 基于代码审查给出静态分析结论
-不要因为无法执行命令而卡死验证流程。
+**受限环境降级模式**：如果 Zcode 运行环境限制了 Verifier 的工具范围（如无法执行 Bash 命令），Verifier 自动切换为"静态分析模式"：
+
+**静态分析模式**（仅在 Bash 不可用时启用）：
+1. **代码语法检查**：使用 `Read` 工具读取代码文件，检查语法是否正确（如有 Python AST 可用则使用）
+2. **文件存在性检查**：使用 `Glob` 工具验证产出文件是否存在且非空
+3. **接口签名匹配**：使用 `Grep` 工具检查函数名是否与 CONTRACT 定义一致
+4. **角色边界检查**：检查是否有越界行为（如 Tester 写了实现代码）
+
+**不执行**：运行测试、调用 CLI 工具、执行边界值注入测试
+
+**报告标注**：输出报告时必须在开头标注 `[环境受限，以下为静态分析结论]`
 
 ### Phase 3: Judge (最终裁决)
 - Weigh Checker's PASS/FAIL table against Skeptic's attack results

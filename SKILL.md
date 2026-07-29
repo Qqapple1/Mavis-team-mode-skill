@@ -1,7 +1,7 @@
 ---
 name: teamforge
 description: "Recreates the TeamForge workflow (Leader + Workers + Verifier) inside Zcode 3.4.2+. Use this skill when the user wants parallel agent execution, structured task decomposition, independent quality verification, or multi-step work that benefits from sub-agents running concurrently. Triggers on: 'teamforge', 'team mode', 'multi-agent', 'split into subtasks', 'verify the result', '用 teamforge', '团队模式', '多智能体协作', '并行处理'. Do NOT use for simple single-step tasks."
-version: 2.9.0
+version: 3.0.0
 license: MIT
 metadata:
   author: Community port (TeamForge CLI agent)
@@ -413,10 +413,14 @@ Leader 收到所有子智能体的摘要后，**自己整合**成初版交付物
 
 ### Step 5.5: 状态快照（断点恢复机制）
 
-在每个 Wave 完成后，Leader **必须**将状态变更追加到 `.teamforge_state.jsonl` 文件：
+在每个 Wave 完成后，Leader **必须**将状态变更追加到 `.teamforge_state_<task_id>.jsonl` 文件：
+
+**任务隔离**：每个 TeamForge 任务使用独立的状态文件，文件名包含任务 ID（如 `.teamforge_state_abc123.jsonl`）。任务 ID 由 Leader 在 Phase 1 生成（使用时间戳 + 随机数）。恢复时 Leader 根据用户指令选择读取哪个文件。
+
+如果用户只说"恢复上次任务"，Leader 读取最近修改的状态文件。
 
 **JSONL 格式**（标准 JSON Lines）：
-- 文件扩展名: `.teamforge_state.jsonl`
+- 文件扩展名: `.teamforge_state_<task_id>.jsonl`
 - 每行一个独立的 JSON 对象
 - 行与行之间用换行符分隔
 - 不需要外层的数组括号 `[...]`
@@ -424,11 +428,11 @@ Leader 收到所有子智能体的摘要后，**自己整合**成初版交付物
 
 ```bash
 # 写入示例（每行一个完整 JSON）
-echo '{"ts":"2026-07-29T10:00:00","wave":1,"task":"subtask_1","status":"done","files":["src/main.py"]}' >> .teamforge_state.jsonl
-echo '{"ts":"2026-07-29T10:05:00","wave":1,"task":"subtask_2","status":"done","files":["tests/test.py"]}' >> .teamforge_state.jsonl
+echo '{"ts":"2026-07-29T10:00:00","wave":1,"task":"subtask_1","status":"done","files":["src/main.py"]}' >> .teamforge_state_<task_id>.jsonl
+echo '{"ts":"2026-07-29T10:05:00","wave":1,"task":"subtask_2","status":"done","files":["tests/test.py"]}' >> .teamforge_state_<task_id>.jsonl
 ```
 
-**恢复流程**：逐行读取 `.teamforge_state.jsonl`，每行解析为独立 JSON 对象，重建最新状态：
+**恢复流程**：逐行读取 `.teamforge_state_<task_id>.jsonl`，每行解析为独立 JSON 对象，重建最新状态：
 1. 解析 JSONL，重建每个子任务的最新状态
 2. 检查已完成子任务的产出文件是否仍然存在
 3. 从最后一个未完成的 Wave 继续派发

@@ -105,3 +105,31 @@ or "simplify" it. A missing `ensure_ascii=False` is itself a common bug
 | ANSI test false-negative | Output wrapped in `\x1b[...m` | Add `--no-color` flag or strip in test |
 | Chinese content invisible to `grep`/search | Escaped as `\uXXXX` by `json.dumps()` | Add `ensure_ascii=False` |
 | Exact-match assertion fails on CLI output | Hidden ANSI codes in string | Strip ANSI or use `--no-color` |
+
+---
+
+## 数据库编码规范
+
+如果任务涉及数据库存储，**必须**在 CONTRACT 中明确指定数据库连接字符集：
+
+- **MySQL/MariaDB**: `charset=utf8mb4`（支持 emoji）
+- **PostgreSQL**: `client_encoding='UTF8'`
+- **SQLite**: 默认 UTF-8，无需额外配置
+- **MongoDB**: 默认 UTF-8，无需额外配置
+
+**示例**（MySQL 连接字符串）：
+```python
+# ✅ 正确
+conn = mysql.connector.connect(host="localhost", database="mydb", charset="utf8mb4")
+
+# ❌ 错误（依赖服务端默认配置，可能不是 UTF-8）
+conn = mysql.connector.connect(host="localhost", database="mydb")
+```
+
+**CONTRACT 模板**：如果任务涉及数据库，CONTRACT 中必须包含：
+```markdown
+## 数据库规范
+- 连接字符集: utf8mb4
+- 表字符集: utf8mb4_unicode_ci
+- 字段编码: UTF-8
+```

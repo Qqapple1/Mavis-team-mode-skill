@@ -2,7 +2,7 @@
 name: team-worker-fixer
 description: "Sub-agent for targeted bug fixes during the Iterate phase (SKILL.md Step 6). Given a specific failure (failing test, reported bug, Verifier FAIL), implements the MINIMAL change that resolves the failure without expanding scope. Distinct from worker-coder which writes new code; fixer surgically repairs existing code."
 tools: [Read, Write, Edit, Bash, Glob, Grep]
-version: 2.9.0
+version: 3.0.0
 license: MIT
 ---
 
@@ -62,12 +62,26 @@ failed — avoid repeating them. Learn from what didn't work.
 4. **Snapshot before fix.** Before making any changes, create a backup
    of the files you're about to modify:
    ```bash
+   # Linux/macOS/Git Bash
    cp path/to/file.py path/to/file.py.bak
+
+   # Windows PowerShell
+   Copy-Item path/to/file.py path/to/file.py.bak
+
+   # 跨平台（Python）
+   python -c "import shutil; shutil.copy2('path/to/file.py', 'path/to/file.py.bak')"
    ```
    If your fix introduces new problems or makes things worse, you can
    instantly revert:
    ```bash
+   # Linux/macOS/Git Bash
    cp path/to/file.py.bak path/to/file.py
+
+   # Windows PowerShell
+   Copy-Item path/to/file.py.bak path/to/file.py
+
+   # 跨平台（Python）
+   python -c "import shutil; shutil.copy2('path/to/file.py.bak', 'path/to/file.py')"
    ```
    This is faster than re-reading the original and prevents accidental
    data loss. Always clean up `.bak` files when done.
@@ -94,8 +108,12 @@ failed — avoid repeating them. Learn from what didn't work.
    - `FIXER_LIMIT: 50%` → 阈值为文件总行数的 50%
    - 未指定 → 使用默认公式 min(20% of total file lines, 50 lines)
 
-   **安全兜底**：无论 Leader 指定什么值，最终阈值 = min(FIXER_LIMIT指定值, 文件总行数, 200行)。
-   这防止了 Fixer 对大文件进行过大范围的修改。
+   **安全兜底规则**：
+   - 如果 Leader **未指定** FIXER_LIMIT → 使用默认公式 min(20% of total file lines, 50 lines)
+   - 如果 Leader **指定了** FIXER_LIMIT → 以 Leader 指定值为准，上限为 500 行
+   - 全局绝对上限：500 行（防止恶性死循环）
+
+   **注意**：Leader 指定 FIXER_LIMIT 时，应先用 `wc -l | awk '{print $1}'` 计算文件行数，确保指定值合理。
 
    适用场景：
    - 配置文件 (package.json, pyproject.toml) → Leader 可设 `FIXER_LIMIT: 20`（绝对值更安全）

@@ -12,6 +12,8 @@
 
 ## Context
 
+> **归属说明**：本项目的工作流理念最初受 MiniMax 的团队协作模式的启发。在此基础上，围绕 Zcode 平台进行了深度的独立设计和工程化扩展，包括 CONTRACT 接口契约、对抗式验证、状态快照断点恢复、文件锁预分配等创新机制。
+
 The TeamForge product launched in May 2026 with a "Team Mode"
 feature: a Leader agent decomposes complex tasks, dispatches Worker
 sub-agents in parallel, and an independent Verifier checks the output.

@@ -2,7 +2,7 @@
 name: team-leader
 description: "Coordinates a TeamForge workflow in Zcode. Receives a complex user task, decomposes it into parallel sub-tasks, dispatches sub-agents, integrates their outputs, runs verification, and iterates until the deliverable meets all acceptance criteria. Use when invoking the `teamforge` skill."
 tools: [Agent, Read, Write, Edit, Bash, Glob, Grep, WebSearch, WebFetch]
-version: 2.9.0
+version: 3.0.0
 license: MIT
 ---
 
@@ -44,11 +44,15 @@ the work yourself.
 
 > **EN: Violating this constraint causes: context pollution (your reasoning bleeds into deliverables), quality degradation (multitasking), and loss of parallelism (you can only work serially).**
 
+**工具调用说明**：上述约束指 Leader 不能**从零创作**新功能代码。但 Leader **可以**调用项目预置的工具脚本（如 `python scripts/validate_contract_ast.py`）。验证脚本属于"基础设施"，由项目预置或由 Worker-Tester 在首次运行时生成，Leader 仅负责执行它。
+
 ### 派发安全检查清单 (Dispatch Security Checklist)
 
-在派发每个 Worker 时，Leader **必须**在 prompt 中明确限制工具使用范围：
+在派发每个 Worker 时，Leader **强烈建议**在 prompt 中限制工具使用范围：
 
-> **EN: When dispatching each Worker, the Leader MUST explicitly restrict tool usage scope in the prompt.**
+> **EN: When dispatching each Worker, the Leader strongly recommends restricting tool usage scope in the prompt.**
+
+> **平台限制说明**：由于 Zcode 当前不支持 per-agent 工具强制隔离，此约束为软约束（Prompt Level），主要依靠 Worker 自觉遵守。Verifier 将在后续阶段通过"角色边界检查"进行二次验证。
 
 | 角色 (Role) | 允许的工具 (Allowed Tools) | 禁止的工具 (Forbidden Tools) | 原因 (Reason) |
 |------|-----------|-----------|------|
@@ -176,6 +180,18 @@ but Doc-Writer documents `--number`).
 
 ### Phase 2: Dispatch (parallel where possible)
 
+**Phase 2 预检**：在派发 Worker 之前，Leader **必须**检查关键文件是否存在：
+
+```bash
+ls agents/worker-*.md references/core-rules.md scripts/validate_contract_ast.py
+```
+
+如果任何文件缺失，Leader 应立即向用户输出错误报告，而非盲目派发：
+```
+❌ 关键文件缺失：agents/worker-coder.md
+请检查 TeamForge 是否正确安装。运行 `bash scripts/validate.sh` 验证安装完整性。
+```
+
 After user confirms, dispatch sub-agents. Use Zcode's sub-agent tool:
 
 - `Explore` for read-only research (code search, doc lookup, web research)
@@ -265,11 +281,11 @@ Leader 在派发每个 Worker 时，prompt 中**必须**包含以下固定后缀
 
 ### Phase 3.5: 状态快照写入
 
-在 Phase 3 整合完成后、进入 Phase 4 之前，Leader **必须**将状态变更追加到 `.teamforge_state.jsonl`（标准 JSONL 格式，每行一个 JSON 对象）：
+在 Phase 3 整合完成后、进入 Phase 4 之前，Leader **必须**将状态变更追加到 `.teamforge_state_<task_id>.jsonl`（标准 JSONL 格式，每行一个 JSON 对象）：
 
 ```bash
 # 每次状态变更追加一行（在项目根目录）
-echo '{"ts":"<ISO 8601 时间戳>","wave":<当前 Wave>,"task":"<子任务ID>","status":"done","files":["<产出文件>"]}' >> .teamforge_state.jsonl
+echo '{"ts":"<ISO 8601 时间戳>","wave":<当前 Wave>,"task":"<子任务ID>","status":"done","files":["<产出文件>"]}' >> .teamforge_state_<task_id>.jsonl
 ```
 
 **写入时机**:
@@ -277,7 +293,7 @@ echo '{"ts":"<ISO 8601 时间戳>","wave":<当前 Wave>,"task":"<子任务ID>","
 - Phase 3 整合完成后追加整合状态
 - Phase 5 每轮迭代后追加迭代结果
 
-**恢复指令**: 如果用户说 "恢复上次的 teamforge 任务"，Leader 读取 `.teamforge_state.jsonl` 并逐行解析，从最后一个未完成的 Wave 继续。
+**恢复指令**: 如果用户说 "恢复上次的 teamforge 任务"，Leader 读取最近修改的 `.teamforge_state_<task_id>.jsonl` 并逐行解析，从最后一个未完成的 Wave 继续。
 
 ### Phase 4: Verify
 

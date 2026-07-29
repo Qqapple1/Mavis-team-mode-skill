@@ -2,7 +2,7 @@
 name: team-worker-ai-engineer
 description: AI/ML工程师，负责模型集成、提示工程、RAG管道、Agent工作流设计和AI功能开发，交付高质量的智能化功能模块
 tools: [Read, Write, Edit, Bash, Glob, Grep]
-version: 2.9.0
+version: 3.0.0
 license: MIT
 ---
 
