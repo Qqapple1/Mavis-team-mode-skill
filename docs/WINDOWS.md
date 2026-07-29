@@ -88,6 +88,8 @@ PowerShell 版**功能等价**（clone + copy + 验证 + 卸载），只是永�
 - `-RepoUrl <url>` 自定义 Git 源
 - `-GitRef <ref>` 指定 branch/tag/commit 检出
 
+> **编码提示**：如果执行 `install.ps1` 出现乱码或语法错误，请确保文件编码为 UTF-8 with BOM，或在 PowerShell 中执行 `chcp 65001` 切换到 UTF-8 代码页。
+
 ---
 
 ## 方案 C：Git Bash — 也支持（已有 Git Bash 的用户）

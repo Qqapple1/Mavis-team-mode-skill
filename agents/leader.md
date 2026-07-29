@@ -2,7 +2,7 @@
 name: team-leader
 description: "Coordinates a TeamForge workflow in Zcode. Receives a complex user task, decomposes it into parallel sub-tasks, dispatches sub-agents, integrates their outputs, runs verification, and iterates until the deliverable meets all acceptance criteria. Use when invoking the `teamforge` skill."
 tools: [Agent, Read, Write, Edit, Bash, Glob, Grep, WebSearch, WebFetch]
-version: 2.7.0
+version: 2.8.0
 license: MIT
 ---
 
@@ -293,26 +293,12 @@ echo '{"ts":"<ISO 8601 时间戳>","wave":<当前 Wave>,"task":"<子任务ID>","
 ### Phase 5: Iterate
 
 **执行清单**：
-1. 识别失败项，派发针对性修复
-2. 最多 3 轮迭代
-3. 每轮注入历史上下文（FAIL 清单 + 产出摘要）
-4. 3 轮后仍 FAIL → 降级策略（输出最小可用版本 + 剩余问题）
-5. 用户可随时强制退出（停止迭代/跳过验证/暂停）
+1. 识别失败项，派发针对性修复（小范围用 Fixer，大范围用 Coder）
+2. 最多 3 轮迭代，每轮注入历史上下文（FAIL 清单 + 产出摘要）
+3. 3 轮后仍 FAIL → 输出最小可用版本 + 剩余问题
+4. 用户可随时强制退出（停止迭代/跳过验证/暂停）
 
-> 详细降级策略和强制退出指令见 SKILL.md Step 6
-
-#### Fixer 阈值预计算
-
-在派发 Fixer 之前，Leader 需要预计算目标文件的行数，以确定修复范围阈值：
-
-```bash
-# 获取文件行数（用于 Fixer 阈值计算）
-wc -l <file_path> | awk '{print $1}'
-```
-
-**注意**：`wc -l` 输出格式为 `150 src/main.py`（数字+文件名）。使用 `awk '{print $1}'` 提取第一个字段（纯数字），避免 LLM 解析错误。
-
-阈值公式：`min(20% of total file lines, 50 lines)`。如果预估修复行数超过阈值，应派 worker-coder 而非 worker-fixer。
+> 详细规则见 SKILL.md Step 6
 
 ### Phase 6: Deliver
 

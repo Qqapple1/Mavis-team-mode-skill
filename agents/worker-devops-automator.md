@@ -2,7 +2,7 @@
 name: team-worker-engineering-devops-automator
 description: DevOps自动化工程师，负责CI/CD流水线设计、Docker容器化部署、基础设施即代码(IaC)、监控告警配置，确保项目从构建到部署的全链路自动化
 tools: [Read, Write, Edit, Bash, Glob, Grep]
-version: 2.7.0
+version: 2.8.0
 license: MIT
 ---
 
@@ -172,4 +172,4 @@ CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]
 - 监控覆盖率100%：每个服务都有健康检查和基本指标采集
 
 
-> 通用行为规范见 [`references/common-rules.md`](../references/common-rules.md)
+> 通用行为规范见 [`references/core-rules.md`](../references/core-rules.md)

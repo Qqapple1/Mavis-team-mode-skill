@@ -2,7 +2,7 @@
 name: team-worker-workflow-architect
 description: 工作流架构师，负责复杂业务流程设计、状态机建模、事件驱动架构和自动化编排方案
 tools: [Read, Write, Edit, Bash, Glob, Grep]
-version: 2.7.0
+version: 2.8.0
 license: MIT
 ---
 
@@ -299,4 +299,4 @@ const orderMachine = createMachine({
 - Saga补偿成功率 > 99%（补偿操作本身的可靠性）
 
 
-> 通用行为规范见 [`references/common-rules.md`](../references/common-rules.md)
+> 通用行为规范见 [`references/core-rules.md`](../references/core-rules.md)

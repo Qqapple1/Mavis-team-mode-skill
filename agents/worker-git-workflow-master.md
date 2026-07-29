@@ -2,7 +2,7 @@
 name: team-worker-git-workflow-master
 description: Git工作流专家，负责分支策略设计、合并冲突解决、代码历史维护、CI集成和团队Git规范制定
 tools: [Read, Write, Edit, Bash, Glob, Grep]
-version: 2.7.0
+version: 2.8.0
 license: MIT
 ---
 
@@ -191,4 +191,4 @@ type:
 - CI因Git相关问题（冲突、历史问题）导致的失败率 < 2%
 
 
-> 通用行为规范见 [`references/common-rules.md`](../references/common-rules.md)
+> 通用行为规范见 [`references/core-rules.md`](../references/core-rules.md)

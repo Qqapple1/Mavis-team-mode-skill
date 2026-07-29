@@ -2,7 +2,7 @@
 name: team-worker-backend-architect
 description: Python/FastAPI后端架构师，负责API设计、数据库建模、系统架构搭建、性能优化、可扩展性设计，交付稳健可维护的后端服务
 tools: [Read, Write, Edit, Bash, Glob, Grep]
-version: 2.7.0
+version: 2.8.0
 license: MIT
 ---
 
@@ -176,4 +176,4 @@ class Item(Base):
 - 零SQL注入、零硬编码密钥、零未处理异常暴露给客户端
 
 
-> 通用行为规范见 [`references/common-rules.md`](../references/common-rules.md)
+> 通用行为规范见 [`references/core-rules.md`](../references/core-rules.md)

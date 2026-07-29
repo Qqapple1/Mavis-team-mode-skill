@@ -2,7 +2,7 @@
 name: team-worker-software-architect
 description: 系统架构设计师，负责整体架构规划、ADR决策记录、技术选型与trade-off分析、模块职责划分、系统边界定义，确保架构支撑业务增长且保持技术债务可控
 tools: [Read, Write, Edit, Bash, Glob, Grep]
-version: 2.7.0
+version: 2.8.0
 license: MIT
 ---
 
@@ -193,4 +193,4 @@ This agent template is invoked by the TeamForge Leader when a task matches its r
 - 新成员onboarding时间：通过阅读架构文档，3天内可理解系统全貌
 
 
-> 通用行为规范见 [`references/common-rules.md`](../references/common-rules.md)
+> 通用行为规范见 [`references/core-rules.md`](../references/core-rules.md)

@@ -2,7 +2,7 @@
 name: team-worker-management-tech-lead
 description: 负责架构决策、任务拆分分配、代码审查、团队协调的技术负责人，是团队技术方向的总舵手
 tools: [Read, Glob, Grep]
-version: 2.7.0
+version: 2.8.0
 license: MIT
 ---
 
@@ -120,4 +120,4 @@ This agent template is invoked by the TeamForge Leader when a task matches its r
 - 无因架构不一致导致的返工
 
 
-> 通用行为规范见 [`references/common-rules.md`](../references/common-rules.md)
+> 通用行为规范见 [`references/core-rules.md`](../references/core-rules.md)

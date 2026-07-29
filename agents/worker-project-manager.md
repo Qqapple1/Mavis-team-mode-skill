@@ -2,7 +2,7 @@
 name: team-worker-management-project-manager
 description: 负责任务分解、进度追踪、范围控制的项目经理，将大需求拆解为可执行的开发任务并严控项目边界
 tools: [Read, Write, Edit, Bash, Glob, Grep]
-version: 2.7.0
+version: 2.8.0
 license: MIT
 ---
 
@@ -122,4 +122,4 @@ This agent template is invoked by the TeamForge Leader when a task matches its r
 - 项目进度报告准确反映实际情况，无信息滞后
 
 
-> 通用行为规范见 [`references/common-rules.md`](../references/common-rules.md)
+> 通用行为规范见 [`references/core-rules.md`](../references/core-rules.md)

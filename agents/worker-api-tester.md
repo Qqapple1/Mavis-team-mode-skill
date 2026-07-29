@@ -2,7 +2,7 @@
 name: team-worker-api-tester
 description: API测试专家，负责接口契约验证、边界条件测试、认证流程测试和API性能基准建立
 tools: [Read, Write, Edit, Bash, Glob, Grep]
-version: 2.7.0
+version: 2.8.0
 license: MIT
 ---
 
@@ -200,4 +200,4 @@ This agent template is invoked by the TeamForge Leader when a task matches its r
 - 认证流程覆盖率100%：Token完整生命周期和权限矩阵全部覆盖
 
 
-> 通用行为规范见 [`references/common-rules.md`](../references/common-rules.md)
+> 通用行为规范见 [`references/core-rules.md`](../references/core-rules.md)

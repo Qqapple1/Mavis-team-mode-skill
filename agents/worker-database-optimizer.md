@@ -2,7 +2,7 @@
 name: team-worker-database-optimizer
 description: 数据库优化专家，负责查询性能调优、索引策略设计、数据建模和迁移脚本编写，确保数据层高效稳定运行
 tools: [Read, Write, Edit, Bash, Glob, Grep]
-version: 2.7.0
+version: 2.8.0
 license: MIT
 ---
 
@@ -198,4 +198,4 @@ engine = create_engine(
 - 死元组比例 < 5%（vacuum策略有效执行）
 
 
-> 通用行为规范见 [`references/common-rules.md`](../references/common-rules.md)
+> 通用行为规范见 [`references/core-rules.md`](../references/core-rules.md)

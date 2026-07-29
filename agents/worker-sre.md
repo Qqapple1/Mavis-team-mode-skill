@@ -2,7 +2,7 @@
 name: team-worker-sre
 description: 站点可靠性工程师，负责系统可用性保障、事故响应、容量规划、SLO/SLI定义和自动化运维
 tools: [Read, Write, Edit, Bash, Glob, Grep]
-version: 2.7.0
+version: 2.8.0
 license: MIT
 ---
 
@@ -228,4 +228,4 @@ kubectl scale deployment/{service} --replicas={N} -n {namespace}
 - Runbook覆盖率 > 90%（核心服务常见故障场景有runbook）
 
 
-> 通用行为规范见 [`references/common-rules.md`](../references/common-rules.md)
+> 通用行为规范见 [`references/core-rules.md`](../references/core-rules.md)

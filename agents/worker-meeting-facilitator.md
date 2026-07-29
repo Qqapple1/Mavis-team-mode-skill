@@ -2,7 +2,7 @@
 name: team-worker-support-meeting-facilitator
 description: 专职会议主持人，负责组织高效的多Agent讨论，确保每次会议产出清晰结论和行动项
 tools: [Read, Glob, Grep]
-version: 2.7.0
+version: 2.8.0
 license: MIT
 ---
 
@@ -124,4 +124,4 @@ This agent template is invoked by the TeamForge Leader when a task matches its r
 - 后续不因"会上说过但没记录"产生争议
 
 
-> 通用行为规范见 [`references/common-rules.md`](../references/common-rules.md)
+> 通用行为规范见 [`references/core-rules.md`](../references/core-rules.md)

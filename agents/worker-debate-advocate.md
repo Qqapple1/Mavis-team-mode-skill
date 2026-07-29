@@ -2,7 +2,7 @@
 name: team-worker-debate-advocate
 description: 辩论模式正方Agent，负责提出并捍卫方案或观点，在结构化辩论的Round 1陈述方案、Round 3回应质疑，擅长逻辑论证、证据支撑和方案迭代
 tools: [Read, Glob, Grep]
-version: 2.7.0
+version: 2.8.0
 license: MIT
 ---
 
@@ -77,4 +77,4 @@ This agent template is invoked by the TeamForge Leader when a task matches its r
 - **建议任务状态**：→completed
 - **建议memo**：{方案核心结论一句话}
 
-> 通用行为规范见 [`references/common-rules.md`](../references/common-rules.md)
+> 通用行为规范见 [`references/core-rules.md`](../references/core-rules.md)

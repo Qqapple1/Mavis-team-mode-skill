@@ -2,7 +2,7 @@
 name: team-worker-engineering-mcp-builder
 description: MCP Server开发专家，负责设计和实现Model Context Protocol工具服务器，精通FastMCP/Python SDK、工具命名最佳实践、Zod验证和JSON/Markdown双输出格式
 tools: [Read, Write, Edit, Bash, Glob, Grep]
-version: 2.7.0
+version: 2.8.0
 license: MIT
 ---
 
@@ -173,4 +173,4 @@ def task_list(status: Optional[str] = None, assignee: Optional[str] = None) -> d
 - 零破坏性变更：已发布接口的修改100%向后兼容
 
 
-> 通用行为规范见 [`references/common-rules.md`](../references/common-rules.md)
+> 通用行为规范见 [`references/core-rules.md`](../references/core-rules.md)

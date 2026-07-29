@@ -1,7 +1,7 @@
 ---
 name: teamforge
 description: "Recreates the TeamForge workflow (Leader + Workers + Verifier) inside Zcode 3.4.2+. Use this skill when the user wants parallel agent execution, structured task decomposition, independent quality verification, or multi-step work that benefits from sub-agents running concurrently. Triggers on: 'teamforge', 'team mode', 'multi-agent', 'split into subtasks', 'verify the result', '用 teamforge', '团队模式', '多智能体协作', '并行处理'. Do NOT use for simple single-step tasks."
-version: 2.7.0
+version: 2.8.0
 license: MIT
 metadata:
   author: Community port (TeamForge CLI agent)
@@ -302,6 +302,8 @@ Leader 在派发 Worker **之前**，必须检查同一 Wave 内是否有多个�
 ```
 
 注意 Subtask 1 和 Subtask 4 都会修改 `src/main.py`，所以必须拆到不同 Wave。
+
+**路径一致性约束**：Team Plan 和 output_manifest 中涉及的文件路径，**必须**统一使用相对于项目根目录的 POSIX 风格路径（使用 `/` 分割，不要使用 `\`）。例如：`src/main.py` 而不是 `src\main.py` 或 `./src/main.py`。
 
 ### Step 3.5: Wave 间产物交接协议
 

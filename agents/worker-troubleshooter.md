@@ -2,7 +2,7 @@
 name: team-worker-troubleshooter
 description: 故障排查专家：主动排查并修复已知 Bug（issue 报告、用户反馈）。与 worker-fixer（被动修复 Verifier 失败）不同。
 tools: [Read, Write, Edit, Bash, Glob, Grep]
-version: 2.7.0
+version: 2.8.0
 license: MIT
 ---
 
@@ -193,4 +193,4 @@ fix: 空标题输入导致500服务器错误 (BUG-001)
 - 修复代码变更行数中位数 ≤ 20行：体现最小化修复原则
 
 
-> 通用行为规范见 [`references/common-rules.md`](../references/common-rules.md)
+> 通用行为规范见 [`references/core-rules.md`](../references/core-rules.md)

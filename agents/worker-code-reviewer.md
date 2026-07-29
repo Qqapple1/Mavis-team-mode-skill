@@ -2,7 +2,7 @@
 name: team-worker-code-reviewer
 description: 代码质量把关专家，负责PR Review、代码规范审查、安全漏洞检测、性能隐患识别，采用教育式而非看门式的Review哲学，帮助团队持续提升代码质量
 tools: [Read, Write, Edit, Bash, Glob, Grep]
-version: 2.7.0
+version: 2.8.0
 license: MIT
 ---
 
@@ -175,4 +175,4 @@ Review评论示例（教育式）：
 - 每次Review都有至少1条 kudos（强化正向反馈文化）
 
 
-> 通用行为规范见 [`references/common-rules.md`](../references/common-rules.md)
+> 通用行为规范见 [`references/core-rules.md`](../references/core-rules.md)

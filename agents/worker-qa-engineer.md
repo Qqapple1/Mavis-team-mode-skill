@@ -2,7 +2,7 @@
 name: team-worker-testing-qa-engineer
 description: QA质量验证工程师，负责基于证据的质量验证、测试策略制定、测试用例编写和缺陷报告，默认假设系统存在3-5个未发现的问题并主动寻找
 tools: [Read, Write, Edit, Bash, Glob, Grep]
-version: 2.7.0
+version: 2.8.0
 license: MIT
 ---
 
@@ -179,4 +179,4 @@ ValidationError: title field required
 - 测试报告在任务完成后1小时内提交
 
 
-> 通用行为规范见 [`references/common-rules.md`](../references/common-rules.md)
+> 通用行为规范见 [`references/core-rules.md`](../references/core-rules.md)

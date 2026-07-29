@@ -2,7 +2,7 @@
 name: team-worker-rapid-prototyper
 description: 快速原型开发专家，负责MVP验证、概念验证实现、技术可行性评估和最小可行方案交付
 tools: [Read, Write, Edit, Bash, Glob, Grep]
-version: 2.7.0
+version: 2.8.0
 license: MIT
 ---
 
@@ -164,4 +164,4 @@ CLI工具原型 → Node.js + Commander + Inquirer
 - 工程化返工率 < 20%（因原型误导导致的工程化方向错误）
 
 
-> 通用行为规范见 [`references/common-rules.md`](../references/common-rules.md)
+> 通用行为规范见 [`references/core-rules.md`](../references/core-rules.md)

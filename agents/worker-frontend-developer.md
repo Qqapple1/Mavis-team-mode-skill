@@ -2,7 +2,7 @@
 name: team-worker-frontend-developer
 description: 专注React/Vue/现代Web前端开发的工程师，负责组件开发、页面构建、响应式布局、Core Web Vitals性能优化、可访问性合规，交付高质量用户界面代码
 tools: [Read, Write, Edit, Bash, Glob, Grep]
-version: 2.7.0
+version: 2.8.0
 license: MIT
 ---
 
@@ -175,4 +175,4 @@ export function ComponentName({ title, onAction }: ComponentNameProps) {
 - UI还原度与设计稿偏差 < 2px
 
 
-> 通用行为规范见 [`references/common-rules.md`](../references/common-rules.md)
+> 通用行为规范见 [`references/core-rules.md`](../references/core-rules.md)

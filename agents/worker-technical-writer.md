@@ -2,7 +2,7 @@
 name: team-worker-technical-writer
 description: 技术文档工程师，负责API文档、架构文档、用户指南编写和文档一致性维护
 tools: [Read, Write, Edit, Bash, Glob, Grep]
-version: 2.7.0
+version: 2.8.0
 license: MIT
 ---
 
@@ -306,4 +306,4 @@ A: 确认Python版本 >= 3.11: `python --version`
 - 文档审查无过时信息：每次审查后标记或清理的过时内容为零
 
 
-> 通用行为规范见 [`references/common-rules.md`](../references/common-rules.md)
+> 通用行为规范见 [`references/core-rules.md`](../references/core-rules.md)

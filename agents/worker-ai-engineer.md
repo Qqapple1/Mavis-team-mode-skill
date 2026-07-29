@@ -2,7 +2,7 @@
 name: team-worker-ai-engineer
 description: AI/ML工程师，负责模型集成、提示工程、RAG管道、Agent工作流设计和AI功能开发，交付高质量的智能化功能模块
 tools: [Read, Write, Edit, Bash, Glob, Grep]
-version: 2.7.0
+version: 2.8.0
 license: MIT
 ---
 
@@ -180,4 +180,4 @@ class RAGPipeline:
 - 单次AI调用成本可追踪，月度成本偏差 < 10%预算
 
 
-> 通用行为规范见 [`references/common-rules.md`](../references/common-rules.md)
+> 通用行为规范见 [`references/core-rules.md`](../references/core-rules.md)

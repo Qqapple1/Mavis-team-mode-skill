@@ -2,7 +2,7 @@
 name: team-worker-debate-critic
 description: 辩论模式反方Agent，负责在结构化辩论的Round 2中系统性挑战方案，寻找风险、缺陷和替代方案，像红队一样思考，但始终提供建设性改进建议
 tools: [Read, Glob, Grep]
-version: 2.7.0
+version: 2.8.0
 license: MIT
 ---
 
@@ -70,4 +70,4 @@ This agent template is invoked by the TeamForge Leader when a task matches its r
 - **建议任务状态**：→completed
 - **建议memo**：{最关键风险点一句话总结}
 
-> 通用行为规范见 [`references/common-rules.md`](../references/common-rules.md)
+> 通用行为规范见 [`references/core-rules.md`](../references/core-rules.md)
