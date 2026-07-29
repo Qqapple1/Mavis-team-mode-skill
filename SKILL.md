@@ -1,7 +1,7 @@
 ---
 name: teamforge
 description: "Recreates the TeamForge workflow (Leader + Workers + Verifier) inside Zcode 3.4.2+. Use this skill when the user wants parallel agent execution, structured task decomposition, independent quality verification, or multi-step work that benefits from sub-agents running concurrently. Triggers on: 'teamforge', 'team mode', 'multi-agent', 'split into subtasks', 'verify the result', '用 teamforge', '团队模式', '多智能体协作', '并行处理'. Do NOT use for simple single-step tasks."
-version: 3.1.0
+version: 3.2.0
 license: MIT
 metadata:
   author: Community port (TeamForge CLI agent)
@@ -89,6 +89,11 @@ using the Agent Skills standard + Zcode's built-in sub-agent system.
 - Worker 并行执行期间，界面可能会暂时冻结
 - 任务状态会保存到 .teamforge_state_<session_uuid>.jsonl，可随时恢复
 ```
+
+**耗时估算公式**：
+- 串行总耗时 = 所有子任务 estimated_minutes 之和
+- 并行总耗时 = max(每个 Wave 的耗时) + Wave 间串行开销（每 Wave 约 1 分钟）
+- 示例：3 个子任务各 5 分钟，分 2 个 Wave → 并行总耗时 ≈ max(5,5) + 1 + 5 = 11 分钟
 
 ## 并行执行说明
 
@@ -193,11 +198,15 @@ If missing, see INSTALL.md.
   ```
 - JSON 文件：使用 `python -c "import json; json.load(open('<file>'))"` 验证格式
 
+**JSON 格式验证注意**：
+- 标准 JSON（`.json`）：使用 `python -c "import json; json.load(open('<file>'))"`
+- JSONC（带注释，`.jsonc`）：需先去除注释再验证
+- 如果 JSON 包含 NaN/Infinity，Python json 模块会报错，需标记为"非标准 JSON"
+
 **Level 2 — 接口验证（推荐）**：
-- 对 Python 代码：使用 AST 验证脚本检查函数是否存在且签名正确
-  ```bash
-  python scripts/validate_contract_ast.py <file.py> <func1> <func2> ...
-  ```
+- 文件行数检查：`python scripts/teamforge_utils.py --count-lines <file>`
+- 文件存在性检查：`python scripts/teamforge_utils.py --check-exists <file1> <file2> ...`
+- Python 函数验证：`python scripts/validate_contract_ast.py <file.py> <func1> <func2> ...`
   示例：`python scripts/validate_contract_ast.py src/main.py scan_file scan_directory detect_language`
   这比 grep 健壮：即使函数是 `async def`、有装饰器、或在注释中出现同名，AST 也能准确识别。
   如果脚本报错"语法错误"，说明 Worker 产出的代码有语法问题，需要返工。
@@ -531,6 +540,8 @@ done
 **检索方式**：新任务启动时，Leader 在 Phase 1 可以用 `grep` 搜索 `.memory_index.jsonl` 中的 keywords，获取历史经验。这能在 0 Token 消耗下获得上下文。
 
 **注意**：此步骤为可选，仅在项目目录下存在 `.memory_index.jsonl` 时执行。
+
+**写入时机**：记忆索引由 Leader 在 Step 7 交付完成后主动写入。若不需要可跳过。写入方式：`echo '{"ts":"...",...}' >> .memory_index.jsonl`
 
 ## Progress Reporting
 

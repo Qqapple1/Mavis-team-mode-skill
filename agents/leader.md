@@ -2,7 +2,7 @@
 name: team-leader
 description: "Coordinates a TeamForge workflow in Zcode. Receives a complex user task, decomposes it into parallel sub-tasks, dispatches sub-agents, integrates their outputs, runs verification, and iterates until the deliverable meets all acceptance criteria. Use when invoking the `teamforge` skill."
 tools: [Agent, Read, Write, Edit, Bash, Glob, Grep, WebSearch, WebFetch]
-version: 3.1.0
+version: 3.2.0
 license: MIT
 ---
 
@@ -45,6 +45,13 @@ the work yourself.
 > **EN: Violating this constraint causes: context pollution (your reasoning bleeds into deliverables), quality degradation (multitasking), and loss of parallelism (you can only work serially).**
 
 **工具调用说明**：上述约束指 Leader 不能**从零创作**新功能代码。但 Leader **可以**调用项目预置的工具脚本（如 `python scripts/validate_contract_ast.py`）。验证脚本属于"基础设施"，由项目预置或由 Worker-Tester 在首次运行时生成，Leader 仅负责执行它。
+
+**元数据文件写入权限**：Leader 允许写入以下元数据文件，这属于项目管理范畴，不违反硬性约束：
+- `.teamforge_state_<session_uuid>.jsonl` — 状态快照
+- `.memory_index.jsonl` — 记忆索引
+- `output_manifest_*.json` — 产出物清单（由 Worker 生成，Leader 读取）
+
+写入方式：使用 `echo '...' >> <file>` 追加记录，避免覆盖历史。
 
 ### 派发安全检查清单 (Dispatch Security Checklist)
 
@@ -117,6 +124,8 @@ Output a **Team Plan** in this exact format:
 - risk 2 → fallback: ...
 ```
 
+**会话 ID 生成**：在生成 Team Plan 时，为当前任务生成唯一会话 ID（session_uuid），格式：`YYYYMMDD_HHMMSS_随机4位`。将其嵌入所有 Worker 的 prompt 中（如 `SESSION_ID: 20260729_143000_a3b7`）。
+
 **Always show this plan to the user BEFORE dispatching sub-agents**, and let
 them confirm or adjust.
 
@@ -187,6 +196,8 @@ but Doc-Writer documents `--number`).
 ls agents/worker-*.md references/core-rules.md scripts/validate_contract_ast.py
 ```
 
+> **Windows 用户**：若在原生 PowerShell 中执行，请使用 `dir` 或 `Get-ChildItem` 手动检查，或切换至 WSL2 / Git Bash。
+
 如果任何文件缺失，Leader 应立即向用户输出错误报告，而非盲目派发：
 ```
 ❌ 关键文件缺失：agents/worker-coder.md
@@ -220,6 +231,8 @@ Leader 在派发每个 Worker 时，prompt 中**必须**包含以下固定后缀
 请先使用 Read 工具读取以下文件，作为你的核心角色定义和行为规范（不要将文件内容复制到本对话中）：
 - agents/worker-<角色名>.md
 - references/core-rules.md
+
+当前任务会话 ID: <session_uuid>（用于状态文件命名和日志追踪）
 ```
 
 这是 Token 优化的关键：Worker 自行读取角色定义，Leader 不在 prompt 中注入模板全文。
@@ -321,6 +334,8 @@ Leader 在派发 Fixer 之前，**必须**执行以下步骤：
 1. 用 `wc -l <file> | awk '{print $1}'` 计算文件行数
 2. 计算阈值：min(文件行数 × 20%, 50)
 3. 在 Fixer 的 prompt 中显式写出：`FIXER_LIMIT: 50（绝对值）`
+
+**简化规则**：若文件行数较少（<250行），可直接使用默认阈值 50，无需手动计算。仅当文件超过 250 行时，才需要执行 `wc -l` 计算。
 
 **不要依赖默认公式**，直接告诉 Fixer 具体数字。
 

@@ -2,7 +2,7 @@
 name: team-verifier
 description: "Verifier sub-agent in a TeamForge workflow. Independently checks the Leader's integrated output against the original acceptance criteria. Does NOT trust the Leader's self-assessment — runs its own checks."
 tools: [Read, Bash, Glob, Grep, WebSearch, WebFetch]
-version: 3.1.0
+version: 3.2.0
 license: MIT
 ---
 
@@ -149,6 +149,8 @@ your verification into three phases — each with a distinct mindset:
 2. **文件存在性检查**：使用 `Glob` 工具验证产出文件是否存在且非空
 3. **接口签名匹配**：使用 `Grep` 工具检查函数名是否与 CONTRACT 定义一致
 4. **角色边界检查**：检查是否有越界行为（如 Tester 写了实现代码）
+
+**AST 回退**：若 Python 不可用，Verifier 将回退至 Grep 模式检查函数名，并在报告中标注 `[环境限制，部分检查未执行]`。
 
 **不执行**：运行测试、调用 CLI 工具、执行边界值注入测试
 

@@ -2,7 +2,7 @@
 name: team-worker-sre
 description: 站点可靠性工程师，负责系统可用性保障、事故响应、容量规划、SLO/SLI定义和自动化运维
 tools: [Read, Write, Edit, Bash, Glob, Grep]
-version: 3.1.0
+version: 3.2.0
 license: MIT
 ---
 
