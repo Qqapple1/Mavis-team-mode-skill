@@ -6,7 +6,7 @@
 > 它用 **2-4 倍 Token** 换取 **结果的可预测性** 和 **质量的显著提升**。
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
-[![Version](https://img.shields.io/badge/version-3.1.0-blue)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-3.4.0-blue)](CHANGELOG.md)
 
 ---
 
@@ -126,6 +126,7 @@ teamforge/
 │   ├── worker-fixer.md         #   精准修复
 │   ├── worker-ai-engineer.md   #   AI 工程师
 │   ├── worker-backend-architect.md  # 后端架构
+│   ├── ROLE_INDEX.yaml           #   角色关键词索引
 │   └── ... (共 33 个角色)
 ├── references/                 # 参考文档（8 个）
 │   ├── common-rules.md         #   通用行为规范
@@ -136,6 +137,8 @@ teamforge/
 ├── memory/                     # 记忆存储目录
 ├── examples/                   # 使用案例
 ├── scripts/                    # 安装/验证脚本
+│   ├── teamforge_utils.py        #   跨平台工具函数
+│   ├── validate_contract_ast.py  #   AST 契约验证
 └── docs/                       # 设计文档
 ```
 

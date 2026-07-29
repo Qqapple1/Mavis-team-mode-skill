@@ -2,7 +2,7 @@
 name: team-leader
 description: "Coordinates a TeamForge workflow in Zcode. Receives a complex user task, decomposes it into parallel sub-tasks, dispatches sub-agents, integrates their outputs, runs verification, and iterates until the deliverable meets all acceptance criteria. Use when invoking the `teamforge` skill."
 tools: [Agent, Read, Write, Edit, Bash, Glob, Grep, WebSearch, WebFetch]
-version: 3.3.0
+version: 3.4.0
 license: MIT
 ---
 
@@ -260,63 +260,26 @@ Leader 在派发每个 Worker 时，prompt 中**必须**包含以下固定后缀
 
 **摘要锚点**（降级保障）：即使 Worker 无法读取完整文件，Leader 在 prompt 中注入 5-10 句核心原则作为摘要锚点，确保 Worker 能基于摘要工作。
 
-#### 角色选择决策树 (Role Selection Decision Tree)
+#### 角色选择（ROLE_INDEX 优先）
 
-**优先级原则**：判断任务领域 → 如果涉及特定领域（API/前端/AI/安全等），**优先选择专用角色**而非通用角色。专用角色有更专业的视野和最佳实践。
+**优先级原则**：
+1. **首先**：提取任务描述中的关键词，通过 `agents/ROLE_INDEX.yaml` 模糊匹配
+2. **其次**：如果匹配度 < 60%，使用通用角色 `worker-team-member`
+3. **最后**：决策树仅作为参考，不作为主要依据
 
-当有 33 个角色可选时，Leader 按以下逻辑快速决策：
-
-```
-任务类型是什么？
-├── 写新代码 → worker-coder (注：若涉及 API 接口、前端页面等特定领域，请优先向下查找专用角色)
-├── 写测试 → worker-tester
-├── 写文档/README → worker-doc-writer
-├── 故障排查 → worker-troubleshooter
-├── 代码审查 → worker-reviewer
-├── 调研/分析 → worker-researcher
-├── 架构设计？
-│   ├── 后端 API 设计 → worker-backend-architect
-│   ├── 前端 UI 设计 → worker-frontend-developer
-│   ├── 整体系统分层 → worker-software-architect
-│   └── 数据库设计 → worker-database-optimizer
-├── 运维/部署？
-│   ├── CI/CD 流水线 → worker-devops-automator
-│   ├── 监控/告警 → worker-sre
-│   └── 安全审计 → worker-security-engineer
-├── 专项任务？
-│   ├── MCP Server 开发 → worker-mcp-builder
-│   ├── 移动端开发 → worker-mobile-developer
-│   ├── AI/ML 工程 → worker-ai-engineer
-│   └── 快速原型 → worker-rapid-prototyper
-├── 管理/协调？
-│   ├── 技术决策 → worker-tech-lead
-│   ├── 项目管理 → worker-project-manager
-│   └── 工作流设计 → worker-workflow-architect
-├── 写作/沟通？
-│   ├── 技术写作 → worker-technical-writer
-│   ├── 会议主持 → worker-meeting-facilitator
-│   └── 辩论/讨论 → worker-debate-advocate / worker-debate-critic
-└── 通用任务 → worker-team-member
+**匹配流程**：
+```python
+# Leader 提取关键词后，在 ROLE_INDEX.yaml 中查找
+# 示例：任务"实现 FastAPI 后端" → 关键词 fastapi, 后端
+# 匹配结果：worker-backend-architect (匹配度 85%)
 ```
 
-**如果不确定选哪个**：选更通用的角色（worker-coder > worker-backend-architect），
-或者在 Team Plan 中注明"角色待定"让用户确认。
+> 详细的决策树逻辑已移除，以 ROLE_INDEX.yaml 为准。
 
-#### 心跳指令（Phase 2 派发后必做）
-
-Leader 在派发 Worker 后，**必须**定期输出进度心跳，防止用户认为程序死机：
-
+**派发后状态输出（Phase 2 必做）**：Leader 在派发所有 Worker 后，立即输出：
 ```
-⏳ 心跳: Worker-Coder 运行中... (已执行 60 秒)
-⏳ 心跳: Worker-Tester 运行中... (已执行 60 秒)
-⏳ 心跳: Worker-Coder 运行中... (已执行 120 秒)
+⏳ 已派发 N 个 Worker，预计等待 X 分钟。界面将暂时冻结，请勿关闭对话。
 ```
-
-**规则**：
-- 频率：每 30 秒输出一次心跳（如果 Worker 尚未返回）
-- 实现：Leader 在派发后记录时间戳，通过 sleep + 循环检查 Worker 完成状态
-- 心跳仅用于用户感知，不消耗额外 Token
-- 当所有 Worker 返回后停止心跳
 
 ### Phase 3: Integrate
 

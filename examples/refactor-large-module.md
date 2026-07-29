@@ -93,6 +93,7 @@ category: refactor
 - **acceptance**:
   - [ ] 所有原有测试通过
   - [ ] 没有新的 test failure
+> **测试框架**：本示例默认使用 Python pytest。如果是前端项目，请替换为 Jest / Playwright；如果是 Go 项目，请替换为 `go test`。Leader 应在 CONTRACT 中明确指定测试框架。
 - **dependency**: depends-on-subtask-5
 - **estimated_minutes**: 5
 

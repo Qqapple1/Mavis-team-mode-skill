@@ -97,6 +97,7 @@ Leader 先发布接口契约，再拆子任务：
   - [ ] 至少 3 个单元测试
   - [ ] 至少 1 个组件集成测试
   - [ ] 全部通过
+> **测试框架**：本示例默认使用 Python pytest。如果是前端项目，请替换为 Jest / Playwright；如果是 Go 项目，请替换为 `go test`。Leader 应在 CONTRACT 中明确指定测试框架。
 - **dependency**: depends-on-subtask-4
 - **estimated_minutes**: 15
 

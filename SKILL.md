@@ -1,7 +1,7 @@
 ---
 name: teamforge
 description: "Recreates the TeamForge workflow (Leader + Workers + Verifier) inside Zcode 3.4.2+. Use this skill when the user wants parallel agent execution, structured task decomposition, independent quality verification, or multi-step work that benefits from sub-agents running concurrently. Triggers on: 'teamforge', 'team mode', 'multi-agent', 'split into subtasks', 'verify the result', '用 teamforge', '团队模式', '多智能体协作', '并行处理'. Do NOT use for simple single-step tasks."
-version: 3.3.0
+version: 3.4.0
 license: MIT
 metadata:
   author: Community port (TeamForge CLI agent)
@@ -95,6 +95,26 @@ using the Agent Skills standard + Zcode's built-in sub-agent system.
 - 并行总耗时 = max(每个 Wave 的耗时) + Wave 间串行开销（每 Wave 约 1 分钟）
 - 示例：3 个子任务各 5 分钟，分 2 个 Wave → 并行总耗时 ≈ max(5,5) + 1 + 5 = 11 分钟
 
+## Verifier 模型配置
+
+Leader 在 Phase 1 时，**必须**检查 Zcode 是否配置了多模型：
+
+```bash
+# 检查方法：读取 Zcode 配置文件中的 provider 列表
+# 如果有多个 provider，强制使用不同模型
+```
+
+**配置选项**：
+- `VERIFIER_MODEL: auto` → 自动选择不同模型（如果可用）
+- `VERIFIER_MODEL: <model-name>` → 指定 Verifier 使用的模型
+- `VERIFIER_MODEL: same` → 使用同一模型（告知用户漏检风险）
+
+**降级说明**：如果仅单模型可用，Leader 必须显式告知用户：
+```
+⚠️ 当前仅单模型可用，Verifier 可能存在 20-30% 漏检率。
+建议在关键验收点进行人工二次审查。
+```
+
 ## 并行执行说明
 
 TeamForge 的 Worker 并行是"前台并行"（Zcode 平台限制），这意味着：
@@ -117,19 +137,17 @@ TeamForge 支持两种执行模式：
 - 自动检测：Leader 在 Phase 2 预检时执行 `ls` 命令，如果失败则切换到纯 Python 模式
 - 验证：全部使用 `python scripts/teamforge_utils.py` 和 `python scripts/validate_contract_ast.py`
 
-## 心跳机制（防止用户认为程序死机）
+## 状态检查点（替代心跳机制）
 
-Leader 在派发 Worker 后，**不能**静默等待。必须通过主对话定期输出进度心跳：
+由于 Zcode 平台限制，Leader 派发 Worker 后会同步阻塞等待，无法实现实时心跳。
 
-```
-⏳ 心跳: Worker-Coder 运行中... (已执行 60 秒)
-⏳ 心跳: Worker-Tester 运行中... (已执行 60 秒)
-⏳ 心跳: Worker-Coder 运行中... (已执行 120 秒)
-```
-
-**频率**：每 30 秒输出一次心跳（如果 Worker 尚未返回）。
-**实现**：Leader 在派发后记录时间戳，通过 sleep + 循环检查 Worker 完成状态。
-**注意**：心跳仅用于用户感知，不消耗额外 Token。
+**替代方案**：
+1. Leader 在派发 Worker 后，**立即**输出一条状态信息：
+   ```
+   ⏳ 已派发 3 个 Worker，预计等待 5 分钟，请勿关闭对话...
+   ```
+2. **被动轮询**（可选）：Worker 在执行过程中可以每 60 秒写入一个 `.heartbeat` 文件（内容为时间戳）。Leader 可以通过 `Glob .heartbeat` 检查 Worker 是否存活。
+3. **明确标注**：当前平台限制下，无法实现秒级心跳反馈。建议用户使用独立会话运行 TeamForge。
 
 ## Required companion files
 
@@ -562,12 +580,23 @@ done
 2. 写入完成后，将 `.tmp` 重命名为 `.jsonl`
 3. 这确保了即使写入过程中断，原文件也不会损坏
 
-```bash
-# 写入临时文件
-echo '{"ts":"...",...}' >> .teamforge_state_<uuid>.tmp
-# 原子替换
-mv .teamforge_state_<uuid>.tmp .teamforge_state_<uuid>.jsonl
+```python
+# 使用 Python 原子写入（跨平台兼容）
+python -c "
+import json, os, tempfile
+data = {'ts': '...', 'wave': 1, 'task': 'subtask_1', 'status': 'done'}
+tmp = '.teamforge_state_<uuid>.tmp'
+final = '.teamforge_state_<uuid>.jsonl'
+with open(tmp, 'a', encoding='utf-8') as f:
+    f.write(json.dumps(data, ensure_ascii=False) + '\n')
+if os.path.exists(final):
+    os.replace(tmp, final)  # 原子替换
+else:
+    os.rename(tmp, final)   # 首次创建
+"
 ```
+
+或更简单的方式：Leader 直接使用 `python scripts/teamforge_utils.py --write-state` 调用。
 
 **JSONL 字段**：每行一个 JSON 对象，字段：
 - `ts`: ISO 时间戳
