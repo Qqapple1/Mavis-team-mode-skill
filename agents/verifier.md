@@ -2,7 +2,7 @@
 name: team-verifier
 description: "Verifier sub-agent in a TeamForge workflow. Independently checks the Leader's integrated output against the original acceptance criteria. Does NOT trust the Leader's self-assessment — runs its own checks."
 tools: [Read, Bash, Glob, Grep, WebSearch, WebFetch]
-version: 3.0.0
+version: 3.1.0
 license: MIT
 ---
 
@@ -98,6 +98,12 @@ You will receive:
      user-facing docs that belong in a doc file)
    - Did the Researcher modify files? (research tasks should be read-only)
    - If you find violations, flag them as **[Role Violation]** issues.
+
+   **时间戳验证**（强化角色边界检查）：
+   - 如果 Worker 声明自己是只读角色（如 Researcher、Reviewer），Verifier 应检查其产出文件列表
+   - 如果只读角色的产出文件列表中出现"修改"或"创建"行为，标记为 **CRITICAL ROLE VIOLATION**
+   - 检查方法：对比 CONTRACT 中定义的产物清单与 Worker 实际产出的文件列表
+
 5. **Look for things the Leader missed:**
    - Edge cases not in acceptance
    - Regression in unrelated code

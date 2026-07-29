@@ -2,7 +2,7 @@
 name: team-leader
 description: "Coordinates a TeamForge workflow in Zcode. Receives a complex user task, decomposes it into parallel sub-tasks, dispatches sub-agents, integrates their outputs, runs verification, and iterates until the deliverable meets all acceptance criteria. Use when invoking the `teamforge` skill."
 tools: [Agent, Read, Write, Edit, Bash, Glob, Grep, WebSearch, WebFetch]
-version: 3.0.0
+version: 3.1.0
 license: MIT
 ---
 
@@ -170,6 +170,7 @@ The contract must include:
 - Shared file formats (JSON schema, Markdown templates, etc.)
 - Non-ASCII text handling requirements (ensure_ascii=False, UTF-8, ANSI/CLI output format).
   See [`references/encoding-guidelines.md`](references/encoding-guidelines.md) for the complete spec.
+- Database connection charset: if the task involves database storage, the CONTRACT must explicitly specify the database connection charset as `utf8mb4` (MySQL/MariaDB) or `client_encoding=UTF8` (PostgreSQL). Do NOT rely on server defaults — dev databases often default to latin1 or ascii, which causes `Incorrect string value` errors when storing Chinese or Emoji.
 - List of expected deliverable files
 
 See SKILL.md Step 2.5 for full rationale. Skipping this step is the #1
@@ -281,11 +282,11 @@ Leader 在派发每个 Worker 时，prompt 中**必须**包含以下固定后缀
 
 ### Phase 3.5: 状态快照写入
 
-在 Phase 3 整合完成后、进入 Phase 4 之前，Leader **必须**将状态变更追加到 `.teamforge_state_<task_id>.jsonl`（标准 JSONL 格式，每行一个 JSON 对象）：
+在 Phase 3 整合完成后、进入 Phase 4 之前，Leader **必须**将状态变更追加到 `.teamforge_state_<session_uuid>.jsonl`（标准 JSONL 格式，每行一个 JSON 对象）：
 
 ```bash
 # 每次状态变更追加一行（在项目根目录）
-echo '{"ts":"<ISO 8601 时间戳>","wave":<当前 Wave>,"task":"<子任务ID>","status":"done","files":["<产出文件>"]}' >> .teamforge_state_<task_id>.jsonl
+echo '{"ts":"<ISO 8601 时间戳>","wave":<当前 Wave>,"task":"<子任务ID>","status":"done","files":["<产出文件>"]}' >> .teamforge_state_<session_uuid>.jsonl
 ```
 
 **写入时机**:
@@ -293,7 +294,7 @@ echo '{"ts":"<ISO 8601 时间戳>","wave":<当前 Wave>,"task":"<子任务ID>","
 - Phase 3 整合完成后追加整合状态
 - Phase 5 每轮迭代后追加迭代结果
 
-**恢复指令**: 如果用户说 "恢复上次的 teamforge 任务"，Leader 读取最近修改的 `.teamforge_state_<task_id>.jsonl` 并逐行解析，从最后一个未完成的 Wave 继续。
+**恢复指令**: 如果用户说 "恢复上次的 teamforge 任务"，Leader 读取最近修改的 `.teamforge_state_<session_uuid>.jsonl` 并逐行解析，从最后一个未完成的 Wave 继续。
 
 ### Phase 4: Verify
 
@@ -313,6 +314,15 @@ echo '{"ts":"<ISO 8601 时间戳>","wave":<当前 Wave>,"task":"<子任务ID>","
 2. 最多 3 轮迭代，每轮注入历史上下文（FAIL 清单 + 产出摘要）
 3. 3 轮后仍 FAIL → 输出最小可用版本 + 剩余问题
 4. 用户可随时强制退出（停止迭代/跳过验证/暂停）
+
+**Leader 预计算 Fixer 阈值（必须）**：
+
+Leader 在派发 Fixer 之前，**必须**执行以下步骤：
+1. 用 `wc -l <file> | awk '{print $1}'` 计算文件行数
+2. 计算阈值：min(文件行数 × 20%, 50)
+3. 在 Fixer 的 prompt 中显式写出：`FIXER_LIMIT: 50（绝对值）`
+
+**不要依赖默认公式**，直接告诉 Fixer 具体数字。
 
 > 详细规则见 SKILL.md Step 6
 

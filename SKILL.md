@@ -1,7 +1,7 @@
 ---
 name: teamforge
 description: "Recreates the TeamForge workflow (Leader + Workers + Verifier) inside Zcode 3.4.2+. Use this skill when the user wants parallel agent execution, structured task decomposition, independent quality verification, or multi-step work that benefits from sub-agents running concurrently. Triggers on: 'teamforge', 'team mode', 'multi-agent', 'split into subtasks', 'verify the result', '用 teamforge', '团队模式', '多智能体协作', '并行处理'. Do NOT use for simple single-step tasks."
-version: 3.0.0
+version: 3.1.0
 license: MIT
 metadata:
   author: Community port (TeamForge CLI agent)
@@ -78,6 +78,18 @@ using the Agent Skills standard + Zcode's built-in sub-agent system.
 - 任务太小不值得拆（拆完比直接干还慢）
 - 你只想要"试试看"（直接干就行）
 
+## 启动警告
+
+当用户触发 TeamForge 时，Leader **必须**在 Phase 1 之前输出以下警告：
+
+```
+⚠️ TeamForge 任务启动提醒：
+- 该任务预计耗时 X 分钟（基于子任务数量估算）
+- 建议在独立的 Zcode 会话中运行，以免阻塞当前主对话
+- Worker 并行执行期间，界面可能会暂时冻结
+- 任务状态会保存到 .teamforge_state_<session_uuid>.jsonl，可随时恢复
+```
+
 ## 并行执行说明
 
 TeamForge 的 Worker 并行是"前台并行"（Zcode 平台限制），这意味着：
@@ -136,6 +148,7 @@ If missing, see INSTALL.md.
    - CLI 工具的完整 `--help` 输出(即使 Coder 还没写完代码,先约定)
    - 任何共享文件格式(JSON schema / Markdown 模板 / etc.)
    - 哪些文件必须存在(产物清单)
+   - 项目语言字段（见下方"项目语言"说明）
 2. Coder 收到 prompt 后**先**按 CONTRACT 写 stub(`raise NotImplementedError`),**再**实现,确保符合契约
 3. Tester / Doc-Writer 基于 CONTRACT 工作,不直接参考 Coder 后续实现
 4. Leader 在 Step 4 整合时,检查 Worker 产物是否遵守 CONTRACT,违反的返回重做
@@ -145,6 +158,19 @@ If missing, see INSTALL.md.
 > **如果任务太简单**(单文件、< 50 行、单一函数)可以跳过 CONTRACT,但 Leader 必须在 prompt 里**写明完整的接口规范**作为 Worker 的输入。
 
 > **CONTRACT 里的文本处理要求**: 如果任务涉及中文/emoji/任何非 ASCII 文本存储、搜索、序列化,CONTRACT 必须明言写盘 (`ensure_ascii=False`)、读盘 (`encoding="utf-8"`)、验证（至少 1 个非 ASCII 测试用例）和 CLI 输出格式（plain / ANSI / JSON）。完整规范见 [`references/encoding-guidelines.md`](references/encoding-guidelines.md)。在 CONTRACT 里就写明,不要在 Verifier 阶段才发现。
+
+> **数据库连接字符集**：如果任务涉及数据库存储，CONTRACT 必须显式指定数据库连接字符集为 `utf8mb4`（MySQL/MariaDB）或 `client_encoding=UTF8`（PostgreSQL），禁止依赖服务端默认配置。开发环境的数据库默认配置往往是 latin1 或 ascii，一旦存储中文或 Emoji 会导致 `Incorrect string value` 错误。
+
+> **CONTRACT 项目语言**: CONTRACT 必须声明项目的 primary_language，格式如下：
+>
+> ```markdown
+> ## 项目语言
+> - primary_language: python | javascript | typescript | go | rust | java
+> - 验证策略根据语言自动选择：
+>   - Python → AST 解析（scripts/validate_contract_ast.py）
+>   - JavaScript/TypeScript → Grep + Regex 模式匹配
+>   - 其他语言 → Grep + Regex 模式匹配（标注"可能存在误报"）
+> ```
 
 > **CONTRACT 智能验证**: Leader 在 Step 4 整合时，**必须**验证 Worker 产出是否遵守 CONTRACT。验证策略按优先级：
 
@@ -413,14 +439,16 @@ Leader 收到所有子智能体的摘要后，**自己整合**成初版交付物
 
 ### Step 5.5: 状态快照（断点恢复机制）
 
-在每个 Wave 完成后，Leader **必须**将状态变更追加到 `.teamforge_state_<task_id>.jsonl` 文件：
+在每个 Wave 完成后，Leader **必须**将状态变更追加到 `.teamforge_state_<session_uuid>.jsonl` 文件：
 
-**任务隔离**：每个 TeamForge 任务使用独立的状态文件，文件名包含任务 ID（如 `.teamforge_state_abc123.jsonl`）。任务 ID 由 Leader 在 Phase 1 生成（使用时间戳 + 随机数）。恢复时 Leader 根据用户指令选择读取哪个文件。
+**会话隔离**：Leader 在 Phase 1 生成一个 `session_uuid`（格式：`YYYYMMDD_HHMMSS_随机4位`），注入到所有 Worker 的 prompt 中，并用于状态文件命名。恢复时 Leader 必须确认用户指的是哪个会话。
+
+每个 TeamForge 任务使用独立的状态文件，文件名包含 session_uuid（如 `.teamforge_state_20260729_103045_a7x2.jsonl`）。恢复时 Leader 根据用户指令选择读取哪个文件。
 
 如果用户只说"恢复上次任务"，Leader 读取最近修改的状态文件。
 
 **JSONL 格式**（标准 JSON Lines）：
-- 文件扩展名: `.teamforge_state_<task_id>.jsonl`
+- 文件扩展名: `.teamforge_state_<session_uuid>.jsonl`
 - 每行一个独立的 JSON 对象
 - 行与行之间用换行符分隔
 - 不需要外层的数组括号 `[...]`
@@ -428,11 +456,11 @@ Leader 收到所有子智能体的摘要后，**自己整合**成初版交付物
 
 ```bash
 # 写入示例（每行一个完整 JSON）
-echo '{"ts":"2026-07-29T10:00:00","wave":1,"task":"subtask_1","status":"done","files":["src/main.py"]}' >> .teamforge_state_<task_id>.jsonl
-echo '{"ts":"2026-07-29T10:05:00","wave":1,"task":"subtask_2","status":"done","files":["tests/test.py"]}' >> .teamforge_state_<task_id>.jsonl
+echo '{"ts":"2026-07-29T10:00:00","wave":1,"task":"subtask_1","status":"done","files":["src/main.py"]}' >> .teamforge_state_<session_uuid>.jsonl
+echo '{"ts":"2026-07-29T10:05:00","wave":1,"task":"subtask_2","status":"done","files":["tests/test.py"]}' >> .teamforge_state_<session_uuid>.jsonl
 ```
 
-**恢复流程**：逐行读取 `.teamforge_state_<task_id>.jsonl`，每行解析为独立 JSON 对象，重建最新状态：
+**恢复流程**：逐行读取 `.teamforge_state_<session_uuid>.jsonl`，每行解析为独立 JSON 对象，重建最新状态：
 1. 解析 JSONL，重建每个子任务的最新状态
 2. 检查已完成子任务的产出文件是否仍然存在
 3. 从最后一个未完成的 Wave 继续派发
@@ -491,6 +519,18 @@ done
 - Verifier 验收结果
 - 迭代历史
 - 已知限制
+
+### Step 7.5: 记忆索引（可选）
+
+每个任务完成后，Leader **可以**在项目目录下写入 `.memory_index.jsonl`：
+
+```json
+{"ts":"2026-07-29T10:00:00","task":"实现CLI工具","summary":"完成了codestat工具的代码+测试+文档","files":["src/main.py","tests/test.py"],"keywords":["cli","argparse","pytest"]}
+```
+
+**检索方式**：新任务启动时，Leader 在 Phase 1 可以用 `grep` 搜索 `.memory_index.jsonl` 中的 keywords，获取历史经验。这能在 0 Token 消耗下获得上下文。
+
+**注意**：此步骤为可选，仅在项目目录下存在 `.memory_index.jsonl` 时执行。
 
 ## Progress Reporting
 

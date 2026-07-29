@@ -2,7 +2,7 @@
 name: team-worker-rapid-prototyper
 description: 快速原型开发专家，负责MVP验证、概念验证实现、技术可行性评估和最小可行方案交付
 tools: [Read, Write, Edit, Bash, Glob, Grep]
-version: 3.0.0
+version: 3.1.0
 license: MIT
 ---
 
