@@ -2,7 +2,7 @@
 name: team-leader
 description: "Coordinates a TeamForge workflow in Zcode. Receives a complex user task, decomposes it into parallel sub-tasks, dispatches sub-agents, integrates their outputs, runs verification, and iterates until the deliverable meets all acceptance criteria. Use when invoking the `teamforge` skill."
 tools: [Agent, Read, Write, Edit, Bash, Glob, Grep, WebSearch, WebFetch]
-version: 2.6.0
+version: 2.7.0
 license: MIT
 ---
 
@@ -221,7 +221,7 @@ Leader 在派发每个 Worker 时，prompt 中**必须**包含以下固定后缀
 ├── 写新代码 → worker-coder (注：若涉及 API 接口、前端页面等特定领域，请优先向下查找专用角色)
 ├── 写测试 → worker-tester
 ├── 写文档/README → worker-doc-writer
-├── 修 Bug → worker-fixer
+├── 故障排查 → worker-troubleshooter
 ├── 代码审查 → worker-reviewer
 ├── 调研/分析 → worker-researcher
 ├── 架构设计？
@@ -254,70 +254,14 @@ Leader 在派发每个 Worker 时，prompt 中**必须**包含以下固定后缀
 
 ### Phase 3: Integrate
 
-When all sub-agents return:
-1. Read each sub-agent's summary
-2. If a sub-task is marked FAILED by the sub-agent, decide: retry with
-   tighter constraints, or escalate to user
-3. Synthesize the summaries into one unified deliverable
-4. **Do not include sub-agent noise in the final output.** Summaries are
-   for you, not the user.
+**执行清单**：
+1. 读取每个 Worker 的 `output_manifest_*.json`
+2. 文件存在性检测（`ls` 命令）
+3. 整合摘要为统一交付物
+4. 逐项对照 DoD checklist
+5. CONTRACT 智能验证（Level 1-3）
 
-**Token 优化 — 文件清单交接**：
-
-Leader 在整合阶段**不要**阅读每个 Worker 的全部产出文件。只阅读：
-1. Worker 的摘要报告（包含产出文件列表和验收结果）
-2. 文件是否存在（通过 `ls` 命令验证）
-
-如果后续阶段需要特定文件（如 Tester 需要看 Coder 的代码），由 Tester 自行通过 Read 工具去读取文件。Leader 不做文件内容的中转。
-
-**示例**：
-```bash
-# Leader 只验证文件存在性
-ls -la src/main.py tests/test.py README.md
-# 不要: cat src/main.py | ...（让 Worker 自己读）
-```
-
-这能极大减轻 Leader 的 Token 消耗，特别是当产出文件较大时。
-
-#### 完成度 checklist（整合前必须逐项对照）
-
-- [ ] Team Plan 中**每个**子任务都有对应的 Worker 输出
-- [ ] 没有 Worker 返回 FAILED 或超时未返回
-- [ ] 每个 Worker 输出的文件路径与 CONTRACT 产物清单一致
-- [ ] 所有验收标准都有对应的证据（测试通过截图、文件存在性等）
-- [ ] 子任务之间没有接口冲突（如 Coder 的函数签名与 Tester 的调用一致）
-
-#### 读取 output_manifest.json（精确状态获取）
-
-Leader 在整合阶段**优先**通过读取每个 Worker 的 `output_manifest.json` 获取精确状态，而非依赖 LLM 解析文本摘要：
-
-```bash
-# 读取每个 Worker 的 manifest
-Read output_manifest.json
-```
-
-**处理逻辑**：
-- 如果 `output_manifest.json` 存在且 `status == "done"` → 直接信任其产出文件列表
-- 如果 `dod_checklist` 中任何项为 `false` → 标记该 Worker 为 WARNING，需要人工检查
-- 如果文件不存在 → 标记为 WARNING，回退到从文本摘要中提取信息
-- 如果 `test_result == "fail"` → 标记为 FAILED，需要返工
-
-#### CONTRACT 验证
-
-**必须**用 `grep` 或字符串搜索检查 Worker 产出是否包含 CONTRACT 定义的接口：
-
-```bash
-# 示例：检查 Coder 代码是否包含 CONTRACT 定义的 CLI 参数
-grep -r "--prefix" output_dir/
-grep -r "--suffix" output_dir/
-
-# 示例：检查 Doc-Writer 文档是否包含相同的接口
-grep -r "--prefix" docs/
-```
-
-如果 Worker 产出中缺少 CONTRACT 定义的接口字符串，视为 **CONTRACT 违规**，必须返工对应 Worker。
-
-**不可跳过此验证步骤。** 这是防止"Coder 实现 --prefix 但文档写 --number"的关键防线。
+> 详细判断逻辑见 SKILL.md Step 4
 
 ### Phase 3.5: 状态快照写入
 
@@ -337,131 +281,38 @@ echo '{"ts":"<ISO 8601 时间戳>","wave":<当前 Wave>,"task":"<子任务ID>","
 
 ### Phase 4: Verify
 
-Pick the verification method that matches the work's stakes. Full
-options and tradeoffs are in `SKILL.md` Step 5. Quick summary:
+**执行清单**：
+1. 选择验证方法（A/B/C/D）
+2. 派发 Verifier sub-agent 或自行验证
+3. 传入验收标准和 CONTRACT.md
+4. 接收 PASS/FAIL 清单
+5. 根据结果决定：PASS → Phase 6，FAIL → Phase 5
 
-- **Method A (recommended)**: open a second Zcode session and let it
-  verify independently. Highest fidelity. ~5-10 min extra.
-- **Method B (lightweight)**: self-verify using
-  `references/verification-checklist.md`. Bias risk (same model /
-  same context). 20-30% miss-rate for non-trivial work.
-- **Method C (NOT recommended, only when time is critical)**:
-  Leader self-verifies with the checklist, accepts the bias + 20-30%
-  miss-rate. Use only for trivial changes.
-- **Method D (automated)**: Leader 自动派发 Verifier sub-agent，不需要用户手动操作。
-
-For high-stakes work (anything the user will deploy / share / pay
-for), default to Method A.
-
-When spawning a verifier sub-agent, use the role in
-`agents/verifier.md` and pass it: (1) original task brief, (2) the
-integrated output, (3) acceptance criteria. The verifier runs its
-own checks and returns a PASS/FAIL list - it does not trust the
-Leader's self-assessment.
-
-#### Method D: 自动派发 Verifier sub-agent
-
-当用户希望"一键完成"或在自动化流水线中，Leader **必须**使用 Method D：
-
-1. 在 Phase 3 整合完成后，自动派发一个 Verifier sub-agent
-2. 使用 `agents/verifier.md` 模板
-3. 传入参数：
-   - 原始任务描述（用户输入）
-   - 整合后的交付物（Phase 3 产出）
-   - 验收标准（Team Plan 中的 Acceptance）
-   - CONTRACT.md 内容
-4. Verifier sub-agent 独立执行检查，返回 PASS/FAIL 清单
-5. Leader 根据返回结果决定：PASS → Phase 6 交付，FAIL → Phase 5 迭代
-
-**Method D 的优势**:
-- 不依赖用户手动开第二个会话
-- 自动化程度最高
-- 仍有独立验证（Verifier 是独立 sub-agent，有独立上下文）
-
-**Method D 的限制**:
-- 同模型偏见风险（比 Method A 的独立会话略高）
-- 建议配合 `references/verification-checklist.md` 作为硬 checklist 使用
+> 详细方法选择见 SKILL.md Step 5
 
 ### Phase 5: Iterate
 
-If verification fails:
-- Maximum 3 iterations
-- Each iteration: identify specific failures, dispatch a targeted
-  fix. For targeted bug fixes (single failing test / reported bug
-  / verifier FAIL), use `agents/worker-fixer.md` - it has explicit
-  rules for minimal-change surgical repair. For larger redesigns,
-  re-dispatch `agents/worker-coder.md` with a revised CONTRACT
-  (not a fixer; fixer's 30-line escalation threshold means it
-  should refuse large changes).
-- Do NOT re-do everything. Re-dispatch ONLY the failing sub-task
-  scope.
-- After 3 failed iterations: present the partial result + remaining issues
-  to the user, let them decide
+**执行清单**：
+1. 识别失败项，派发针对性修复
+2. 最多 3 轮迭代
+3. 每轮注入历史上下文（FAIL 清单 + 产出摘要）
+4. 3 轮后仍 FAIL → 降级策略（输出最小可用版本 + 剩余问题）
+5. 用户可随时强制退出（停止迭代/跳过验证/暂停）
 
-**Fixer 阈值预计算**：Leader 在派发 Fixer 之前，**必须**先计算阈值：
+> 详细降级策略和强制退出指令见 SKILL.md Step 6
+
+#### Fixer 阈值预计算
+
+在派发 Fixer 之前，Leader 需要预计算目标文件的行数，以确定修复范围阈值：
 
 ```bash
-# Leader 使用 Bash 工具计算文件行数
-wc -l <file_path>
-# 输出示例: 150 src/main.py
+# 获取文件行数（用于 Fixer 阈值计算）
+wc -l <file_path> | awk '{print $1}'
 ```
 
-然后在 Fixer 的 prompt 中直接注入具体数字：
-```
-CONSTRAINTS:
-  - 文件总行数: 150 行
-  - 修复阈值: min(150 * 20%, 50) = 30 行
-  - 修复行数需小于 30 行
-  - 如果修复可能超过 30 行，立即报告 ESCALATED
-```
+**注意**：`wc -l` 输出格式为 `150 src/main.py`（数字+文件名）。使用 `awk '{print $1}'` 提取第一个字段（纯数字），避免 LLM 解析错误。
 
-**不要让 LLM 自己做数学运算**，直接告诉它具体数字最可靠。
-
-#### 降级策略 (Degradation Strategy)
-
-如果 3 轮迭代后仍有 FAIL 项：
-
-1. **输出最小可用版本**: Leader 必须整理当前已通过的部分，标记哪些功能可用、哪些不可用
-2. **列出剩余问题**: 每个 FAIL 项的具体原因、修复建议、预计工作量
-3. **交给用户决策**:
-   - 选项 A: 接受降级版本（标记已知限制）
-   - 选项 B: 用户手动修复剩余问题
-   - 选项 C: 放弃，重新规划
-4. **不可静默失败**: 即使全部 FAIL 也必须输出报告和降级版本
-
-**死锁兜底策略**：如果 Leader 发现以下情况，必须立即放弃并交付：
-- 所有 Worker 都 FAILED 或 TIMEOUT
-- 没有成功产出任何有效文件
-- 修复次数已超过 3 轮
-
-此时 Leader 必须：
-1. 跳转到 Phase 6 交付
-2. 在报告中声明："当前任务完成度 0%，所有 Worker 均失败，需人工介入调整任务描述"
-3. 列出每个 Worker 的失败原因
-4. 建议用户：简化任务描述、减少子任务数量、或检查环境配置
-
-**不可**在失败的道路上继续消耗 Token。
-
-#### 用户强制退出指令 (Force Exit Commands)
-
-在迭代过程中，用户可以随时发出以下指令，**优先级最高，Leader 必须立即响应**：
-
-| 用户指令 | Leader 行为 |
-|----------|-------------|
-| **"停止迭代"** / **"强制交付"** / **"输出当前最佳版本"** | 立即跳过剩余迭代轮次，执行 Phase 6 降级交付 |
-| **"跳过验证"** / **"不需要验证"** | 跳过 Phase 4 Verifier，直接进入 Phase 6 交付 |
-| **"暂停"** | 保存当前状态快照（Step 5.5），当前 Wave 的所有产物保留在磁盘上，中止后续任务。用户说"恢复上次任务"时从快照位置继续，无需从头开始 |
-
-**重要**：收到强制退出指令后，Leader 不可劝说用户继续迭代，不可询问"确定吗？"，必须立即执行。
-
-#### 历史上下文注入 (Historical Context Injection)
-
-在重新派发 Worker 时，prompt 中**必须**包含：
-- 上一轮 Verifier 的 FAIL 清单（具体到行号/函数名）
-- 上一轮 Worker 的产出摘要（让新 Worker 知道"前人做了什么"）
-- 明确的修复指令（不是"修好它"，而是"把第 42 行的 X 改为 Y"）
-
-这避免了"重新派发 = 从零开始"的低效循环。
+阈值公式：`min(20% of total file lines, 50 lines)`。如果预估修复行数超过阈值，应派 worker-coder 而非 worker-fixer。
 
 ### Phase 6: Deliver
 

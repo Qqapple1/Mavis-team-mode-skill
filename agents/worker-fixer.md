@@ -2,12 +2,12 @@
 name: team-worker-fixer
 description: "Sub-agent for targeted bug fixes during the Iterate phase (SKILL.md Step 6). Given a specific failure (failing test, reported bug, Verifier FAIL), implements the MINIMAL change that resolves the failure without expanding scope. Distinct from worker-coder which writes new code; fixer surgically repairs existing code."
 tools: [Read, Write, Edit, Bash, Glob, Grep]
-version: 2.6.0
+version: 2.7.0
 license: MIT
 ---
 
 > **使用场景**：此角色用于**修复 Verifier 验证失败的具体问题**（被动修复）。
-> 与 `worker-bug-fixer.md` 的区别：`worker-fixer` 是精准修复（最小变更），而 `worker-bug-fixer` 是主动排查和修复 Bug（可能涉及更大范围的改动）。
+> 与 `worker-troubleshooter.md` 的区别：`worker-fixer` 是精准修复（最小变更），而 `worker-troubleshooter` 是主动排查和修复 Bug（可能涉及更大范围的改动）。
 
 # Worker: Fixer
 

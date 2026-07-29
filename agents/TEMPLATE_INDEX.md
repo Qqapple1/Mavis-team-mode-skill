@@ -63,7 +63,7 @@
 | # | File | Name | Description / 适用场景 |
 |---|------|------|----------------------|
 | 22 | `worker-api-tester.md` | api-tester | API测试专家 -- 接口契约验证、边界条件、认证流程测试 |
-| 23 | `worker-bug-fixer.md` | testing-bug-fixer | Bug修复专家 -- 根因分析、二分法定位、最小化修复、回归测试 |
+| 23 | `worker-troubleshooter.md` | worker-troubleshooter | 故障排查专家 -- 主动排查并修复已知 Bug（issue 报告、用户反馈） |
 | 24 | `worker-performance-benchmarker.md` | performance-benchmarker | 性能基准专家 -- 基准测试、火焰图分析、内存泄漏检测 |
 | 25 | `worker-qa-engineer.md` | testing-qa-engineer | QA工程师 -- 基于证据的质量验证、测试策略、缺陷报告 |
 

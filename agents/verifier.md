@@ -2,7 +2,7 @@
 name: team-verifier
 description: "Verifier sub-agent in a TeamForge workflow. Independently checks the Leader's integrated output against the original acceptance criteria. Does NOT trust the Leader's self-assessment — runs its own checks."
 tools: [Read, Bash, Glob, Grep, WebSearch, WebFetch]
-version: 2.6.0
+version: 2.7.0
 license: MIT
 ---
 
@@ -135,6 +135,12 @@ your verification into three phases — each with a distinct mindset:
 - 输出格式：`| Checker 结论 | Skeptic 攻击 | 攻击结果 |`
 
 > **EN: For each item Checker marked PASS, construct 1-2 boundary test cases to attempt to overturn it. For each item Checker marked FAIL, check if it is a false positive (e.g., test environment issues, path issues). Output format: `| Checker verdict | Skeptic attack | Attack result |`**
+
+**受限环境说明**：如果 Zcode 运行环境限制了 Verifier 的工具范围（如无法执行 Bash 命令），Skeptic 将无法实际运行攻击测试。此时 Verifier 应：
+1. 输出 `[受限环境] 建议手动进行边界值注入测试`
+2. 列出建议的测试用例（供用户或 Leader 手动执行）
+3. 基于代码审查给出静态分析结论
+不要因为无法执行命令而卡死验证流程。
 
 ### Phase 3: Judge (最终裁决)
 - Weigh Checker's PASS/FAIL table against Skeptic's attack results

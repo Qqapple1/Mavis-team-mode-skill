@@ -1,7 +1,7 @@
 ---
 name: teamforge
 description: "Recreates the TeamForge workflow (Leader + Workers + Verifier) inside Zcode 3.4.2+. Use this skill when the user wants parallel agent execution, structured task decomposition, independent quality verification, or multi-step work that benefits from sub-agents running concurrently. Triggers on: 'teamforge', 'team mode', 'multi-agent', 'split into subtasks', 'verify the result', '用 teamforge', '团队模式', '多智能体协作', '并行处理'. Do NOT use for simple single-step tasks."
-version: 2.6.0
+version: 2.7.0
 license: MIT
 metadata:
   author: Community port (TeamForge CLI agent)
@@ -150,7 +150,9 @@ If missing, see INSTALL.md.
 
 **Level 1 — 结构验证（必须）**：
 - 检查 CONTRACT 中定义的所有文件是否已创建（`ls` 命令）
-- 检查每个文件非空（`wc -l` 命令）
+- 检查每个文件非空（`wc -l <file_path> | awk '{print $1}'` 命令）
+
+**注意**：`wc -l` 输出格式为 `150 src/main.py`（数字+文件名）。使用 `awk '{print $1}'` 提取第一个字段（纯数字），避免 LLM 解析错误。
 
 **验证细节**：
 - 文本文件：检查是否包含至少 10 个非空白字符（避免空文件或只有空行的文件）
@@ -279,16 +281,15 @@ CONTEXT: [相关文件列表]
 - 新策略：每个 Worker prompt ~300 Token（只写核心指令）
 - 3 个 Worker 节省 ~5100 Token（约 60-70%）
 
-### 文件锁协议（防止并发修改冲突）
+### 文件锁协议（Leader 预分配机制）
 
-当同一 Wave 内的多个 Worker 可能修改同一文件时，Leader **必须**在派发前建立文件锁：
+Leader 在派发 Worker **之前**，必须检查同一 Wave 内是否有多个子任务会修改同一文件：
 
 **规则**：
 1. Leader 在 Team Plan 中为每个子任务标注其会修改的文件列表
-2. 如果两个子任务会修改同一文件，**必须**拆分到不同 Wave
-3. Worker 在修改核心文件前，需在报告中声明 `LOCK: <file_path>`
-4. Leader 收到 LOCK 声明后，检查是否有其他 Worker 已锁定该文件
-5. 如果已锁定 → 将该 Worker 标记为 BLOCKED，推迟到下一 Wave
+2. 如果两个子任务会修改同一文件，**强制拆分到不同 Wave**
+3. 不依赖 Worker 运行时的 LOCK 声明（避免异步死锁）
+4. Leader 是唯一的仲裁者，所有文件分配在派发前确定
 
 **示例**：
 ```markdown
@@ -357,9 +358,9 @@ Leader 收到所有子智能体的摘要后，**自己整合**成初版交付物
 
 如果任何一项不通过，Leader 必须在整合前修复（重新派发对应 Worker 或手动补齐）。
 
-**产出物标准化（output_manifest.json）**：
+**产出物标准化（output_manifest_<subtask_id>.json）**：
 
-每个 Worker 完成后，**必须**在项目目录下生成 `output_manifest.json` 文件，Leader 通过读取此文件获取精确状态：
+每个 Worker 完成后，**必须**在项目目录下生成带子任务 ID 的唯一 manifest 文件，文件名格式为 `output_manifest_<subtask_id>.json`（如 `output_manifest_subtask_1.json`、`output_manifest_subtask_2.json`）。Leader 通过读取这些文件获取精确状态：
 
 ```json
 {
@@ -379,7 +380,8 @@ Leader 收到所有子智能体的摘要后，**自己整合**成初版交付物
 ```
 
 **使用方式**：
-- Leader 在整合阶段只需 `Read output_manifest.json` 获取精确状态
+- Leader 在整合阶段通过 `ls output_manifest_*.json` 遍历读取所有 Worker 的 manifest 文件
+- 每个 Worker 的 manifest 文件名包含其子任务 ID，避免多个 Worker 同时写入同一文件导致冲突
 - 不需要依赖 LLM 解析文本摘要
 - 如果 Worker 未生成此文件，Leader 应标记为 WARNING 并从文本摘要中提取信息
 
@@ -437,7 +439,7 @@ for file in <产出文件列表>; do
     if [ ! -s "$file" ]; then
         echo "❌ MISSING: $file"
     else
-        echo "✅ EXISTS: $file ($(wc -l < "$file") lines)"
+        echo "✅ EXISTS: $file ($(wc -l < "$file" | awk '{print $1}') lines)"
     fi
 done
 ```
