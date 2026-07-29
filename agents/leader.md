@@ -2,7 +2,7 @@
 name: team-leader
 description: "Coordinates a TeamForge workflow in Zcode. Receives a complex user task, decomposes it into parallel sub-tasks, dispatches sub-agents, integrates their outputs, runs verification, and iterates until the deliverable meets all acceptance criteria. Use when invoking the `teamforge` skill."
 tools: [Agent, Read, Write, Edit, Bash, Glob, Grep, WebSearch, WebFetch]
-version: 3.5.0
+version: 3.6.0
 license: MIT
 ---
 
@@ -332,11 +332,11 @@ echo '{"ts":"<ISO 8601 时间戳>","wave":<当前 Wave>,"task":"<子任务ID>","
 **Leader 预计算 Fixer 阈值（必须）**：
 
 Leader 在派发 Fixer 之前，**必须**执行以下步骤：
-1. 用 `wc -l <file> | awk '{print $1}'` 计算文件行数
+1. 用 `python scripts/teamforge_utils.py --count-lines <file>` 计算文件行数
 2. 计算阈值：min(文件行数 × 20%, 50)
 3. 在 Fixer 的 prompt 中显式写出：`FIXER_LIMIT: 50（绝对值）`
 
-**简化规则**：若文件行数较少（<250行），可直接使用默认阈值 50，无需手动计算。仅当文件超过 250 行时，才需要执行 `wc -l` 计算。
+**简化规则**：若文件行数较少（<250行），可直接使用默认阈值 50，无需手动计算。仅当文件超过 250 行时，才需要执行 `python scripts/teamforge_utils.py --count-lines <file>` 计算。
 
 **不要依赖默认公式**，直接告诉 Fixer 具体数字。
 

@@ -1,7 +1,7 @@
 ---
 name: teamforge
 description: "Recreates the TeamForge workflow (Leader + Workers + Verifier) inside Zcode 3.4.2+. Use this skill when the user wants parallel agent execution, structured task decomposition, independent quality verification, or multi-step work that benefits from sub-agents running concurrently. Triggers on: 'teamforge', 'team mode', 'multi-agent', 'split into subtasks', 'verify the result', '用 teamforge', '团队模式', '多智能体协作', '并行处理'. Do NOT use for simple single-step tasks."
-version: 3.5.0
+version: 3.6.0
 license: MIT
 metadata:
   author: Community port (TeamForge CLI agent)
@@ -99,10 +99,15 @@ using the Agent Skills standard + Zcode's built-in sub-agent system.
 
 Leader 在 Phase 1 时，**必须**检查 Zcode 是否配置了多模型：
 
+**多模型检查方法**：
+
+Leader 通过以下命令检查 Zcode 是否配置了多模型：
 ```bash
-# 检查方法：读取 Zcode 配置文件中的 provider 列表
-# 如果有多个 provider，强制使用不同模型
+python -c "import json; c=json.load(open('$HOME/.zcode/cli/config.json')); providers=[k for k in c.get('provider',{}) if c['provider'][k].get('enabled',True)]; print(f'providers: {len(providers)}'); print('multi-model: ' + str(len(providers)>1))"
 ```
+
+如果返回 `multi-model: True`，Leader 应使用不同模型派发 Verifier。
+如果返回 `multi-model: False`，Leader 告知用户单模型漏检风险。
 
 **配置选项**：
 - `VERIFIER_MODEL: auto` → 自动选择不同模型（如果可用）
@@ -592,9 +597,20 @@ done
 - 所有文件缺失 → 从 Wave 1 重新开始
 
 **原子写入**：Leader 使用以下命令写入状态快照：
+
+**状态写入命令**：
 ```bash
-python scripts/teamforge_utils.py --write-state <session_uuid> <wave> <task> <status>
+python scripts/teamforge_utils.py --write-state <session_uuid> <wave> <task> <status> [--files "file1,file2"] [--error "错误信息"]
 ```
+
+参数说明：
+- `session_uuid`: 会话 ID（格式：YYYYMMDD_HHMMSS_随机4位）
+- `wave`: Wave 编号（整数）
+- `task`: 子任务 ID（如 subtask_1）
+- `status`: 状态（done / failed / blocked / started）
+- `--files`: 可选，产出文件列表，逗号分隔
+- `--error`: 可选，错误信息
+
 脚本内部处理跨平台的原子写入（.tmp → .jsonl）。
 
 **JSONL 字段**：每行一个 JSON 对象，字段：

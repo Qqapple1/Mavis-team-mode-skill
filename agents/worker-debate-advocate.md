@@ -2,7 +2,7 @@
 name: team-worker-debate-advocate
 description: 辩论模式正方Agent，负责提出并捍卫方案或观点，在结构化辩论的Round 1陈述方案、Round 3回应质疑，擅长逻辑论证、证据支撑和方案迭代
 tools: [Read, Glob, Grep]
-version: 3.5.0
+version: 3.6.0
 license: MIT
 ---
 

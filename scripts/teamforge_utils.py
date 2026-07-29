@@ -5,6 +5,7 @@ TeamForge 跨平台工具函数库
   python scripts/teamforge_utils.py --count-lines <file>
   python scripts/teamforge_utils.py --check-exists <file1> <file2> ...
   python scripts/teamforge_utils.py --strip-ansi <text>
+  python scripts/teamforge_utils.py --write-state <session_uuid> <wave> <task> <status> [--files "file1,file2"] [--error "错误信息"]
 """
 
 import sys
@@ -132,15 +133,32 @@ def main():
 
     elif cmd == "--write-state":
         if len(sys.argv) < 6:
-            print("用法: --write-state <session_uuid> <wave> <task> <status>")
+            print("用法: --write-state <session_uuid> <wave> <task> <status> [--files \"file1,file2\"] [--error \"错误信息\"]")
             sys.exit(1)
         uuid = sys.argv[2]
         wave = sys.argv[3]
         task = sys.argv[4]
         status = sys.argv[5]
+        # 解析可选参数
+        files_list = []
+        error_msg = None
+        i = 6
+        while i < len(sys.argv):
+            if sys.argv[i] == "--files" and i + 1 < len(sys.argv):
+                files_list = [f.strip() for f in sys.argv[i + 1].split(',') if f.strip()]
+                i += 2
+            elif sys.argv[i] == "--error" and i + 1 < len(sys.argv):
+                error_msg = sys.argv[i + 1]
+                i += 2
+            else:
+                i += 1
         import json as json_mod
         from datetime import datetime
         data = {"ts": datetime.now().isoformat(), "wave": int(wave), "task": task, "status": status}
+        if files_list:
+            data["files"] = files_list
+        if error_msg:
+            data["error"] = error_msg
         final = f".teamforge_state_{uuid}.jsonl"
         tmp = f".teamforge_state_{uuid}.tmp"
         with open(tmp, 'a', encoding='utf-8') as f:

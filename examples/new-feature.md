@@ -24,6 +24,9 @@ Leader 先发布接口契约，再拆子任务：
 - 状态提升到父组件：`selectedTag` state
 - 不引入新依赖
 - 不改 API 接口
+
+## 测试框架
+- test_framework: pytest
 ```
 
 ```markdown
@@ -89,7 +92,7 @@ Leader 先发布接口契约，再拆子任务：
 
 ### Subtask 5: 写测试
 - **type**: general-purpose
-- **prompt**: 写测试覆盖：
+- **prompt**: 使用指定的测试框架（见 CONTRACT 中的 test_framework 字段）编写测试，覆盖：
   1. tag 提取 selector
   2. filter 逻辑
   3. 标签点击交互
@@ -97,7 +100,6 @@ Leader 先发布接口契约，再拆子任务：
   - [ ] 至少 3 个单元测试
   - [ ] 至少 1 个组件集成测试
   - [ ] 全部通过
-> **测试框架**：本示例默认使用 Python pytest。如果是前端项目，请替换为 Jest / Playwright；如果是 Go 项目，请替换为 `go test`。Leader 应在 CONTRACT 中明确指定测试框架。
 - **dependency**: depends-on-subtask-4
 - **estimated_minutes**: 15
 
