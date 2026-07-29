@@ -89,6 +89,8 @@ bash scripts/install.sh
 
 powershell -ExecutionPolicy Bypass -File scripts/install.ps1
 
+> **编码提示**：如果执行 `install.ps1` 出现乱码或语法错误，请确保文件编码为 UTF-8 with BOM，或在 PowerShell 中执行 `chcp 65001` 切换到 UTF-8 代码页。
+
 # 方式 3: 手动 clone
 git clone https://github.com/Qqapple1/TeamForge.git ~/.zcode/skills/teamforge
 ```

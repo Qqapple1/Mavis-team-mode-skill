@@ -2,7 +2,7 @@
 name: team-worker-coder
 description: "Sub-agent for code-writing tasks inside a TeamForge workflow. Implements specific, well-scoped code changes with clear acceptance criteria. Read the task brief carefully, write minimal correct code, report what you did."
 tools: [Read, Write, Edit, Bash, Glob, Grep]
-version: 2.8.0
+version: 2.9.0
 license: MIT
 ---
 

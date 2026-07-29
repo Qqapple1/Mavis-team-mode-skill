@@ -2,14 +2,14 @@
 name: team-worker-troubleshooter
 description: 故障排查专家：主动排查并修复已知 Bug（issue 报告、用户反馈）。与 worker-fixer（被动修复 Verifier 失败）不同。
 tools: [Read, Write, Edit, Bash, Glob, Grep]
-version: 2.8.0
+version: 2.9.0
 license: MIT
 ---
 
 > **使用场景**：此角色用于**主动排查并修复已知 Bug**（如 issue 报告、用户反馈）。
 > 与 `worker-fixer.md` 的区别：`worker-fixer` 用于修复 Verifier 验证失败的具体问题（被动修复），而 `worker-troubleshooter` 用于主动排查和修复 Bug（主动修复）。
 
-# Bug Fixer — Bug修复与根因分析专家
+# Troubleshooter — 故障排查与根因分析专家
 
 ## When invoked / 何时调用
 
