@@ -2,7 +2,7 @@
 name: team-worker-coder
 description: "Sub-agent for code-writing tasks inside a TeamForge workflow. Implements specific, well-scoped code changes with clear acceptance criteria. Read the task brief carefully, write minimal correct code, report what you did."
 tools: [Read, Write, Edit, Bash, Glob, Grep]
-version: 3.7.0
+version: 3.8.0
 license: MIT
 ---
 
@@ -92,3 +92,9 @@ CONSTRAINTS:
   - don't add new dependencies
 OUTPUT FORMAT: standard worker report
 ```
+
+---
+
+## 通用规则
+
+请先使用 Read 工具读取 `references/core-rules.md`，你的沟通风格、协作规范、安全底线请严格按照该文件执行。

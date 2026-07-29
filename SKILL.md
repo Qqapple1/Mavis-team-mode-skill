@@ -1,7 +1,7 @@
 ---
 name: teamforge
 description: "Recreates the TeamForge workflow (Leader + Workers + Verifier) inside Zcode 3.4.2+. Use this skill when the user wants parallel agent execution, structured task decomposition, independent quality verification, or multi-step work that benefits from sub-agents running concurrently. Triggers on: 'teamforge', 'team mode', 'multi-agent', 'split into subtasks', 'verify the result', '用 teamforge', '团队模式', '多智能体协作', '并行处理'. Do NOT use for simple single-step tasks."
-version: 3.7.0
+version: 3.8.0
 license: MIT
 metadata:
   author: Community port (TeamForge CLI agent)
@@ -131,16 +131,13 @@ TeamForge 的 Worker 并行是"前台并行"（Zcode 平台限制），这意味
 
 ## 平台兼容模式
 
-TeamForge 支持两种执行模式：
+TeamForge 使用纯 Python 跨平台模式，所有操作通过 `python scripts/teamforge_utils.py` 完成：
 
-**标准模式**（推荐）：使用 Unix 命令（ls, grep）+ Python 脚本
-- 适用：WSL2, Git Bash, macOS, Linux
+- 适用：Windows、macOS、Linux（无需 Unix 工具链）
 - 验证：`python scripts/teamforge_utils.py --count-lines <file>`
-
-**纯 Python 模式**（兜底）：所有操作使用 Python 脚本
-- 适用：Windows 原生 PowerShell（无 Unix 工具）
-- 自动检测：Leader 在 Phase 2 预检时执行 `ls` 命令，如果失败则切换到纯 Python 模式
-- 验证：全部使用 `python scripts/teamforge_utils.py`（推荐）或 `python scripts/validate_contract_ast.py`（向后兼容）
+- 文件查找：`python scripts/teamforge_utils.py --glob "<pattern>"`
+- 内容搜索：`python scripts/teamforge_utils.py --grep "<pattern>" <file>`
+- 文件检查：`python scripts/teamforge_utils.py --check-exists <file1> <file2> ...`
 
 > **Windows Python 路径**：如果 `python` 命令不可用，尝试使用 `py -3`（Windows Python 启动器）或直接指定 Python 完整路径（如 `C:\Users\user\AppData\Local\Programs\Python\Python312\python.exe`）。
 
@@ -164,21 +161,11 @@ reference these worker roles by name when dispatching sub-tasks.
 **Verify these are installed alongside SKILL.md:**
 
 ```bash
-# Linux / macOS / Git Bash / WSL
-ls ~/.zcode/skills/teamforge/agents/
+# 跨平台验证（推荐）
+python scripts/teamforge_utils.py --glob "agents/*.md"
 ```
-```powershell
-# Windows PowerShell
-dir $env:USERPROFILE\.zcode\skills\teamforge\agents\
-```
-```text
-# should show (30+ files):
-#   leader.md  verifier.md
-#   worker-coder.md  worker-tester.md  worker-researcher.md
-#   worker-doc-writer.md  worker-reviewer.md  worker-fixer.md
-#   worker-ai-engineer.md  worker-backend-architect.md  ...
-#   TEMPLATE_INDEX.md
-```
+
+> 应显示 30+ 文件：leader.md, verifier.md, worker-coder.md, worker-tester.md, worker-researcher.md, worker-doc-writer.md, worker-reviewer.md, worker-fixer.md, worker-ai-engineer.md, worker-backend-architect.md, ..., TEMPLATE_INDEX.md
 
 If missing, see INSTALL.md.
 
@@ -241,21 +228,25 @@ If missing, see INSTALL.md.
 > **CONTRACT 智能验证**: Leader 在 Step 4 整合时，**必须**验证 Worker 产出是否遵守 CONTRACT。验证策略按优先级：
 
 **Level 1 — 结构验证（必须）**：
-- 检查 CONTRACT 中定义的所有文件是否已创建（`ls` 命令）
+- 检查 CONTRACT 中定义的所有文件是否已创建（`python scripts/teamforge_utils.py --check-exists <files>`）
 - 检查每个文件非空（`python scripts/teamforge_utils.py --count-lines <file_path>` 命令）
 
 **验证细节**：
 - 文本文件：检查是否包含至少 10 个非空白字符（避免空文件或只有空行的文件）
-  ```bash
-  # 检查文件是否有实际内容
-  content=$(tr -d '[:space:]' < <file> | wc -c)
-  if [ "$content" -lt 10 ]; then echo "⚠️ 文件内容过少"; fi
+  ```python
+  # 检查文件是否有实际内容（跨平台）
+  python -c "
+  import os, sys
+  f = sys.argv[1]
+  if not os.path.exists(f):
+      print(f'❌ 文件不存在: {f}'); sys.exit(1)
+  content = open(f, 'r', encoding='utf-8', errors='ignore').read().strip()
+  if len(content) < 10:
+      print(f'⚠️ 文件内容过少 ({len(content)} chars)'); sys.exit(1)
+  print(f'✅ 文件内容正常 ({len(content)} chars)')
+  " <file>
   ```
-- 二进制文件：使用 `file` 命令校验文件类型
-  ```bash
-  file <file>  # 应显示 "ASCII text" 或类似，而非 "data" 或 "binary"
-  ```
-- JSON 文件：使用 `python -c "import json; json.load(open('<file>'))"` 验证格式
+- JSON 文件：使用 `python -c "import json; json.load(open('<file>', encoding='utf-8'))"` 验证格式
 
 **JSON 格式验证注意**：
 - 标准 JSON（`.json`）：使用 `python -c "import json; json.load(open('<file>'))"`
@@ -301,7 +292,24 @@ python scripts/teamforge_utils.py --match-role "实现 FastAPI 后端 API"
 
 Leader 必须输出一个**结构化任务书**，格式见 `agents/leader.md` 的 Phase 1。
 
-### Step 2.7: 拆解质量自检
+### Step 2.8: 契约自检（CONTRACT Self-Validation）
+
+Leader 在发布 CONTRACT 后、派发 Worker 之前，**必须**对 CONTRACT 进行自检：
+
+**结构检查**：
+- CONTRACT 是否包含 `primary_language` 字段
+- CONTRACT 是否包含 `test_framework` 字段
+- CONTRACT 是否包含 `files_created` 产物清单
+- 所有函数签名是否符合 `primary_language` 的命名规范
+
+**自检命令**：
+```bash
+python scripts/teamforge_utils.py --validate-contract CONTRACT.md
+```
+
+**自检失败处理**：如果自检发现矛盾或缺失，Leader 必须自行修正 CONTRACT，而不是强行派发 Worker。
+
+### Step 2.9: 拆解质量自检
 
 Leader 在发布 Team Plan 之前，**必须**用以下 checklist 自检拆解质量：
 
@@ -386,9 +394,11 @@ ACCEPTANCE: [具体验收标准]
 CONTRACT: D:\Z code\project\CONTRACT.md
 CONTEXT: [相关文件列表]
 
-请先读取以下文件获取你的角色定义和行为规范:
+请先使用 Read 工具读取以下文件：
 - agents/worker-coder.md
 - references/core-rules.md
+
+你的沟通风格、协作规范、安全底线请严格按照 references/core-rules.md 执行。
 ```
 
 **Token 节省效果**：
@@ -491,7 +501,7 @@ Leader 收到所有子智能体的摘要后，**自己整合**成初版交付物
 - [ ] Team Plan 中每个子任务都有对应的 Worker 输出
 - [ ] 没有 Worker 返回 FAILED 或超时未返回
 - [ ] 每个 Worker 输出的文件路径与 CONTRACT 产物清单一致
-- [ ] 用 `grep` 验证 Worker 产出包含 CONTRACT 定义的接口字符串
+- [ ] 用 `python scripts/teamforge_utils.py --grep "接口字符串" <file>` 验证 Worker 产出包含 CONTRACT 定义的接口字符串
 - [ ] 所有验收标准都有对应的证据（测试通过截图、文件存在性等）
 - [ ] 子任务之间没有接口冲突（如 Coder 的函数签名与 Tester 的调用一致）
 
@@ -519,7 +529,7 @@ Leader 收到所有子智能体的摘要后，**自己整合**成初版交付物
 ```
 
 **使用方式**：
-- Leader 在整合阶段通过 `ls output_manifest_*.json` 遍历读取所有 Worker 的 manifest 文件
+- Leader 在整合阶段通过 `python scripts/teamforge_utils.py --glob "output_manifest_*.json"` 遍历读取所有 Worker 的 manifest 文件
 - 每个 Worker 的 manifest 文件名包含其子任务 ID，避免多个 Worker 同时写入同一文件导致冲突
 - 不需要依赖 LLM 解析文本摘要
 - 如果 Worker 未生成此文件，Leader 应标记为 WARNING 并从文本摘要中提取信息
@@ -566,9 +576,9 @@ Leader 收到所有子智能体的摘要后，**自己整合**成初版交付物
 - 任何 JSON 解析器都能逐行读取
 
 ```bash
-# 写入示例（每行一个完整 JSON）
-echo '{"ts":"2026-07-29T10:00:00","wave":1,"task":"subtask_1","status":"done","files":["src/main.py"]}' >> .teamforge_state_<session_uuid>.jsonl
-echo '{"ts":"2026-07-29T10:05:00","wave":1,"task":"subtask_2","status":"done","files":["tests/test.py"]}' >> .teamforge_state_<session_uuid>.jsonl
+# 写入示例（跨平台，使用 Python 脚本）
+python scripts/teamforge_utils.py --write-state <session_uuid> 1 subtask_1 done --files "src/main.py"
+python scripts/teamforge_utils.py --write-state <session_uuid> 1 subtask_2 done --files "tests/test.py"
 ```
 
 **恢复流程**：逐行读取 `.teamforge_state_<session_uuid>.jsonl`，每行解析为独立 JSON 对象，重建最新状态：
@@ -613,6 +623,11 @@ python scripts/teamforge_utils.py --write-state <session_uuid> <wave> <task> <st
 - `files`: 产出文件列表（可选）
 - `error`: 错误信息（可选）
 
+**状态文件轮转**：如果 `.teamforge_state_<uuid>.jsonl` 超过 1000 行，Leader 在恢复检查时执行轮转：
+```bash
+python scripts/teamforge_utils.py --rotate-state <session_uuid>
+```
+
 ### Step 6: 迭代修正
 
 如果 Verifier 标 FAIL：
@@ -650,9 +665,9 @@ python scripts/teamforge_utils.py --write-state <session_uuid> <wave> <task> <st
 {"ts":"2026-07-29T10:00:00","task":"实现CLI工具","summary":"完成了codestat工具的代码+测试+文档","files":["src/main.py","tests/test.py"],"keywords":["cli","argparse","pytest"]}
 ```
 
-**检索方式**：新任务启动时，Leader 在 Phase 1 可以用 `grep` 搜索 `.memory_index.jsonl` 中的 keywords，获取历史经验。这能在 0 Token 消耗下获得上下文。
+**检索方式**：新任务启动时，Leader 在 Phase 1 可以用 `python scripts/teamforge_utils.py --grep "keyword" .memory_index.jsonl` 搜索 `.memory_index.jsonl` 中的 keywords，获取历史经验。这能在 0 Token 消耗下获得上下文。
 
-**语义匹配增强**（可选）：除了 grep 关键词匹配，Leader 可以使用 `teamforge_utils.py` 进行近似匹配：
+**语义匹配增强**（可选）：除了关键词匹配，Leader 可以使用 `teamforge_utils.py` 进行近似匹配：
 
 ```bash
 python scripts/teamforge_utils.py --search-memory "重构"
@@ -666,7 +681,7 @@ python scripts/teamforge_utils.py --search-memory "重构"
 
 **注意**：此步骤为可选，仅在项目目录下存在 `.memory_index.jsonl` 时执行。
 
-**写入时机**：记忆索引由 Leader 在 Step 7 交付完成后主动写入。若不需要可跳过。写入方式：`echo '{"ts":"...",...}' >> .memory_index.jsonl`
+**写入时机**：记忆索引由 Leader 在 Step 7 交付完成后主动写入。若不需要可跳过。写入方式：`python -c "import json; f=open('.memory_index.jsonl','a',encoding='utf-8'); f.write(json.dumps({'ts':'...','task':'...','summary':'...','files':[...],'keywords':[...]},ensure_ascii=False)+'\n'); f.close()"`
 
 ## Progress Reporting
 

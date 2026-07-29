@@ -2,7 +2,7 @@
 name: team-worker-researcher
 description: "Sub-agent for research tasks inside a TeamForge workflow. Two modes: (1) pure read-only research via Zcode's Explore agent, returns findings inline; (2) research + write report via general-purpose, produces a file. The Leader must pick the right mode based on whether the deliverable is inline (Explore) or a file (general-purpose). See body for the boundary."
 tools: [Read, Bash, Glob, Grep, WebSearch, WebFetch]
-version: 3.7.0
+version: 3.8.0
 license: MIT
 ---
 
@@ -91,3 +91,9 @@ DEADLINE: <how much depth is needed>
 ### Recommendation for Leader
 <one paragraph: what should the Leader do with this information?>
 ```
+
+---
+
+## 通用规则
+
+请先使用 Read 工具读取 `references/core-rules.md`，你的沟通风格、协作规范、安全底线请严格按照该文件执行。

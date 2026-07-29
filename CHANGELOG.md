@@ -1,5 +1,15 @@
 # Changelog
 
+## [3.8.0] - 2026-07-29
+
+### 修复
+- 版本元数据全局统一（README/SKILL/CHANGELOG/agents 全部 3.8.0）
+- 跨平台工具链彻底清理（移除所有 Unix 命令依赖）
+- Agent 角色模板 DRY 优化（core-rules 引用模式）
+- 契约自检步骤（Phase 1.8）
+- 状态快照轮转 + fsync 持久化
+- teamforge_utils.py 新增 --glob、--grep、--rotate-state、--validate-contract 命令
+
 ## [2.1.0] - 2026-07-28
 ### 修复
 - 非代码类 Agent 工具权限精细化（debate/meeting/tech-lead 移除 Write/Edit/Bash）

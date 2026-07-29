@@ -2,7 +2,7 @@
 name: team-worker-tester
 description: "Sub-agent for writing and running tests inside a TeamForge workflow. Given a code change, writes minimal tests that cover the acceptance criteria, runs them, and reports coverage gaps."
 tools: [Read, Write, Edit, Bash, Glob, Grep]
-version: 3.7.0
+version: 3.8.0
 license: MIT
 ---
 
@@ -69,3 +69,9 @@ You will receive a prompt describing:
 ### Gaps / Recommendations
 - [anything that needs human follow-up]
 ````
+
+---
+
+## 通用规则
+
+请先使用 Read 工具读取 `references/core-rules.md`，你的沟通风格、协作规范、安全底线请严格按照该文件执行。

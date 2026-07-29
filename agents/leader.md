@@ -2,7 +2,7 @@
 name: team-leader
 description: "Coordinates a TeamForge workflow in Zcode. Receives a complex user task, decomposes it into parallel sub-tasks, dispatches sub-agents, integrates their outputs, runs verification, and iterates until the deliverable meets all acceptance criteria. Use when invoking the `teamforge` skill."
 tools: [Agent, Read, Write, Edit, Bash, Glob, Grep, WebSearch, WebFetch]
-version: 3.7.0
+version: 3.8.0
 license: MIT
 ---
 
@@ -51,7 +51,7 @@ the work yourself.
 - `.memory_index.jsonl` — 记忆索引
 - `output_manifest_*.json` — 产出物清单（由 Worker 生成，Leader 读取）
 
-写入方式：使用 `echo '...' >> <file>` 追加记录，避免覆盖历史。
+写入方式：使用 `python scripts/teamforge_utils.py --write-state ...` 追加记录，避免覆盖历史。
 
 **用户监督机制**：由于 Leader 作为 LLM 无法精确检测自身上下文中的代码片段，此约束改为用户监督：
 
@@ -207,10 +207,9 @@ but Doc-Writer documents `--number`).
 **Phase 2 预检**：在派发 Worker 之前，Leader **必须**检查关键文件是否存在：
 
 ```bash
-ls agents/worker-*.md references/core-rules.md scripts/validate_contract_ast.py
+python scripts/teamforge_utils.py --check-exists agents/leader.md agents/verifier.md references/core-rules.md scripts/validate_contract_ast.py
+python scripts/teamforge_utils.py --glob "agents/worker-*.md"
 ```
-
-> **Windows 用户**：若在原生 PowerShell 中执行，请使用 `dir` 或 `Get-ChildItem` 手动检查，或切换至 WSL2 / Git Bash。
 
 如果任何文件缺失，Leader 应立即向用户输出错误报告，而非盲目派发：
 ```
@@ -242,9 +241,11 @@ After user confirms, dispatch sub-agents. Use Zcode's sub-agent tool:
 Leader 在派发每个 Worker 时，prompt 中**必须**包含以下固定后缀（不可省略）：
 
 ```
-请先使用 Read 工具读取以下文件，作为你的核心角色定义和行为规范（不要将文件内容复制到本对话中）：
+请先使用 Read 工具读取以下文件：
 - agents/worker-<角色名>.md
 - references/core-rules.md
+
+你的沟通风格、协作规范、安全底线请严格按照 references/core-rules.md 执行。
 
 当前任务会话 ID: <session_uuid>（用于状态文件命名和日志追踪）
 ```
@@ -299,8 +300,8 @@ Leader 在派发每个 Worker 时，prompt 中**必须**包含以下固定后缀
 在 Phase 3 整合完成后、进入 Phase 4 之前，Leader **必须**将状态变更追加到 `.teamforge_state_<session_uuid>.jsonl`（标准 JSONL 格式，每行一个 JSON 对象）：
 
 ```bash
-# 每次状态变更追加一行（在项目根目录）
-echo '{"ts":"<ISO 8601 时间戳>","wave":<当前 Wave>,"task":"<子任务ID>","status":"done","files":["<产出文件>"]}' >> .teamforge_state_<session_uuid>.jsonl
+# 每次状态变更追加一行（跨平台，使用 Python 脚本）
+python scripts/teamforge_utils.py --write-state <session_uuid> <wave> <task> <status> [--files "file1,file2"] [--error "错误信息"]
 ```
 
 **写入时机**:

@@ -9,6 +9,10 @@ TeamForge 跨平台工具函数库
   python scripts/teamforge_utils.py --check-multi-model
   python scripts/teamforge_utils.py --search-memory <keyword>
   python scripts/teamforge_utils.py --validate-ast <file.py> <func1> [func2] ...
+  python scripts/teamforge_utils.py --validate-contract <CONTRACT.md>
+  python scripts/teamforge_utils.py --rotate-state <session_uuid>
+  python scripts/teamforge_utils.py --glob <pattern>
+  python scripts/teamforge_utils.py --grep <pattern> <file>
   python scripts/teamforge_utils.py --self-check
 """
 
@@ -203,6 +207,7 @@ def main():
         tmp = f".teamforge_state_{uuid}.tmp"
         with open(tmp, 'a', encoding='utf-8') as f:
             f.write(json_mod.dumps(data, ensure_ascii=False) + '\n')
+            os.fsync(f.fileno())
         if os.path.exists(final):
             os.replace(tmp, final)
         else:
@@ -274,6 +279,105 @@ def main():
         if result.get("missing"):
             sys.exit(1)
 
+    elif cmd == "--validate-contract":
+        if len(sys.argv) < 3:
+            print("用法: --validate-contract <CONTRACT.md>")
+            sys.exit(1)
+        filepath = sys.argv[2]
+        if not os.path.exists(filepath):
+            print(f"❌ 文件不存在: {filepath}")
+            sys.exit(1)
+
+        with open(filepath, 'r', encoding='utf-8') as f:
+            content = f.read()
+
+        checks = []
+
+        # 检查必要字段
+        required = ['primary_language', 'test_framework', 'files_created']
+        for field in required:
+            if field in content:
+                checks.append(f"✅ {field}: 存在")
+            else:
+                checks.append(f"⚠️ {field}: 缺失")
+
+        # 检查命名规范一致性
+        py_funcs = re.findall(r'def\s+(\w+)', content)
+        js_funcs = re.findall(r'function\s+(\w+)', content)
+
+        if py_funcs:
+            camel = [f for f in py_funcs if re.search(r'[a-z][A-Z]', f)]
+            if camel:
+                checks.append(f"⚠️ Python 函数使用了 camelCase: {camel[:3]}")
+            else:
+                checks.append(f"✅ Python 函数命名规范 (snake_case)")
+
+        # 检查产物清单
+        if 'files_created' in content:
+            files = re.findall(r'files_created.*?\[([^\]]+)\]', content)
+            if files:
+                checks.append(f"✅ 产物清单: 已定义")
+
+        for c in checks:
+            print(c)
+
+        warnings = sum(1 for c in checks if '⚠️' in c)
+        if warnings:
+            print(f"\n⚠️ 发现 {warnings} 个问题，建议修正后再派发")
+            sys.exit(1)
+        else:
+            print(f"\n✅ 契约自检通过")
+
+    elif cmd == "--rotate-state":
+        if len(sys.argv) < 3:
+            print("用法: --rotate-state <session_uuid>")
+            sys.exit(1)
+        uuid = sys.argv[2]
+        state_file = f".teamforge_state_{uuid}.jsonl"
+
+        if not os.path.exists(state_file):
+            print(f"状态文件不存在: {state_file}")
+            sys.exit(0)
+
+        # 检查行数
+        with open(state_file, 'r', encoding='utf-8') as f:
+            lines = f.readlines()
+
+        if len(lines) <= 1000:
+            print(f"状态文件行数 {len(lines)}，无需轮转")
+            sys.exit(0)
+
+        # 轮转
+        import shutil
+        backup = f"{state_file}.1"
+        shutil.move(state_file, backup)
+        print(f"✅ 状态文件已轮转: {state_file} → {backup} ({len(lines)} 行)")
+
+    elif cmd == "--glob":
+        if len(sys.argv) < 3:
+            print("用法: --glob <pattern>")
+            sys.exit(1)
+        pattern = sys.argv[2]
+        files = find_files(pattern)
+        for f in files:
+            print(f)
+        if not files:
+            print(f"未找到匹配: {pattern}")
+
+    elif cmd == "--grep":
+        if len(sys.argv) < 4:
+            print("用法: --grep <pattern> <file>")
+            sys.exit(1)
+        pattern = sys.argv[2]
+        filepath = sys.argv[3]
+        if not os.path.exists(filepath):
+            print(f"❌ 文件不存在: {filepath}")
+            sys.exit(1)
+        with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
+            for i, line in enumerate(f, 1):
+                if pattern in line:
+                    print(f"{filepath}:{i}: {line.rstrip()}")
+
     elif cmd == "--self-check":
         print("TeamForge Utils 自检...")
         print(f"Python: {sys.version}")
@@ -281,7 +385,8 @@ def main():
 
         # 检查所有子命令
         commands = ["--count-lines", "--check-exists", "--strip-ansi", "--match-role",
-                    "--write-state", "--check-multi-model", "--search-memory", "--validate-ast"]
+                    "--write-state", "--check-multi-model", "--search-memory", "--validate-ast",
+                    "--validate-contract", "--rotate-state", "--glob", "--grep"]
 
         for subcmd in commands:
             print(f"  ✅ {subcmd}: 可用")

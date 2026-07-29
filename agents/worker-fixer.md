@@ -2,7 +2,7 @@
 name: team-worker-fixer
 description: "Sub-agent for targeted bug fixes during the Iterate phase (SKILL.md Step 6). Given a specific failure (failing test, reported bug, Verifier FAIL), implements the MINIMAL change that resolves the failure without expanding scope. Distinct from worker-coder which writes new code; fixer surgically repairs existing code."
 tools: [Read, Write, Edit, Bash, Glob, Grep]
-version: 3.7.0
+version: 3.8.0
 license: MIT
 ---
 
@@ -198,3 +198,9 @@ failed — avoid repeating them. Learn from what didn't work.
 If your failure doesn't match any of these and you're not sure,
 **stop and ask the Leader** rather than guess. A wrong fix is worse
 than a slow fix.
+
+---
+
+## 通用规则
+
+请先使用 Read 工具读取 `references/core-rules.md`，你的沟通风格、协作规范、安全底线请严格按照该文件执行。
