@@ -1,0 +1,126 @@
+# TeamForge 角色索引（用于自动匹配）
+# Leader 在 Phase 1 提取任务关键词，通过此索引模糊匹配最佳角色
+
+worker-coder:
+  keywords: [代码, 实现, 开发, 函数, 模块, api, cli]
+  desc: 通用代码实现
+
+worker-backend-architect:
+  keywords: [后端, api, fastapi, django, flask, 数据库, 服务端, restful, graphql]
+  desc: 后端架构设计
+
+worker-frontend-developer:
+  keywords: [前端, react, vue, ui, 界面, 组件, css, html, 浏览器]
+  desc: 前端开发
+
+worker-tester:
+  keywords: [测试, pytest, unittest, 单元测试, 集成测试, 测试用例]
+  desc: 测试编写
+
+worker-researcher:
+  keywords: [调研, 分析, 评估, 对比, 研究, 方案, 选型]
+  desc: 只读调研
+
+worker-doc-writer:
+  keywords: [文档, readme, 说明, 注释, api文档, changelog]
+  desc: 文档编写
+
+worker-reviewer:
+  keywords: [审查, review, code review, 代码质量, 风格]
+  desc: 代码审查
+
+worker-fixer:
+  keywords: [修复, bug, 错误, 失败, verifier, 回归]
+  desc: 精准修复（Verifier 失败后）
+
+worker-troubleshooter:
+  keywords: [排查, 调试, debug, 故障, 问题定位, 根因]
+  desc: 故障排查（主动修复 Bug）
+
+worker-security-engineer:
+  keywords: [安全, 漏洞, xss, sql注入, 认证, 授权, 加密]
+  desc: 安全审计
+
+worker-database-optimizer:
+  keywords: [数据库, sql, 索引, 查询优化, 迁移, postgres, mysql]
+  desc: 数据库优化
+
+worker-devops-automator:
+  keywords: [部署, ci/cd, docker, kubernetes, 流水线, 自动化]
+  desc: DevOps 自动化
+
+worker-sre:
+  keywords: [监控, 告警, 日志, 可靠性, 性能, 负载, sla]
+  desc: SRE 可靠性工程
+
+worker-ai-engineer:
+  keywords: [ai, ml, 机器学习, 模型, 训练, 推理, llm]
+  desc: AI/ML 工程
+
+worker-mcp-builder:
+  keywords: [mcp, mcp server, 工具, 插件, 协议]
+  desc: MCP Server 开发
+
+worker-mobile-developer:
+  keywords: [移动端, ios, android, react native, flutter, app]
+  desc: 移动端开发
+
+worker-rapid-prototyper:
+  keywords: [原型, mvp, 快速验证, demo, poc]
+  desc: 快速原型
+
+worker-software-architect:
+  keywords: [架构, 系统设计, 分层, 微服务, 模块化]
+  desc: 软件架构
+
+worker-tech-lead:
+  keywords: [技术决策, 选型, 团队, 技术方案]
+  desc: 技术负责人
+
+worker-project-manager:
+  keywords: [项目管理, 排期, 里程碑, 进度, 需求]
+  desc: 项目管理
+
+worker-technical-writer:
+  keywords: [技术写作, 博客, 教程, 翻译]
+  desc: 技术写作
+
+worker-meeting-facilitator:
+  keywords: [会议, 讨论, 头脑风暴, 决策, 评审]
+  desc: 会议主持
+
+worker-workflow-architect:
+  keywords: [工作流, 流程, 自动化, 流水线, 编排]
+  desc: 工作流设计
+
+worker-debate-advocate:
+  keywords: [辩论, 正方, 支持, 论证]
+  desc: 辩论正方
+
+worker-debate-critic:
+  keywords: [辩论, 反方, 质疑, 反驳]
+  desc: 辩论反方
+
+worker-team-member:
+  keywords: [通用, 杂项, 辅助, 支持]
+  desc: 通用团队成员
+
+worker-api-tester:
+  keywords: [api测试, 接口测试, postman, http]
+  desc: API 测试
+
+worker-bug-fixer:
+  keywords: [bug修复, 故障排查, 调试]
+  desc: 主动排查 Bug（已重命名为 worker-troubleshooter）
+
+worker-performance-benchmarker:
+  keywords: [性能, 基准测试, 压测, 优化, profiling]
+  desc: 性能测试
+
+worker-code-reviewer:
+  keywords: [代码审查, review, 质量, 规范]
+  desc: 代码审查（与 worker-reviewer 相同）
+
+worker-git-workflow-master:
+  keywords: [git, 版本控制, 分支, 合并, rebase]
+  desc: Git 工作流

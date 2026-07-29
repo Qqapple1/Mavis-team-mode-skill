@@ -2,7 +2,7 @@
 name: team-worker-tester
 description: "Sub-agent for writing and running tests inside a TeamForge workflow. Given a code change, writes minimal tests that cover the acceptance criteria, runs them, and reports coverage gaps."
 tools: [Read, Write, Edit, Bash, Glob, Grep]
-version: 3.2.0
+version: 3.3.0
 license: MIT
 ---
 

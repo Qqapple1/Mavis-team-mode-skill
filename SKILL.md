@@ -1,7 +1,7 @@
 ---
 name: teamforge
 description: "Recreates the TeamForge workflow (Leader + Workers + Verifier) inside Zcode 3.4.2+. Use this skill when the user wants parallel agent execution, structured task decomposition, independent quality verification, or multi-step work that benefits from sub-agents running concurrently. Triggers on: 'teamforge', 'team mode', 'multi-agent', 'split into subtasks', 'verify the result', '用 teamforge', '团队模式', '多智能体协作', '并行处理'. Do NOT use for simple single-step tasks."
-version: 3.2.0
+version: 3.3.0
 license: MIT
 metadata:
   author: Community port (TeamForge CLI agent)
@@ -104,6 +104,33 @@ TeamForge 的 Worker 并行是"前台并行"（Zcode 平台限制），这意味
 
 **建议**：对于复杂任务，开启一个独立的 Zcode 对话来运行 TeamForge，避免在主对话中等待时卡死。
 
+## 平台兼容模式
+
+TeamForge 支持两种执行模式：
+
+**标准模式**（推荐）：使用 Unix 命令（ls, wc, grep, awk）+ Python 脚本
+- 适用：WSL2, Git Bash, macOS, Linux
+- 验证：`python scripts/teamforge_utils.py --count-lines <file>`
+
+**纯 Python 模式**（兜底）：所有操作使用 Python 脚本
+- 适用：Windows 原生 PowerShell（无 Unix 工具）
+- 自动检测：Leader 在 Phase 2 预检时执行 `ls` 命令，如果失败则切换到纯 Python 模式
+- 验证：全部使用 `python scripts/teamforge_utils.py` 和 `python scripts/validate_contract_ast.py`
+
+## 心跳机制（防止用户认为程序死机）
+
+Leader 在派发 Worker 后，**不能**静默等待。必须通过主对话定期输出进度心跳：
+
+```
+⏳ 心跳: Worker-Coder 运行中... (已执行 60 秒)
+⏳ 心跳: Worker-Tester 运行中... (已执行 60 秒)
+⏳ 心跳: Worker-Coder 运行中... (已执行 120 秒)
+```
+
+**频率**：每 30 秒输出一次心跳（如果 Worker 尚未返回）。
+**实现**：Leader 在派发后记录时间戳，通过 sleep + 循环检查 Worker 完成状态。
+**注意**：心跳仅用于用户感知，不消耗额外 Token。
+
 ## Required companion files
 
 This skill needs the `agents/` directory to work. The Leader agent will
@@ -204,6 +231,21 @@ If missing, see INSTALL.md.
 - 如果 JSON 包含 NaN/Infinity，Python json 模块会报错，需标记为"非标准 JSON"
 
 **Level 2 — 接口验证（推荐）**：
+
+**语言检测**：Leader 在调用 AST 验证前，**必须**先检测项目语言：
+
+```bash
+# 检测是否存在 Python 文件
+python scripts/teamforge_utils.py --check-exists src/*.py
+# 检测是否存在 JS/TS 文件
+python scripts/teamforge_utils.py --check-exists src/*.js src/*.ts
+```
+
+**验证策略**：
+- Python 项目 → 使用 `scripts/validate_contract_ast.py`（AST 解析）
+- JavaScript/TypeScript 项目 → 使用 Grep + Regex 模式匹配（标注"可能存在误报"）
+- 其他语言 → 使用 Grep + Regex 模式匹配（标注"AST 验证跳过"）
+
 - 文件行数检查：`python scripts/teamforge_utils.py --count-lines <file>`
 - 文件存在性检查：`python scripts/teamforge_utils.py --check-exists <file1> <file2> ...`
 - Python 函数验证：`python scripts/validate_contract_ast.py <file.py> <func1> <func2> ...`
@@ -375,6 +417,28 @@ Wave 2: Tester 写 tests/test_auth.py → prompt 中引用 "参考 src/auth.py �
 | Subtask 3 | 2 | ⏸️ BLOCKED | Subtask 2 | — |
 ```
 
+### Step 3.7: 三查机制（降低同模型偏见）
+
+在整合前，执行三层独立检查：
+
+**第一查：自查（Contract）**
+- Leader 执行 `python scripts/validate_contract_ast.py` 或 `python scripts/teamforge_utils.py --count-lines`
+- 不依赖 LLM，纯工具验证
+- 检查文件存在性、函数签名、行数
+
+**第二查：互查（Worker 交叉审查）**
+- 在 Wave 2 中，让 Worker-Coder 和 Worker-Tester 相互审查对方的产物
+- Coder 阅读 Tester 的测试用例，检查是否覆盖了所有边界
+- Tester 阅读 Coder 的实现，检查是否有隐藏的 bug
+- 利用不同角色的视角差异发现漏洞
+
+**第三查：终查（Verifier）**
+- Verifier 负责最终裁决
+- 使用对抗式验证（Checker + Skeptic + Judge）
+- 综合前两查的结果做出最终判断
+
+**效果**：三层相互独立，极大降低单一模型的认知偏见。
+
 ### Step 4: 收集子任务结果
 
 Leader 收到所有子智能体的摘要后，**自己整合**成初版交付物。
@@ -492,6 +556,19 @@ done
 - 部分文件缺失 → 标记对应 Worker 为 MISSING，触发重派
 - 所有文件缺失 → 从 Wave 1 重新开始
 
+**原子写入规则**：Leader 写入 `.teamforge_state_<session_uuid>.jsonl` 时，**必须**使用原子写入：
+
+1. 先写入临时文件 `.teamforge_state_<session_uuid>.tmp`
+2. 写入完成后，将 `.tmp` 重命名为 `.jsonl`
+3. 这确保了即使写入过程中断，原文件也不会损坏
+
+```bash
+# 写入临时文件
+echo '{"ts":"...",...}' >> .teamforge_state_<uuid>.tmp
+# 原子替换
+mv .teamforge_state_<uuid>.tmp .teamforge_state_<uuid>.jsonl
+```
+
 **JSONL 字段**：每行一个 JSON 对象，字段：
 - `ts`: ISO 时间戳
 - `wave`: Wave 编号
@@ -538,6 +615,27 @@ done
 ```
 
 **检索方式**：新任务启动时，Leader 在 Phase 1 可以用 `grep` 搜索 `.memory_index.jsonl` 中的 keywords，获取历史经验。这能在 0 Token 消耗下获得上下文。
+
+**语义匹配增强**（可选）：除了 grep 关键词匹配，Leader 可以使用 Python 的 `difflib` 进行近似匹配：
+
+```python
+python -c "
+import difflib, json, sys
+keyword = sys.argv[1]
+with open('.memory_index.jsonl') as f:
+    for line in f:
+        entry = json.loads(line)
+        ratio = difflib.SequenceMatcher(None, keyword, entry.get('summary','')).ratio()
+        if ratio > 0.3:
+            print(f'[{ratio:.0%}] {entry[\"task\"]}: {entry[\"summary\"][:50]}')
+" "重构"
+```
+
+如果找到匹配度 > 30% 的历史记录，Leader 应显式输出：
+```
+🔍 检测到相似历史任务: "重构支付模块" (匹配度 45%)
+是否希望我参考其架构？
+```
 
 **注意**：此步骤为可选，仅在项目目录下存在 `.memory_index.jsonl` 时执行。
 
