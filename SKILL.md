@@ -1,7 +1,7 @@
 ---
 name: teamforge
 description: "Recreates the TeamForge workflow (Leader + Workers + Verifier) inside Zcode 3.4.2+. Use this skill when the user wants parallel agent execution, structured task decomposition, independent quality verification, or multi-step work that benefits from sub-agents running concurrently. Triggers on: 'teamforge', 'team mode', 'multi-agent', 'split into subtasks', 'verify the result', '用 teamforge', '团队模式', '多智能体协作', '并行处理'. Do NOT use for simple single-step tasks."
-version: 3.4.0
+version: 3.5.0
 license: MIT
 metadata:
   author: Community port (TeamForge CLI agent)
@@ -137,17 +137,19 @@ TeamForge 支持两种执行模式：
 - 自动检测：Leader 在 Phase 2 预检时执行 `ls` 命令，如果失败则切换到纯 Python 模式
 - 验证：全部使用 `python scripts/teamforge_utils.py` 和 `python scripts/validate_contract_ast.py`
 
+> **Windows Python 路径**：如果 `python` 命令不可用，尝试使用 `py -3`（Windows Python 启动器）或直接指定 Python 完整路径（如 `C:\Users\user\AppData\Local\Programs\Python\Python312\python.exe`）。
+
 ## 状态检查点（替代心跳机制）
 
-由于 Zcode 平台限制，Leader 派发 Worker 后会同步阻塞等待，无法实现实时心跳。
+由于 Zcode 平台限制，Leader 派发 Worker 后会同步阻塞等待，无法实现实时心跳或被动轮询。
 
-**替代方案**：
+**当前方案**：
 1. Leader 在派发 Worker 后，**立即**输出一条状态信息：
    ```
-   ⏳ 已派发 3 个 Worker，预计等待 5 分钟，请勿关闭对话...
+   ⏳ 已派发 3 个 Worker，预计等待 5 分钟。界面将暂时冻结，请勿关闭对话。
    ```
-2. **被动轮询**（可选）：Worker 在执行过程中可以每 60 秒写入一个 `.heartbeat` 文件（内容为时间戳）。Leader 可以通过 `Glob .heartbeat` 检查 Worker 是否存活。
-3. **明确标注**：当前平台限制下，无法实现秒级心跳反馈。建议用户使用独立会话运行 TeamForge。
+2. **明确标注**：当前平台限制下，Leader 无法在等待期间执行额外命令。建议用户使用独立会话运行 TeamForge 以规避界面冻结。
+3. **超时判断**：如果超过预期时间仍未返回，用户可手动判断 Worker 是否存活。
 
 ## Required companion files
 
@@ -222,6 +224,15 @@ If missing, see INSTALL.md.
 >   - 其他语言 → Grep + Regex 模式匹配（标注"可能存在误报"）
 > ```
 
+> **CONTRACT 测试框架**: CONTRACT 必须声明测试框架，格式如下：
+>
+> ```markdown
+> ## 测试框架
+> - test_framework: pytest | jest | playwright | go_test | 其他
+> - 默认: pytest
+> - Leader 应在 CONTRACT 中明确指定测试框架
+> ```
+
 > **CONTRACT 智能验证**: Leader 在 Step 4 整合时，**必须**验证 Worker 产出是否遵守 CONTRACT。验证策略按优先级：
 
 **Level 1 — 结构验证（必须）**：
@@ -253,16 +264,22 @@ If missing, see INSTALL.md.
 **语言检测**：Leader 在调用 AST 验证前，**必须**先检测项目语言：
 
 ```bash
-# 检测是否存在 Python 文件
-python scripts/teamforge_utils.py --check-exists src/*.py
+# 检测是否存在 Python 文件（使用 Python glob 避免 shell 通配符展开问题）
+python -c "import glob; files=glob.glob('src/**/*.py', recursive=True); print(f'Python files: {len(files)}'); [print(f'  {f}') for f in files[:5]]"
 # 检测是否存在 JS/TS 文件
-python scripts/teamforge_utils.py --check-exists src/*.js src/*.ts
+python -c "import glob; files=glob.glob('src/**/*.js', recursive=True) + glob.glob('src/**/*.ts', recursive=True); print(f'JS/TS files: {len(files)}'); [print(f'  {f}') for f in files[:5]]"
 ```
 
 **验证策略**：
 - Python 项目 → 使用 `scripts/validate_contract_ast.py`（AST 解析）
 - JavaScript/TypeScript 项目 → 使用 Grep + Regex 模式匹配（标注"可能存在误报"）
 - 其他语言 → 使用 Grep + Regex 模式匹配（标注"AST 验证跳过"）
+
+**匹配调用**：Leader 使用以下命令匹配角色：
+```bash
+python scripts/teamforge_utils.py --match-role "实现 FastAPI 后端 API"
+# 输出: [{'role': 'worker-backend-architect', 'score': 0.67, 'matched': ['fastapi', '后端', 'api']}]
+```
 
 - 文件行数检查：`python scripts/teamforge_utils.py --count-lines <file>`
 - 文件存在性检查：`python scripts/teamforge_utils.py --check-exists <file1> <file2> ...`
@@ -574,29 +591,11 @@ done
 - 部分文件缺失 → 标记对应 Worker 为 MISSING，触发重派
 - 所有文件缺失 → 从 Wave 1 重新开始
 
-**原子写入规则**：Leader 写入 `.teamforge_state_<session_uuid>.jsonl` 时，**必须**使用原子写入：
-
-1. 先写入临时文件 `.teamforge_state_<session_uuid>.tmp`
-2. 写入完成后，将 `.tmp` 重命名为 `.jsonl`
-3. 这确保了即使写入过程中断，原文件也不会损坏
-
-```python
-# 使用 Python 原子写入（跨平台兼容）
-python -c "
-import json, os, tempfile
-data = {'ts': '...', 'wave': 1, 'task': 'subtask_1', 'status': 'done'}
-tmp = '.teamforge_state_<uuid>.tmp'
-final = '.teamforge_state_<uuid>.jsonl'
-with open(tmp, 'a', encoding='utf-8') as f:
-    f.write(json.dumps(data, ensure_ascii=False) + '\n')
-if os.path.exists(final):
-    os.replace(tmp, final)  # 原子替换
-else:
-    os.rename(tmp, final)   # 首次创建
-"
+**原子写入**：Leader 使用以下命令写入状态快照：
+```bash
+python scripts/teamforge_utils.py --write-state <session_uuid> <wave> <task> <status>
 ```
-
-或更简单的方式：Leader 直接使用 `python scripts/teamforge_utils.py --write-state` 调用。
+脚本内部处理跨平台的原子写入（.tmp → .jsonl）。
 
 **JSONL 字段**：每行一个 JSON 对象，字段：
 - `ts`: ISO 时间戳

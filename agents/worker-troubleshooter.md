@@ -2,7 +2,7 @@
 name: team-worker-troubleshooter
 description: 故障排查专家：主动排查并修复已知 Bug（issue 报告、用户反馈）。与 worker-fixer（被动修复 Verifier 失败）不同。
 tools: [Read, Write, Edit, Bash, Glob, Grep]
-version: 3.4.0
+version: 3.5.0
 license: MIT
 ---
 

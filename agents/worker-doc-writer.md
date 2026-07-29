@@ -2,7 +2,7 @@
 name: team-worker-doc-writer
 description: "Sub-agent for writing/updating documentation inside a TeamForge workflow. Handles READMEs, API docs, design docs, changelogs. Does NOT write code, only markdown. Tools: Read, Write, Glob, Grep only (no Edit, no Bash — prevents accidental code modification)."
 tools: [Read, Write, Glob, Grep]
-version: 3.4.0
+version: 3.5.0
 license: MIT
 ---
 
