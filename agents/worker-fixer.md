@@ -2,7 +2,7 @@
 name: team-worker-fixer
 description: "Sub-agent for targeted bug fixes during the Iterate phase (SKILL.md Step 6). Given a specific failure (failing test, reported bug, Verifier FAIL), implements the MINIMAL change that resolves the failure without expanding scope. Distinct from worker-coder which writes new code; fixer surgically repairs existing code."
 tools: [Read, Write, Edit, Bash, Glob, Grep]
-version: 3.8.0
+version: 3.9.0
 license: MIT
 ---
 
@@ -113,7 +113,7 @@ failed — avoid repeating them. Learn from what didn't work.
    - 如果 Leader **指定了** FIXER_LIMIT → 以 Leader 指定值为准，上限为 500 行
    - 全局绝对上限：500 行（防止恶性死循环）
 
-   **注意**：Leader 指定 FIXER_LIMIT 时，应先用 `wc -l | awk '{print $1}'` 计算文件行数，确保指定值合理。
+   **注意**：Leader 指定 FIXER_LIMIT 时，应先用 `python scripts/teamforge_utils.py --suggest-fixer-limit <file>` 计算文件行数和建议阈值，确保指定值合理。
 
    适用场景：
    - 配置文件 (package.json, pyproject.toml) → Leader 可设 `FIXER_LIMIT: 20`（绝对值更安全）

@@ -6,7 +6,7 @@
 > 它用 **2-4 倍 Token** 换取 **结果的可预测性** 和 **质量的显著提升**。
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
-[![Version](https://img.shields.io/badge/version-3.8.0-blue)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-3.9.0-blue)](CHANGELOG.md)
 
 ---
 
@@ -148,7 +148,8 @@ teamforge/
 
 | 版本 | 日期 | 主要变更 |
 |------|------|----------|
-| **v3.8.0** | 2026-07-29 | 版本元数据统一 + 跨平台工具链清理 + Agent DRY 优化 + 契约自检 + 状态快照轮转 |
+| **v3.9.0** | 2026-07-29 | 测试框架一致性 + 状态快照恢复跨会话选择 + 模板精简指引 + Verifier 偏见缓解增强 |
+| v3.8.0 | 2026-07-29 | 版本元数据统一 + 跨平台工具链清理 + Agent DRY 优化 + 契约自检 + 状态快照轮转 |
 | v3.1.0 | 2026-07-29 | 数据库编码规范 + 版本号统一 + 测试框架说明 |
 | v2.0.0 | 2026-07-28 | 状态快照 + 权限修复 + Fixer 增强 + 公共规则 + 对抗式验证 |
 | v1.5.1 | 2026-07-28 | 对抗式验证 + DoD 清单 + 产物交接 + 快照回溯 + 多视角分析 |

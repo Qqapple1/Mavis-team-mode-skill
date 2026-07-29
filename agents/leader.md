@@ -2,7 +2,7 @@
 name: team-leader
 description: "Coordinates a TeamForge workflow in Zcode. Receives a complex user task, decomposes it into parallel sub-tasks, dispatches sub-agents, integrates their outputs, runs verification, and iterates until the deliverable meets all acceptance criteria. Use when invoking the `teamforge` skill."
 tools: [Agent, Read, Write, Edit, Bash, Glob, Grep, WebSearch, WebFetch]
-version: 3.8.0
+version: 3.9.0
 license: MIT
 ---
 
@@ -288,7 +288,7 @@ Leader 在派发每个 Worker 时，prompt 中**必须**包含以下固定后缀
 
 **执行清单**：
 1. 读取每个 Worker 的 `output_manifest_*.json`
-2. 文件存在性检测（`ls` 命令）
+2. 文件存在性检测（`python scripts/teamforge_utils.py --check-exists <files>`）
 3. 整合摘要为统一交付物
 4. 逐项对照 DoD checklist
 5. CONTRACT 智能验证（Level 1-3）
@@ -330,14 +330,12 @@ python scripts/teamforge_utils.py --write-state <session_uuid> <wave> <task> <st
 3. 3 轮后仍 FAIL → 输出最小可用版本 + 剩余问题
 4. 用户可随时强制退出（停止迭代/跳过验证/暂停）
 
-**Leader 预计算 Fixer 阈值（必须）**：
-
-Leader 在派发 Fixer 之前，**必须**执行以下步骤：
-1. 用 `python scripts/teamforge_utils.py --count-lines <file>` 计算文件行数
-2. 计算阈值：min(文件行数 × 20%, 50)
-3. 在 Fixer 的 prompt 中显式写出：`FIXER_LIMIT: 50（绝对值）`
-
-**简化规则**：若文件行数较少（<250行），可直接使用默认阈值 50，无需手动计算。仅当文件超过 250 行时，才需要执行 `python scripts/teamforge_utils.py --count-lines <file>` 计算。
+**Fixer 阈值计算（必须）**：
+```bash
+python scripts/teamforge_utils.py --suggest-fixer-limit <file>
+# 输出: 文件行数: 300, 建议阈值: 50
+```
+将输出的"建议阈值"直接写入 Fixer 的 prompt 中。
 
 **不要依赖默认公式**，直接告诉 Fixer 具体数字。
 

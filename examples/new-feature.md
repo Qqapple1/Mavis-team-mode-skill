@@ -96,6 +96,8 @@ Leader 先发布接口契约，再拆子任务：
   1. tag 提取 selector
   2. filter 逻辑
   3. 标签点击交互
+
+  所有测试代码必须使用 CONTRACT 中声明的 test_framework 字段指定的框架编写。
 - **acceptance**:
   - [ ] 至少 3 个单元测试
   - [ ] 至少 1 个组件集成测试

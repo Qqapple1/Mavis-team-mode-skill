@@ -2,7 +2,7 @@
 name: team-worker-engineering-mcp-builder
 description: MCP Server开发专家，负责设计和实现Model Context Protocol工具服务器，精通FastMCP/Python SDK、工具命名最佳实践、Zod验证和JSON/Markdown双输出格式
 tools: [Read, Write, Edit, Bash, Glob, Grep]
-version: 3.8.0
+version: 3.9.0
 license: MIT
 ---
 

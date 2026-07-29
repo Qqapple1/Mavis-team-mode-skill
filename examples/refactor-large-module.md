@@ -90,6 +90,8 @@ category: refactor
 ### Subtask 6: 跑完整测试
 - **type**: general-purpose
 - **prompt**: 跑 `pytest tests/`，报告所有通过/失败的测试。
+
+  所有测试代码必须使用 CONTRACT 中声明的 test_framework 字段指定的框架编写。
 - **acceptance**:
   - [ ] 所有原有测试通过
   - [ ] 没有新的 test failure

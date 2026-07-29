@@ -1,7 +1,7 @@
 ---
 name: teamforge
 description: "Recreates the TeamForge workflow (Leader + Workers + Verifier) inside Zcode 3.4.2+. Use this skill when the user wants parallel agent execution, structured task decomposition, independent quality verification, or multi-step work that benefits from sub-agents running concurrently. Triggers on: 'teamforge', 'team mode', 'multi-agent', 'split into subtasks', 'verify the result', '用 teamforge', '团队模式', '多智能体协作', '并行处理'. Do NOT use for simple single-step tasks."
-version: 3.8.0
+version: 3.9.0
 license: MIT
 metadata:
   author: Community port (TeamForge CLI agent)
@@ -307,7 +307,21 @@ Leader 在发布 CONTRACT 后、派发 Worker 之前，**必须**对 CONTRACT �
 python scripts/teamforge_utils.py --validate-contract CONTRACT.md
 ```
 
-**自检失败处理**：如果自检发现矛盾或缺失，Leader 必须自行修正 CONTRACT，而不是强行派发 Worker。
+**检查清单**：
+1. 结构检查：是否包含 primary_language、test_framework、files_created 字段
+2. 命名规范：根据 primary_language 检查函数名风格（Python snake_case / JS camelCase）
+3. 冲突检测：检查是否有重复的 CLI 参数名
+4. 产物清单：files_created 是否非空
+
+**输出格式**：
+```
+✅ primary_language: 存在
+✅ test_framework: 存在
+✅ 函数命名规范 (snake_case)
+⚠️ files_created: 缺失
+```
+
+**失败处理**：Leader 应自动修正缺失字段，而非中断流程。
 
 ### Step 2.9: 拆解质量自检
 
@@ -405,6 +419,13 @@ CONTEXT: [相关文件列表]
 - 旧策略：每个 Worker prompt ~2000 Token（注入完整模板）
 - 新策略：每个 Worker prompt ~300 Token（只写核心指令）
 - 3 个 Worker 节省 ~5100 Token（约 60-70%）
+
+**模板精简指引**：角色模板文件应只包含：
+- YAML frontmatter（name, description, tools, version）
+- 角色核心使命和专业领域
+- 特有的行为规则（如 Coder 的"不重构无关代码"）
+
+通用行为规范（沟通风格、协作规范、安全底线）**不应**写在角色模板中，而应通过 `references/core-rules.md` 引用。这确保维护成本最低。
 
 ### 文件锁协议（Leader 预分配机制）
 
@@ -581,10 +602,21 @@ python scripts/teamforge_utils.py --write-state <session_uuid> 1 subtask_1 done 
 python scripts/teamforge_utils.py --write-state <session_uuid> 1 subtask_2 done --files "tests/test.py"
 ```
 
-**恢复流程**：逐行读取 `.teamforge_state_<session_uuid>.jsonl`，每行解析为独立 JSON 对象，重建最新状态：
-1. 解析 JSONL，重建每个子任务的最新状态
-2. 检查已完成子任务的产出文件是否仍然存在
-3. 从最后一个未完成的 Wave 继续派发
+**恢复流程**：当用户说"恢复上次任务"时，Leader **必须**：
+
+1. 列出最近 3 个状态文件及其时间戳：
+```bash
+python scripts/teamforge_utils.py --list-states
+# 输出:
+# 1. .teamforge_state_20260729_143000_a3b7.jsonl (2026-07-29 14:30, 5 条记录)
+# 2. .teamforge_state_20260729_100000_x9y2.jsonl (2026-07-29 10:00, 12 条记录)
+# 3. .teamforge_state_20260728_200000_m1n8.jsonl (2026-07-28 20:00, 8 条记录)
+```
+
+2. 询问用户选择哪个会话
+3. 用户确认后读取对应文件，逐行解析 JSONL，重建每个子任务的最新状态
+4. 检查已完成子任务的产出文件是否仍然存在
+5. 从最后一个未完成的 Wave 继续派发
 
 **文件一致性校验**：恢复时 Leader **必须**检查每个已完成子任务的产出文件：
 
@@ -747,8 +779,7 @@ This skill is **model-agnostic**. See `references/deepseek-setup.md`.
 
 ### Windows users
 
-This SKILL.md uses Unix-style commands in examples (e.g. `ls`, `ln -s`,
-`~/.zcode/...`). For Windows users there are two paths, both fully
+This SKILL.md uses cross-platform Python commands via `python scripts/teamforge_utils.py` for all operations. For Windows users there are two paths, both fully
 supported — see [`docs/WINDOWS.md`](docs/WINDOWS.md) for detailed
 instructions:
 

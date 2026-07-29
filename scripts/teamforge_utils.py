@@ -13,6 +13,8 @@ TeamForge 跨平台工具函数库
   python scripts/teamforge_utils.py --rotate-state <session_uuid>
   python scripts/teamforge_utils.py --glob <pattern>
   python scripts/teamforge_utils.py --grep <pattern> <file>
+  python scripts/teamforge_utils.py --suggest-fixer-limit <file>
+  python scripts/teamforge_utils.py --list-states
   python scripts/teamforge_utils.py --self-check
 """
 
@@ -378,6 +380,43 @@ def main():
                 if pattern in line:
                     print(f"{filepath}:{i}: {line.rstrip()}")
 
+    elif cmd == "--suggest-fixer-limit":
+        if len(sys.argv) < 3:
+            print("用法: --suggest-fixer-limit <file>")
+            sys.exit(1)
+        filepath = sys.argv[2]
+        lines = get_file_lines(filepath)
+        if lines == -1:
+            print(f"❌ 文件不存在: {filepath}")
+            sys.exit(1)
+        default_limit = min(int(lines * 0.2), 50)
+        print(f"文件行数: {lines}")
+        print(f"建议阈值: {default_limit}")
+        print(f"公式: min({lines} * 20%, 50) = {default_limit}")
+
+    elif cmd == "--list-states":
+        import glob as _glob
+        from datetime import datetime
+        pattern = ".teamforge_state_*.jsonl"
+        files = _glob.glob(pattern)
+        if not files:
+            print("未找到状态文件")
+            sys.exit(0)
+
+        # 按修改时间倒序排列
+        files.sort(key=lambda f: os.path.getmtime(f), reverse=True)
+        for i, fpath in enumerate(files[:3], 1):
+            # 从文件名提取 session_uuid
+            basename = os.path.basename(fpath)
+            uuid_part = basename.replace(".teamforge_state_", "").replace(".jsonl", "")
+            # 统计行数
+            with open(fpath, 'r', encoding='utf-8', errors='ignore') as f:
+                line_count = sum(1 for _ in f)
+            # 获取修改时间
+            mtime = os.path.getmtime(fpath)
+            ts = datetime.fromtimestamp(mtime).strftime("%Y-%m-%d %H:%M")
+            print(f"{i}. {basename} ({ts}, {line_count} 条记录)")
+
     elif cmd == "--self-check":
         print("TeamForge Utils 自检...")
         print(f"Python: {sys.version}")
@@ -386,7 +425,8 @@ def main():
         # 检查所有子命令
         commands = ["--count-lines", "--check-exists", "--strip-ansi", "--match-role",
                     "--write-state", "--check-multi-model", "--search-memory", "--validate-ast",
-                    "--validate-contract", "--rotate-state", "--glob", "--grep"]
+                    "--validate-contract", "--rotate-state", "--glob", "--grep", "--list-states",
+                    "--suggest-fixer-limit"]
 
         for subcmd in commands:
             print(f"  ✅ {subcmd}: 可用")

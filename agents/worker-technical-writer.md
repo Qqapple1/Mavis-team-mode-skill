@@ -2,7 +2,7 @@
 name: team-worker-technical-writer
 description: 技术文档工程师，负责API文档、架构文档、用户指南编写和文档一致性维护
 tools: [Read, Write, Edit, Bash, Glob, Grep]
-version: 3.8.0
+version: 3.9.0
 license: MIT
 ---
 
